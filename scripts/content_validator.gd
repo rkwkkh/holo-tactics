@@ -80,6 +80,18 @@ static func validate(catalog: Dictionary) -> Array[String]:
 				for action in overrides:
 					if not action is String or not _is_positive_number(overrides[action]):
 						errors.append("%s has an invalid AI weight override" % wave.get("id", "<missing-id>"))
+		if wave is Dictionary and wave.has("reinforcements"):
+			var reinforcements: Variant = wave.reinforcements
+			if not reinforcements is Array:
+				errors.append("%s reinforcements must be an array" % wave.get("id", "<missing-id>"))
+			else:
+				for group in reinforcements:
+					var spawn: Variant = group.get("spawn", []) if group is Dictionary else null
+					var enemy_id: Variant = group.get("enemy_id", "") if group is Dictionary else null
+					if not group is Dictionary or unit_teams.get(enemy_id) != "enemy" or not _is_positive_integer(group.get("count")) or not _is_nonnegative_number(group.get("at")) or not _is_integer_cell(spawn):
+						errors.append("%s has invalid reinforcement data" % wave.get("id", "<missing-id>"))
+					elif not wave.get("references", []).has(enemy_id):
+						errors.append("%s reinforcement enemy must be referenced" % wave.get("id", "<missing-id>"))
 	for stage in stage_items:
 		if not stage is Dictionary:
 			continue
@@ -117,6 +129,12 @@ static func validate(catalog: Dictionary) -> Array[String]:
 							if spawn.x >= columns or blocked.has(spawn) or GridPathfinder.find_path(spawn, Vector2i(int(core_cell[0]), int(core_cell[1])), columns, rows, blocked).is_empty():
 								errors.append("%s blocks a required wave route" % stage.get("id", "<missing-id>"))
 								break
+						for group in wave.get("reinforcements", []):
+							if not group is Dictionary or not _is_integer_cell(group.get("spawn")):
+								continue
+							var reinforcement_spawn := Vector2i(int(group.spawn[0]), int(group.spawn[1]))
+							if blocked.has(reinforcement_spawn) or reinforcement_spawn == Vector2i(int(core_cell[0]), int(core_cell[1])) or GridPathfinder.find_path(reinforcement_spawn, Vector2i(int(core_cell[0]), int(core_cell[1])), columns, rows, blocked).is_empty():
+								errors.append("%s blocks a reinforcement route" % stage.get("id", "<missing-id>"))
 		var wave_ids := _ids_in(wave_items)
 		var references: Variant = stage.get("references", [])
 		var has_wave := false
@@ -151,6 +169,12 @@ static func _is_nonnegative_integer(value: Variant) -> bool:
 
 static func _is_positive_number(value: Variant) -> bool:
 	return (value is int or value is float) and float(value) > 0.0
+
+static func _is_nonnegative_number(value: Variant) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and float(value) >= 0.0
+
+static func _is_integer_cell(value: Variant) -> bool:
+	return value is Array and value.size() == 2 and _is_nonnegative_integer(value[0]) and _is_nonnegative_integer(value[1]) and int(value[0]) < BattleModel.COLUMNS and int(value[1]) < BattleModel.ROWS
 
 static func _find_dependency_cycles(categories: Dictionary) -> Array[String]:
 	var graph: Dictionary = {}

@@ -129,7 +129,8 @@ func _tick() -> void:
 		rest_timer.start()
 	if battle.phase == "finished":
 		rest_timer.stop()
-		store.clear_checkpoint()
+		if battle.battle_result != "safe_abort":
+			store.clear_checkpoint()
 	_refresh()
 
 func _on_rest_tick() -> void:
@@ -168,7 +169,10 @@ func _refresh() -> void:
 		if not status_override.is_empty():
 			status.text = status_override
 		elif battle.phase == "finished":
-			status.text = "수성 성공!" if battle.battle_result == "victory" else "핵심이 파괴되었습니다"
+			match battle.battle_result:
+				"victory": status.text = "전투에서 승리했습니다!"
+				"safe_abort": status.text = "증원 출현 실패로 전투를 안전 종료했습니다. 마지막 체크포인트에서 다시 시작할 수 있습니다."
+				_: status.text = "전투에서 패배했습니다"
 		elif battle.phase == "combat":
 			status.text = "전투 중 · 선택 유닛을 누른 뒤 이동할 칸을 선택하세요"
 		else:

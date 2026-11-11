@@ -22,6 +22,8 @@ var units: Array[Dictionary] = []
 var enemies: Array[Dictionary] = []
 var rewarded_waves: Array[int] = []
 var blocked_cells: Dictionary = {}
+var wave_elapsed := 0.0
+var pending_reinforcements: Array[Dictionary] = []
 
 func _init(selected_stage_id: String = STAGE_ID) -> void:
 	stage_id = selected_stage_id
@@ -80,19 +82,23 @@ func start_wave(store: CheckpointStore) -> bool:
 		return false
 	phase = "combat"
 	var wave_definition: Dictionary = waves[wave - 1]
-	var enemy_definition: Dictionary = _unit_by_content_id(wave_definition.enemy_id)
-	var ai_profile: Dictionary = ai_profiles.get(enemy_definition.get("ai_profile_id", ""), {})
-	var ai_weights: Dictionary = ai_profile.get("weights", {}).duplicate()
-	for action in wave_definition.get("ai_weight_overrides", {}):
-		ai_weights[action] = wave_definition.ai_weight_overrides[action]
+	wave_elapsed = 0.0
+	pending_reinforcements.clear()
 	for i in wave_definition.count:
 		var spawn := Vector2i(2 + i * 2, int(stage.get("enemy_spawn_row", 0)))
-		enemies.append({"id": next_id, "kind": enemy_definition.kind, "cell": spawn, "hp": enemy_definition.hp, "damage": enemy_definition.damage, "range": enemy_definition.range, "ai_profile_id": enemy_definition.ai_profile_id, "ai_weights": ai_weights.duplicate(), "cooldown": 0.0, "alive": true})
-		next_id += 1
+		if not _spawn_enemy(wave_definition.enemy_id, spawn, wave_definition):
+			phase = "finished"
+			battle_result = "safe_abort"
+			return false
+	for reinforcement in wave_definition.get("reinforcements", []):
+		pending_reinforcements.append({"enemy_id": reinforcement.enemy_id, "remaining": reinforcement.count, "spawn": Vector2i(reinforcement.spawn[0], reinforcement.spawn[1]), "at": float(reinforcement.at), "attempts": 0})
 	return true
 
 func tick(delta: float) -> void:
 	if phase != "combat":
+		return
+	wave_elapsed += delta
+	if not _advance_reinforcements():
 		return
 	for unit in units:
 		if not unit.alive:
@@ -140,7 +146,7 @@ func tick(delta: float) -> void:
 	elif stage.mode == "siege" and wave == waves.size() and core_hp <= 0.0:
 		phase = "finished"
 		battle_result = "victory"
-	elif enemies.all(func(enemy: Dictionary) -> bool: return not enemy.alive) and not (stage.mode == "siege" and wave == waves.size()):
+	elif pending_reinforcements.is_empty() and enemies.all(func(enemy: Dictionary) -> bool: return not enemy.alive) and not (stage.mode == "siege" and wave == waves.size()):
 		if not rewarded_waves.has(wave):
 			combat_gold += stage.wave_reward
 			rewarded_waves.append(wave)
@@ -155,6 +161,8 @@ func tick(delta: float) -> void:
 					unit.hp = balance_seed[unit.kind].hp
 					unit.cooldown = 0.0
 			enemies.clear()
+			pending_reinforcements.clear()
+			wave_elapsed = 0.0
 
 func to_dict() -> Dictionary:
 	var saved_units: Array[Dictionary] = []
@@ -262,6 +270,52 @@ func _unit_by_content_id(content_id: String) -> Dictionary:
 		if unit.id == content_id:
 			return unit
 	return {}
+
+func _spawn_enemy(content_id: String, cell: Vector2i, wave_definition: Dictionary) -> bool:
+	var enemy_definition := _unit_by_content_id(content_id)
+	if enemy_definition.is_empty():
+		return false
+	var spawn := Vector2i(-1, -1)
+	for distance in COLUMNS + ROWS:
+		for y in ROWS:
+			for x in COLUMNS:
+				var candidate := Vector2i(x, y)
+				if absi(candidate.x - cell.x) + absi(candidate.y - cell.y) == distance and candidate != core_cell and not blocked_cells.has(candidate) and not _occupied(candidate):
+					spawn = candidate
+					break
+			if spawn.x >= 0:
+				break
+		if spawn.x >= 0:
+			break
+	if spawn.x < 0:
+		return false
+	var ai_profile: Dictionary = ai_profiles.get(enemy_definition.get("ai_profile_id", ""), {})
+	var ai_weights: Dictionary = ai_profile.get("weights", {}).duplicate()
+	for action in wave_definition.get("ai_weight_overrides", {}):
+		ai_weights[action] = wave_definition.ai_weight_overrides[action]
+	enemies.append({"id": next_id, "kind": enemy_definition.kind, "cell": spawn, "hp": enemy_definition.hp, "damage": enemy_definition.damage, "range": enemy_definition.range, "ai_profile_id": enemy_definition.ai_profile_id, "ai_weights": ai_weights, "cooldown": 0.0, "alive": true})
+	next_id += 1
+	return true
+
+func _advance_reinforcements() -> bool:
+	var wave_definition: Dictionary = waves[wave - 1]
+	for index in range(pending_reinforcements.size() - 1, -1, -1):
+		var reinforcement: Dictionary = pending_reinforcements[index]
+		if wave_elapsed < reinforcement.at:
+			continue
+		if _spawn_enemy(reinforcement.enemy_id, reinforcement.spawn, wave_definition):
+			reinforcement.remaining -= 1
+			reinforcement.attempts = 0
+			if reinforcement.remaining <= 0:
+				pending_reinforcements.remove_at(index)
+		else:
+			reinforcement.attempts += 1
+			if reinforcement.attempts >= 6:
+				phase = "finished"
+				battle_result = "safe_abort"
+				return false
+			reinforcement.at = wave_elapsed + 0.5
+	return true
 
 func _occupied(cell: Vector2i) -> bool:
 	for item in units + enemies:

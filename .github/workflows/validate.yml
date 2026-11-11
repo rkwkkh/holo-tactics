@@ -16,6 +16,9 @@ jobs:
       - name: Import project
         run: godot --headless --editor --path . --quit
       - name: Run unit tests
-        run: godot --headless --path . --script res://tests/run.gd
+        run: |
+          output="$(godot --headless --path . --script res://tests/run.gd 2>&1)"
+          echo "$output"
+          grep -q "All headless project tests passed" <<< "$output"
       - name: Validate content (errors block CI)
         run: godot --headless --path . --script res://scripts/validate_content.gd

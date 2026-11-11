@@ -25,6 +25,15 @@ func _initialize() -> void:
 	assert(ContentValidator.validate(ai_override_catalog).is_empty())
 	ai_override_catalog.categories.waves[0].ai_weight_overrides = "invalid"
 	assert(ContentValidator.validate(ai_override_catalog).any(func(error): return error.contains("AI weight overrides")))
+	var reinforcement_catalog: Dictionary = seeded_catalog.duplicate(true)
+	reinforcement_catalog.categories.waves[0].reinforcements = [{"enemy_id": "enemy.goblin", "count": 2, "at": 1.0, "spawn": [2, 0]}]
+	assert(ContentValidator.validate(reinforcement_catalog).is_empty())
+	reinforcement_catalog.categories.waves[0].reinforcements[0].spawn = [8, 0]
+	assert(ContentValidator.validate(reinforcement_catalog).any(func(error): return error.contains("invalid reinforcement data")))
+	var blocked_reinforcement_route: Dictionary = seeded_catalog.duplicate(true)
+	blocked_reinforcement_route.categories.waves[0].reinforcements = [{"enemy_id": "enemy.goblin", "count": 1, "at": 1.0, "spawn": [4, 0]}]
+	blocked_reinforcement_route.categories.stages[0].blocked_cells.append([4, 0])
+	assert(ContentValidator.validate(blocked_reinforcement_route).any(func(error): return error.contains("blocks a reinforcement route")))
 	var blocked_route_catalog: Dictionary = seeded_catalog.duplicate(true)
 	blocked_route_catalog.categories.stages[0].blocked_cells.clear()
 	for x in 8:
@@ -36,6 +45,38 @@ func _initialize() -> void:
 	var cyclic := {"content_version": 1, "schema_version": 1, "categories": {"research": [{"id": "research.a", "dependencies": ["research.b"]}, {"id": "research.b", "dependencies": ["research.a"]}]}}
 	assert(ContentValidator.validate(cyclic).any(func(error): return error.contains("cyclic dependency")))
 	assert(ProjectVersions.CONTENT_VERSION == 1 and ProjectVersions.SCHEMA_VERSION == 1 and ProjectVersions.SAVE_VERSION == 1)
+	var reinforcement_test := BattleModel.new()
+	reinforcement_test.waves[0].count = 1
+	reinforcement_test.waves[0].reinforcements = [{"enemy_id": "enemy.goblin", "count": 2, "at": 1.0, "spawn": [2, 0]}]
+	var reinforcement_store := CheckpointStore.new("user://m2_reinforcement_test.json")
+	assert(reinforcement_test.start_wave(reinforcement_store))
+	reinforcement_test.enemies[0].alive = false
+	reinforcement_test.tick(0.5)
+	assert(reinforcement_test.phase == "combat" and reinforcement_test.pending_reinforcements.size() == 1)
+	reinforcement_test.enemies[0].alive = true
+	reinforcement_test.enemies[0].cell = Vector2i(2, 0)
+	reinforcement_test.wave_elapsed = 1.0
+	assert(reinforcement_test._advance_reinforcements())
+	assert(reinforcement_test.pending_reinforcements.size() == 1 and reinforcement_test.pending_reinforcements[0].remaining == 1)
+	assert(reinforcement_test.enemies[1].cell != Vector2i(2, 0))
+	assert(reinforcement_test._advance_reinforcements())
+	assert(reinforcement_test.pending_reinforcements.is_empty() and reinforcement_test.enemies.size() == 3)
+	var failed_reinforcement := BattleModel.new()
+	failed_reinforcement.waves[0].count = 1
+	failed_reinforcement.waves[0].reinforcements = [{"enemy_id": "enemy.goblin", "count": 1, "at": 0.0, "spawn": [0, 0]}]
+	var failed_store := CheckpointStore.new("user://m2_failed_reinforcement_test.json")
+	assert(failed_reinforcement.start_wave(failed_store))
+	failed_reinforcement.enemies[0].alive = false
+	for y in BattleModel.ROWS:
+		for x in BattleModel.COLUMNS:
+			failed_reinforcement.blocked_cells[Vector2i(x, y)] = true
+	for attempt in 6:
+		failed_reinforcement.wave_elapsed += 0.5
+		assert(not failed_reinforcement._advance_reinforcements() if attempt == 5 else failed_reinforcement._advance_reinforcements())
+	assert(failed_reinforcement.phase == "finished" and failed_reinforcement.battle_result == "safe_abort")
+	assert(failed_store.load_checkpoint().phase == "preparation" and failed_reinforcement.combat_gold == failed_reinforcement.stage.start_resource)
+	reinforcement_store.clear_checkpoint()
+	failed_store.clear_checkpoint()
 	var battle := BattleModel.new()
 	assert(battle.deploy("swordsman", Vector2i(3, 8)))
 	assert(not battle.deploy("swordsman", Vector2i(3, 5)))

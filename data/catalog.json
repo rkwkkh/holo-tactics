@@ -14,11 +14,13 @@
     "obstacles": [],
     "waves": [
       {"id": "wave.m1.1", "enemy_id": "enemy.goblin", "count": 2, "references": ["enemy.goblin"], "dependencies": []},
-      {"id": "wave.m1.2", "enemy_id": "enemy.goblin", "count": 3, "references": ["enemy.goblin"], "dependencies": []}
+      {"id": "wave.m1.2", "enemy_id": "enemy.goblin", "count": 3, "references": ["enemy.goblin"], "dependencies": []},
+      {"id": "wave.m2.siege.1", "enemy_id": "enemy.goblin", "count": 2, "references": ["enemy.goblin"], "dependencies": []},
+      {"id": "wave.m2.siege.2", "enemy_id": "enemy.goblin", "count": 2, "reinforcements": [{"enemy_id": "enemy.goblin", "count": 1, "at": 3.0, "spawn": [2, 2]}], "references": ["enemy.goblin"], "dependencies": []}
     ],
     "stages": [
       {"id": "stage.m1.frontier", "mode": "defense", "columns": 8, "rows": 10, "core_cell": [4, 9], "blocked_cells": [[3, 5], [4, 5]], "core_hp": 300, "start_resource": 160, "kill_reward": 10, "wave_reward": 40, "intermission_seconds": 30, "references": ["unit.swordsman", "unit.archer", "wave.m1.1", "wave.m1.2"], "dependencies": []},
-      {"id": "stage.m2.siege", "mode": "siege", "columns": 8, "rows": 10, "core_cell": [4, 0], "blocked_cells": [[3, 4], [4, 4]], "enemy_spawn_row": 2, "core_hp": 100, "start_resource": 160, "kill_reward": 10, "wave_reward": 30, "intermission_seconds": 30, "references": ["unit.swordsman", "unit.archer", "wave.m1.1", "wave.m1.2"], "dependencies": []}
+      {"id": "stage.m2.siege", "mode": "siege", "columns": 8, "rows": 10, "core_cell": [4, 0], "blocked_cells": [[3, 4], [4, 4]], "enemy_spawn_row": 2, "core_hp": 100, "start_resource": 160, "kill_reward": 10, "wave_reward": 30, "intermission_seconds": 30, "references": ["unit.swordsman", "unit.archer", "wave.m2.siege.1", "wave.m2.siege.2"], "dependencies": []}
     ],
     "research": [],
     "ai_profiles": [
