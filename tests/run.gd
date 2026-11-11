@@ -1,16 +1,159 @@
 extends SceneTree
 
 func _initialize() -> void:
-	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "references": ["skill.slash"], "dependencies": []}], "skills": [{"id": "skill.slash", "references": [], "dependencies": []}]}}
+	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "team": "ally", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash"], "dependencies": []}], "skills": [{"id": "skill.slash", "references": [], "dependencies": []}]}}
 	assert(ContentValidator.validate(valid).is_empty())
 	var duplicate := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "same"}], "skills": [{"id": "same"}]}}
 	assert(ContentValidator.validate(duplicate).any(func(error): return error.contains("duplicate content id")))
 	var dangling := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.a", "references": ["missing"]}]}}
 	assert(ContentValidator.validate(dangling).any(func(error): return error.contains("unresolved reference")))
+	var missing_dependency := {"content_version": 1, "schema_version": 1, "categories": {"research": [{"id": "research.a", "dependencies": ["missing"]}]}}
+	assert(ContentValidator.validate(missing_dependency).any(func(error): return error.contains("unresolved dependency")))
 	var invalid_version := {"content_version": 1.5, "schema_version": 1, "categories": {}}
 	assert(ContentValidator.validate(invalid_version).any(func(error): return error.contains("content_version")))
+	var unsupported_version := {"content_version": 2, "schema_version": 1, "categories": {}}
+	assert(ContentValidator.validate(unsupported_version).any(func(error): return error.contains("unsupported content_version")))
+	var invalid_category := {"content_version": 1, "schema_version": 1, "categories": {"waves": "bad"}}
+	assert(ContentValidator.validate(invalid_category).any(func(error): return error.contains("category waves")))
+	var route := GridPathfinder.find_path(Vector2i(0, 1), Vector2i(4, 1), 5, 3, {Vector2i(2, 1): true})
+	assert(not route.is_empty() and route[-1] == Vector2i(4, 1) and not route.has(Vector2i(2, 1)))
+	assert(GridPathfinder.find_path(Vector2i(0, 0), Vector2i(2, 0), 3, 1, {Vector2i(1, 0): true}).is_empty())
+	var seeded_catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/catalog.json"))
+	assert(ContentValidator.validate(seeded_catalog).is_empty())
+	var ai_override_catalog: Dictionary = seeded_catalog.duplicate(true)
+	ai_override_catalog.categories.waves[0].ai_weight_overrides = {"objective": 1.5}
+	assert(ContentValidator.validate(ai_override_catalog).is_empty())
+	ai_override_catalog.categories.waves[0].ai_weight_overrides = "invalid"
+	assert(ContentValidator.validate(ai_override_catalog).any(func(error): return error.contains("AI weight overrides")))
+	var blocked_route_catalog: Dictionary = seeded_catalog.duplicate(true)
+	blocked_route_catalog.categories.stages[0].blocked_cells.clear()
+	for x in 8:
+		blocked_route_catalog.categories.stages[0].blocked_cells.append([x, 1])
+	assert(ContentValidator.validate(blocked_route_catalog).any(func(error): return error.contains("required wave route")))
+	var core_block_catalog: Dictionary = seeded_catalog.duplicate(true)
+	core_block_catalog.categories.stages[0].blocked_cells.append([4, 9])
+	assert(ContentValidator.validate(core_block_catalog).any(func(error): return error.contains("blocks its core cell")))
 	var cyclic := {"content_version": 1, "schema_version": 1, "categories": {"research": [{"id": "research.a", "dependencies": ["research.b"]}, {"id": "research.b", "dependencies": ["research.a"]}]}}
 	assert(ContentValidator.validate(cyclic).any(func(error): return error.contains("cyclic dependency")))
 	assert(ProjectVersions.CONTENT_VERSION == 1 and ProjectVersions.SCHEMA_VERSION == 1 and ProjectVersions.SAVE_VERSION == 1)
-	print("M0 tests passed")
+	var battle := BattleModel.new()
+	assert(battle.deploy("swordsman", Vector2i(3, 8)))
+	assert(not battle.deploy("swordsman", Vector2i(3, 5)))
+	assert(not battle.deploy("archer", Vector2i(3, 8)))
+	var store := CheckpointStore.new("user://m0_checkpoint_test.json")
+	assert(battle.start_wave(store))
+	assert(battle.phase == "combat")
+	var disk_snapshot := store.load_checkpoint()
+	var restored := BattleModel.new()
+	assert(restored.restore(disk_snapshot))
+	assert(restored.phase == "preparation" and restored.units[0].cell == Vector2i(3, 8))
+	var incompatible := disk_snapshot.duplicate(true)
+	incompatible.schema_version = ProjectVersions.SCHEMA_VERSION + 1
+	assert(not restored.restore(incompatible))
+	assert(restored.wave == 1 and restored.units.size() == 1)
+	assert(store.save_checkpoint({"revision": 2}))
+	assert(store.load_checkpoint().revision == 2)
+	assert(battle.move_unit(1, Vector2i(4, 7)))
+	assert(battle.units[0].cell == Vector2i(3, 8))
+	battle.enemies.resize(1)
+	battle.enemies[0].cell = Vector2i(3, 7)
+	battle.enemies[0].hp = 1.0
+	battle.units[0].cell = Vector2i(3, 8)
+	battle.units[0].destination = Vector2i(3, 8)
+	battle.tick(1.0)
+	assert(battle.enemies.is_empty())
+	assert(battle.wave == 2 and battle.phase == "preparation")
+	assert(battle.rewarded_waves == [1])
+	assert(battle.start_wave(store))
+	for enemy in battle.enemies:
+		enemy.alive = false
+	battle.tick(0.2)
+	assert(battle.phase == "finished" and battle.battle_result == "victory")
+	assert(battle.rewarded_waves == [1, 2])
+	var core_test := BattleModel.new()
+	core_test.core_hp = 5.0
+	core_test.phase = "combat"
+	core_test.enemies.append({"id": 99, "kind": "goblin", "cell": Vector2i(4, 8), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "alive": true})
+	core_test.tick(0.2)
+	assert(core_test.phase == "finished" and core_test.battle_result == "defeat")
+	var siege_test := BattleModel.new("stage.m2.siege")
+	assert(siege_test.stage.mode == "siege" and siege_test.core_cell == Vector2i(4, 0))
+	siege_test.wave = siege_test.waves.size()
+	siege_test.phase = "combat"
+	siege_test.core_hp = 20.0
+	siege_test.units.append({"id": 200, "kind": "swordsman", "cell": Vector2i(4, 1), "hp": 120.0, "damage": 20.0, "range": 1, "cooldown": 0.0, "alive": true})
+	siege_test.enemies.append({"id": 201, "kind": "goblin", "cell": Vector2i(0, 2), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})
+	siege_test.tick(0.2)
+	assert(siege_test.phase == "finished" and siege_test.battle_result == "victory" and siege_test.enemies[0].alive)
+	var siege_wipe_test := BattleModel.new("stage.m2.siege")
+	siege_wipe_test.phase = "combat"
+	siege_wipe_test.tick(0.2)
+	assert(siege_wipe_test.phase == "finished" and siege_wipe_test.battle_result == "defeat")
+	var siege_checkpoint_source := BattleModel.new("stage.m2.siege")
+	assert(siege_checkpoint_source.deploy("swordsman", Vector2i(3, 8)))
+	var siege_checkpoint := siege_checkpoint_source.to_dict()
+	var siege_restore_test := BattleModel.new("stage.m2.siege")
+	assert(siege_restore_test.restore(siege_checkpoint))
+	assert(not BattleModel.new().restore(siege_checkpoint))
+	var path_test := BattleModel.new()
+	path_test.phase = "combat"
+	path_test.blocked_cells[Vector2i(1, 9)] = true
+	path_test.units.append({"id": 100, "kind": "swordsman", "cell": Vector2i(2, 9), "hp": 120.0, "damage": 20.0, "range": 1, "cooldown": 0.0, "alive": true})
+	path_test.enemies.append({"id": 101, "kind": "goblin", "cell": Vector2i(0, 9), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})
+	path_test.tick(0.2)
+	assert(path_test.enemies[0].cell != Vector2i(0, 9) and path_test.enemies[0].cell != Vector2i(1, 9) and path_test.enemies[0].cell != Vector2i(2, 9))
+	assert(path_test.enemies[0].fsm_state == "advance")
+	var attack_test := BattleModel.new()
+	attack_test.phase = "combat"
+	attack_test.units.append({"id": 102, "kind": "swordsman", "cell": Vector2i(4, 7), "hp": 120.0, "damage": 20.0, "range": 1, "cooldown": 0.0, "alive": true})
+	attack_test.enemies.append({"id": 103, "kind": "goblin", "cell": Vector2i(4, 6), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})
+	attack_test.tick(0.2)
+	assert(attack_test.enemies[0].fsm_state == "attack" and attack_test.units[0].hp == 110.0)
+	attack_test.tick(0.2)
+	assert(attack_test.enemies[0].fsm_state == "cooldown")
+	var wave_override_test := BattleModel.new()
+	wave_override_test.waves[0].ai_weight_overrides = {"objective": 2.5}
+	var ai_store := CheckpointStore.new("user://m2_ai_override_test.json")
+	assert(wave_override_test.start_wave(ai_store))
+	assert(wave_override_test.enemies[0].ai_weights.objective == 2.5)
+	ai_store.clear_checkpoint()
+	var utility_test := BattleModel.new()
+	utility_test.phase = "combat"
+	utility_test.units.append({"id": 104, "kind": "swordsman", "cell": Vector2i(4, 7), "hp": 120.0, "damage": 20.0, "range": 1, "cooldown": 0.0, "alive": true})
+	utility_test.enemies.append({"id": 105, "kind": "goblin", "cell": Vector2i(4, 6), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 0.1, "objective": 10.0}, "alive": true})
+	utility_test.tick(0.2)
+	assert(utility_test.enemies[0].fsm_state == "advance" and utility_test.units[0].hp == 120.0)
+	var blocked_ai_test := BattleModel.new()
+	blocked_ai_test.phase = "combat"
+	blocked_ai_test.blocked_cells[Vector2i(1, 0)] = true
+	blocked_ai_test.blocked_cells[Vector2i(0, 1)] = true
+	blocked_ai_test.enemies.append({"id": 106, "kind": "goblin", "cell": Vector2i.ZERO, "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})
+	blocked_ai_test.tick(0.2)
+	assert(blocked_ai_test.enemies[0].fsm_state == "blocked" and blocked_ai_test.enemies[0].cell == Vector2i.ZERO)
+	var ally_path_test := BattleModel.new()
+	ally_path_test.phase = "combat"
+	ally_path_test.units.append({"id": 102, "kind": "swordsman", "cell": Vector2i(2, 9), "hp": 120.0, "damage": 20.0, "range": 1, "cooldown": 0.0, "alive": true})
+	ally_path_test.blocked_cells[Vector2i(3, 9)] = true
+	assert(ally_path_test.move_unit(102, Vector2i(4, 8)))
+	ally_path_test.tick(0.2)
+	assert(ally_path_test.units[0].cell != Vector2i(3, 9) and ally_path_test.units[0].cell != Vector2i(2, 9))
+	store.clear_checkpoint()
+	var playable := BattleModel.new()
+	var trial_store := CheckpointStore.new("user://m1_trial_checkpoint.json")
+	assert(playable.deploy("swordsman", Vector2i(3, 6)))
+	assert(playable.deploy("swordsman", Vector2i(4, 6)))
+	assert(playable.deploy("archer", Vector2i(5, 6)))
+	for trial_wave in 2:
+		assert(playable.start_wave(trial_store))
+		for _frame in 1000:
+			if playable.phase != "combat":
+				break
+			playable.tick(0.2)
+		if trial_wave == 0:
+			assert(playable.wave == 2 and playable.phase == "preparation")
+	assert(playable.phase == "finished" and playable.battle_result == "victory")
+	trial_store.clear_checkpoint()
+	var battle_scene: PackedScene = load("res://scenes/battle.tscn")
+	assert(battle_scene != null)
+	print("All headless project tests passed")
 	quit(0)

@@ -4,11 +4,17 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
 
 ## Local development
 
-- Godot: 4.7.2 stable (any Godot 4 build pinned in CI should be matched locally).
-- Headless tests: `godot --headless --path . --script res://tests/run.gd`
-- Content gate: `godot --headless --path . --script res://scripts/validate_content.gd`
+- Godot: 4.7.2 stable (any Godot 4 build pinned in CI should be matched locally). On the inspected Windows workstation, run commands with:
+
+  ```powershell
+  $godot = "$env:LOCALAPPDATA\Programs\Godot\Godot_v4.7.2-stable_win64_console.exe"
+  & $godot --headless --path . --script res://tests/run.gd
+  & $godot --headless --path . --script res://scripts/validate_content.gd
+  ```
+
 - Open `project.godot` in the Godot editor to run the portrait project.
-- Android SDK on this workstation: `%LOCALAPPDATA%/Android/Sdk`; configure Godot Editor > Editor Settings > Export > Android to use it. Android export templates and signing credentials are not stored in this repository.
+- Android SDK and OpenJDK 17 are installed and configured in the local Godot editor settings. Export templates are installed. The local debug preset exports with `--export-debug "Android Debug APK" build/holo-debug.apk` (create the ignored `build/` directory first).
+- `assets/icon.svg` is temporary project art; replace it before store publication. No release keystore or store credentials belong in this repository.
 
 ## Data boundaries
 

@@ -7,6 +7,8 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		var version: Variant = catalog.get(version_key)
 		if not (version is int or version is float) or version < 1 or floor(float(version)) != float(version):
 			errors.append("%s must be a positive integer" % version_key)
+		elif version != (ProjectVersions.CONTENT_VERSION if version_key == "content_version" else ProjectVersions.SCHEMA_VERSION):
+			errors.append("unsupported %s: %s" % [version_key, version])
 	var categories: Variant = catalog.get("categories", {})
 	if not categories is Dictionary:
 		errors.append("categories must be an object")
@@ -31,18 +33,124 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		for item in categories[category]:
 			if not item is Dictionary:
 				continue
-			if not item.get("dependencies", []) is Array:
+			var dependencies: Variant = item.get("dependencies", [])
+			if not dependencies is Array:
 				errors.append("%s dependencies must be an array" % item.get("id", "<missing-id>"))
+			else:
+				for target in dependencies:
+					if not target is String or not ids.has(target):
+						errors.append("%s has unresolved dependency: %s" % [item.get("id", "<missing-id>"), target])
 			if not item.get("references", []) is Array:
 				errors.append("%s references must be an array" % item.get("id", "<missing-id>"))
 				continue
 			for target in item.get("references", []):
 				if not target is String or not ids.has(target):
 					errors.append("%s has unresolved reference: %s" % [item.get("id", "<missing-id>"), target])
+	var wave_items := _as_array(categories.get("waves", []))
+	var unit_items := _as_array(categories.get("units", []))
+	var stage_items := _as_array(categories.get("stages", []))
+	var unit_teams: Dictionary = {}
+	var profile_ids := _ids_in(_as_array(categories.get("ai_profiles", [])))
+	for unit in unit_items:
+		if unit is Dictionary and (unit.get("team") not in ["ally", "enemy"] or not _is_positive_number(unit.get("hp")) or not _is_positive_number(unit.get("damage")) or not _is_positive_integer(unit.get("range")) or not _is_positive_number(unit.get("attack_time")) or not _is_nonnegative_integer(unit.get("cost"))):
+			errors.append("%s has invalid combat or cost data" % unit.get("id", "<missing-id>"))
+		if unit is Dictionary:
+			unit_teams[unit.get("id", "")] = unit.get("team", "")
+			if unit.get("team") == "enemy":
+				var profile_id: Variant = unit.get("ai_profile_id", "")
+				var references: Variant = unit.get("references", [])
+				if not profile_ids.has(profile_id) or not references is Array or not references.has(profile_id):
+					errors.append("%s must reference an AI profile" % unit.get("id", "<missing-id>"))
+	for profile in _as_array(categories.get("ai_profiles", [])):
+		var weights: Variant = profile.get("weights") if profile is Dictionary else null
+		if not weights is Dictionary or weights.is_empty():
+			errors.append("%s must define AI weights" % (profile.get("id", "<missing-id>") if profile is Dictionary else "<missing-id>"))
+			continue
+		for action in weights:
+			if not action is String or not _is_positive_number(weights[action]):
+				errors.append("%s has an invalid AI weight" % profile.get("id", "<missing-id>"))
+	for wave in wave_items:
+		if wave is Dictionary and (unit_teams.get(wave.get("enemy_id", "")) != "enemy" or not wave.get("references", []) is Array or not wave.get("references", []).has(wave.get("enemy_id", "")) or not _is_positive_integer(wave.get("count"))):
+			errors.append("%s must reference an enemy and have a positive integer count" % wave.get("id", "<missing-id>"))
+		if wave is Dictionary and wave.has("ai_weight_overrides"):
+			var overrides: Variant = wave.ai_weight_overrides
+			if not overrides is Dictionary:
+				errors.append("%s AI weight overrides must be an object" % wave.get("id", "<missing-id>"))
+			else:
+				for action in overrides:
+					if not action is String or not _is_positive_number(overrides[action]):
+						errors.append("%s has an invalid AI weight override" % wave.get("id", "<missing-id>"))
+	for stage in stage_items:
+		if not stage is Dictionary:
+			continue
+		var columns := int(stage.get("columns", 0))
+		var rows := int(stage.get("rows", 0))
+		var core_cell: Variant = stage.get("core_cell", [])
+		if not _is_positive_integer(stage.get("columns")) or not _is_positive_integer(stage.get("rows")) or not core_cell is Array or core_cell.size() != 2 or not _is_nonnegative_integer(core_cell[0]) or not _is_nonnegative_integer(core_cell[1]) or int(core_cell[0]) >= columns or int(core_cell[1]) >= rows:
+			errors.append("%s has invalid board dimensions or core cell" % stage.get("id", "<missing-id>"))
+		if stage.get("mode") not in ["defense", "siege"]:
+			errors.append("%s has an unknown battle mode" % stage.get("id", "<missing-id>"))
+		var enemy_spawn_row := int(stage.get("enemy_spawn_row", 0))
+		if enemy_spawn_row < 0 or enemy_spawn_row >= rows:
+			errors.append("%s has an invalid enemy spawn row" % stage.get("id", "<missing-id>"))
+		var blocked_cells: Variant = stage.get("blocked_cells", [])
+		var blocked: Dictionary = {}
+		if not blocked_cells is Array:
+			errors.append("%s blocked_cells must be an array" % stage.get("id", "<missing-id>"))
+		else:
+			for cell in blocked_cells:
+				if not cell is Array or cell.size() != 2 or not _is_nonnegative_integer(cell[0]) or not _is_nonnegative_integer(cell[1]) or int(cell[0]) >= columns or int(cell[1]) >= rows:
+					errors.append("%s has an invalid blocked cell" % stage.get("id", "<missing-id>"))
+					continue
+				var blocked_cell := Vector2i(int(cell[0]), int(cell[1]))
+				if blocked.has(blocked_cell):
+					errors.append("%s has a duplicate blocked cell" % stage.get("id", "<missing-id>"))
+				blocked[blocked_cell] = true
+		if core_cell is Array and core_cell.size() == 2 and _is_nonnegative_integer(core_cell[0]) and _is_nonnegative_integer(core_cell[1]) and blocked.has(Vector2i(int(core_cell[0]), int(core_cell[1]))):
+			errors.append("%s blocks its core cell" % stage.get("id", "<missing-id>"))
+		if columns > 0 and rows > 0 and core_cell is Array and core_cell.size() == 2 and _is_nonnegative_integer(core_cell[0]) and _is_nonnegative_integer(core_cell[1]) and int(core_cell[0]) < columns and int(core_cell[1]) < rows:
+			for reference in stage.get("references", []):
+				for wave in wave_items:
+					if wave is Dictionary and wave.get("id") == reference and _is_positive_integer(wave.get("count")):
+						for index in int(wave.count):
+							var spawn := Vector2i(2 + index * 2, rows - 1 if stage.get("mode") == "siege" else enemy_spawn_row)
+							if spawn.x >= columns or blocked.has(spawn) or GridPathfinder.find_path(spawn, Vector2i(int(core_cell[0]), int(core_cell[1])), columns, rows, blocked).is_empty():
+								errors.append("%s blocks a required wave route" % stage.get("id", "<missing-id>"))
+								break
+		var wave_ids := _ids_in(wave_items)
+		var references: Variant = stage.get("references", [])
+		var has_wave := false
+		if references is Array:
+			for reference in references:
+				if reference is String and wave_ids.has(reference):
+					has_wave = true
+		if not has_wave:
+			errors.append("%s must reference at least one wave" % stage.get("id", "<missing-id>"))
+		if not _is_positive_number(stage.get("core_hp")) or not _is_nonnegative_integer(stage.get("start_resource")) or not _is_nonnegative_integer(stage.get("kill_reward")) or not _is_nonnegative_integer(stage.get("wave_reward")) or not _is_positive_integer(stage.get("intermission_seconds")):
+			errors.append("%s has invalid core or resource values" % stage.get("id", "<missing-id>"))
 	var cycle_nodes := _find_dependency_cycles(categories)
 	for id in cycle_nodes:
 		errors.append("cyclic dependency involving: %s" % id)
 	return errors
+
+static func _ids_in(items: Array) -> Array[String]:
+	var result: Array[String] = []
+	for item in items:
+		if item is Dictionary and item.get("id", "") is String:
+			result.append(item.id)
+	return result
+
+static func _as_array(value: Variant) -> Array:
+	return value if value is Array else []
+
+static func _is_positive_integer(value: Variant) -> bool:
+	return (value is int or value is float) and float(value) >= 1.0 and floor(float(value)) == float(value)
+
+static func _is_nonnegative_integer(value: Variant) -> bool:
+	return (value is int or value is float) and float(value) >= 0.0 and floor(float(value)) == float(value)
+
+static func _is_positive_number(value: Variant) -> bool:
+	return (value is int or value is float) and float(value) > 0.0
 
 static func _find_dependency_cycles(categories: Dictionary) -> Array[String]:
 	var graph: Dictionary = {}

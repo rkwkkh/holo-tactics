@@ -8,4 +8,23 @@
 - 통과: `--headless --path . --script res://scripts/validate_content.gd` (`Content validation passed`).
 - 통과: `--headless --path . --quit-after 2` (기본 메인 씬 실행).
 - 첫 검증에서 JSON 숫자 타입 가정 때문에 버전 검사에 실패했고, 정수값 판별을 보완한 후 전체 재실행 통과.
-- Android 내보내기·실기기 FPS·Google Play AAB 업로드는 아직 검증하지 않았다.
+- Android debug APK export 통과: `--export-debug "Android Debug APK" build/holo-debug.apk`; APK Manifest min API 24/target API 36. API 36 x86_64 에뮬레이터에서 실행, 검사 배치(-50 자원), 웨이브 시작과 적 출현을 터치로 확인했다.
+- 정적 `blocked_cells` 타일을 추가한 APK를 다시 내보내 API 36 에뮬레이터에 설치했다. 메인 화면→전투 진입, 장애물 타일 표시, 검사 배치(자원 160→110), 웨이브 시작 및 적 출현을 터치로 확인했고 앱 스크립트 오류는 관찰되지 않았다.
+- 실기기 FPS·Android 10 물리 기기·Google Play AAB/비공개 테스트는 검증하지 않았다. Android emulator 실행은 보급형 실기기 성능 인수를 대신하지 않는다.
+
+## M1 진행 중
+
+- Headless에서 단위 배치, 체크포인트 JSON 파일 저장/복원, 수동 이동 명령, 적 처치, 웨이브 보상 1회 정산, 수성 핵심 파괴 패배, 최종 웨이브 승리를 확인한다.
+- 3유닛 시험 배치로 2개 웨이브를 자동 교전해 M1 시드 콘텐츠가 승리로 끝나는 시뮬레이션을 확인한다. A* 적용 뒤 기존 2유닛 배치가 패배함을 확인해 초기 자원을 160으로 조정했다. 이 수치는 밸런스 임시 초기값이며 승인된 정책이 아니다.
+- A* 경로 테스트에서 장애물 우회 및 완전 차단 경로 실패를 확인한다.
+- A*를 아군 수동 이동과 적의 핵심 접근 경로에 연결했다. 점유 타일·지형 타일 우회, 이동 위치 검사, 콘텐츠상 웨이브 스폰 경로 단절 및 핵심 겹침 오류를 headless 테스트로 확인했다. 파괴 가능한 방어벽, 경로 우회/파괴 Utility 비교, 6종 적 역할은 아직 미구현.
+- 적 FSM의 공격·진격·쿨타임 상태, 행동 점수에 따른 공격/목표 우선 선택, 프로필 및 웨이브 가중치 덮어쓰기를 headless 테스트로 확인했다. 현재 콘텐츠 프로필과 역할은 고블린 전사 1종 시드다.
+- UI 코드 반영 전 Android screenshot에서 상태 문구가 가로로 넘친 것을 발견해 줄바꿈 처리 및 타일 구역색을 적용했다. APK 재내보내기 및 실행으로 확인.
+
+## 재검증 (2026-11-12)
+
+- 통과: Godot 4.7.2 `--headless --editor --path . --quit`, `--headless --path . --script res://tests/run.gd --quit-after 5`, `--headless --path . --script res://scripts/validate_content.gd`, `--headless --path . --quit-after 2`. 전체 테스트 통과, `Content validation passed`, 기본 씬 실행.
+- 통과: 최신 소스에서 Android Debug APK 재내보내기 (`build/holo-debug.apk`, 86,252,151 bytes); package `com.example.holotactics`, target API 36, prebuilt APK min API 24.
+- API 29 AVD 재확인: 설치 이미지 `android-29/google_apis/x86_64`는 GLES2만 제공. 앱에서 `eglCreateContext ... no ES 3 support` 및 `createContext failed` 발생. 해당 AVD 실행 실패는 Android 10 실기기 검증 결과로 간주하지 않는다.
+- API 37 AVD: 최신 APK 설치 성공, 앱 프로세스/포그라운드 Activity 실행 확인. 로그에서 GLES3 Scene/Canvas shader uniform limit 오류(`GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)`)가 확인되어 화면 렌더링 및 입력 플레이는 통과 판정하지 않았다.
+- 제약: 실기기, 성능(FPS/P95), Android 10 실제 기기 및 Google Play AAB/비공개 테스트는 미검증. 이전 API 36 터치 스모크 결과는 이전 코드 빌드에 한정되며 최신 공성 코드 빌드의 동작 증거로 재사용하지 않는다.
