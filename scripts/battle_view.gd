@@ -2,8 +2,9 @@ extends Control
 
 const TILE_SIZE := Vector2(40, 39)
 
-var battle := BattleModel.new()
-var store := CheckpointStore.new()
+var battle: BattleModel
+var store: CheckpointStore
+var stage_title := ""
 var tiles: Array[Button] = []
 var status: Label
 var hud: Label
@@ -17,6 +18,11 @@ var deploy_buttons: Array[Button] = []
 var status_override := ""
 
 func _ready() -> void:
+	var selected_stage_id: String = get_tree().get_meta("selected_stage_id", BattleModel.STAGE_ID)
+	battle = BattleModel.new(selected_stage_id)
+	var checkpoint_path := "user://battle_checkpoint.json" if selected_stage_id == BattleModel.STAGE_ID else "user://battle_checkpoint_%s.json" % selected_stage_id.replace(".", "_")
+	store = CheckpointStore.new(checkpoint_path)
+	stage_title = "수성" if battle.stage.get("mode") == "defense" else "공성"
 	var saved := store.load_checkpoint()
 	var resume := FileAccess.file_exists(store.path)
 	if resume and (saved.is_empty() or not battle.restore(saved)):
@@ -147,7 +153,7 @@ func _unit_at(cell: Vector2i) -> Dictionary:
 	return {}
 
 func _refresh() -> void:
-	hud.text = "웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [battle.wave, battle.core_hp, battle.combat_gold]
+	hud.text = "%s · 웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [stage_title, battle.wave, battle.core_hp, battle.combat_gold]
 	wave_button.text = "웨이브 시작 (%d)" % rest_seconds if rest_seconds > 0 else "웨이브 시작"
 	wave_button.disabled = battle.phase != "preparation"
 	for button in deploy_buttons:
