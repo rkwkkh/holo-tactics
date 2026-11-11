@@ -34,6 +34,19 @@ func _initialize() -> void:
 	blocked_reinforcement_route.categories.waves[0].reinforcements = [{"enemy_id": "enemy.goblin", "count": 1, "at": 1.0, "spawn": [4, 0]}]
 	blocked_reinforcement_route.categories.stages[0].blocked_cells.append([4, 0])
 	assert(ContentValidator.validate(blocked_reinforcement_route).any(func(error): return error.contains("blocks a reinforcement route")))
+	var wall_catalog: Dictionary = seeded_catalog.duplicate(true)
+	wall_catalog.categories.stages[0].walls = [{"cell": [3, 5], "hp": 60}]
+	assert(ContentValidator.validate(wall_catalog).is_empty())
+	wall_catalog.categories.stages[0].walls[0].cell = [4, 9]
+	assert(ContentValidator.validate(wall_catalog).any(func(error): return error.contains("conflicting wall cell")))
+	var wall_restore_source := BattleModel.new()
+	wall_restore_source.walls[0].hp = 20.0
+	var wall_snapshot: Dictionary = wall_restore_source.to_dict()
+	var wall_restore_target := BattleModel.new()
+	assert(wall_restore_target.restore(wall_snapshot) and wall_restore_target.walls[0].hp == 20.0)
+	wall_snapshot.erase("walls")
+	var legacy_wall_restore := BattleModel.new()
+	assert(legacy_wall_restore.restore(wall_snapshot) and legacy_wall_restore.walls[0].hp == 60.0)
 	var blocked_route_catalog: Dictionary = seeded_catalog.duplicate(true)
 	blocked_route_catalog.categories.stages[0].blocked_cells.clear()
 	for x in 8:
@@ -77,6 +90,32 @@ func _initialize() -> void:
 	assert(failed_store.load_checkpoint().phase == "preparation" and failed_reinforcement.combat_gold == failed_reinforcement.stage.start_resource)
 	reinforcement_store.clear_checkpoint()
 	failed_store.clear_checkpoint()
+	var wall_model := BattleModel.new()
+	wall_model.walls = [{"cell": Vector2i(1, 0), "hp": 10.0, "max_hp": 10.0}]
+	for y in BattleModel.ROWS:
+		for x in BattleModel.COLUMNS:
+			var cell := Vector2i(x, y)
+			if cell != Vector2i.ZERO and cell != Vector2i(1, 0):
+				wall_model.blocked_cells[cell] = true
+	wall_model.phase = "combat"
+	wall_model.enemies.append({"id": 300, "kind": "goblin", "cell": Vector2i.ZERO, "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "alive": true})
+	wall_model.tick(0.2)
+	assert(wall_model.walls.is_empty() and wall_model.enemies[0].cooldown > 0.0)
+	var wall_route_choice := BattleModel.new()
+	wall_route_choice.phase = "combat"
+	wall_route_choice.walls[0].hp = 1.0
+	var wall_corridor: Array[Vector2i] = [Vector2i(3, 4), Vector2i(3, 5), Vector2i(3, 6), Vector2i(4, 6), Vector2i(4, 7), Vector2i(4, 8), Vector2i(4, 9)]
+	for y in BattleModel.ROWS:
+		for x in BattleModel.COLUMNS:
+			var cell := Vector2i(x, y)
+			if not wall_corridor.has(cell):
+				wall_route_choice.blocked_cells[cell] = true
+	wall_route_choice.enemies.append({"id": 301, "kind": "goblin", "cell": Vector2i(3, 4), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"objective": 1.0}, "alive": true})
+	assert(wall_route_choice._choose_enemy_action(wall_route_choice.enemies[0]).kind == "attack_wall")
+	var wall_detour_choice := BattleModel.new()
+	wall_detour_choice.phase = "combat"
+	wall_detour_choice.enemies.append({"id": 302, "kind": "goblin", "cell": Vector2i(3, 4), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"objective": 1.0}, "alive": true})
+	assert(wall_detour_choice._choose_enemy_action(wall_detour_choice.enemies[0]).kind == "advance")
 	var battle := BattleModel.new()
 	assert(battle.deploy("swordsman", Vector2i(3, 8)))
 	assert(not battle.deploy("swordsman", Vector2i(3, 5)))

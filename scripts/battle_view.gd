@@ -163,7 +163,7 @@ func _refresh() -> void:
 			var cell := Vector2i(x, y)
 			var index := y * BattleModel.COLUMNS + x
 			var tile := tiles[index]
-			tile.text = "◆" if cell == battle.core_cell else "▧" if battle.blocked_cells.has(cell) else ""
+			tile.text = "◆" if cell == battle.core_cell else "▧" if battle.blocked_cells.has(cell) else "▤" if battle._wall_at(cell) >= 0 else ""
 			for unit in battle.units:
 				if unit.alive and unit.cell == cell:
 					tile.text = "검" if unit.kind == "swordsman" else "궁"

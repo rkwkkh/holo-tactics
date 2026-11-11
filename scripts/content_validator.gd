@@ -120,6 +120,20 @@ static func validate(catalog: Dictionary) -> Array[String]:
 				blocked[blocked_cell] = true
 		if core_cell is Array and core_cell.size() == 2 and _is_nonnegative_integer(core_cell[0]) and _is_nonnegative_integer(core_cell[1]) and blocked.has(Vector2i(int(core_cell[0]), int(core_cell[1]))):
 			errors.append("%s blocks its core cell" % stage.get("id", "<missing-id>"))
+		var wall_cells: Dictionary = {}
+		var wall_data: Variant = stage.get("walls", [])
+		if not wall_data is Array:
+			errors.append("%s walls must be an array" % stage.get("id", "<missing-id>"))
+		else:
+			for wall in wall_data:
+				var cell: Variant = wall.get("cell", []) if wall is Dictionary else null
+				if not wall is Dictionary or not _is_integer_cell(cell) or int(cell[0]) >= columns or int(cell[1]) >= rows or not _is_positive_number(wall.get("hp")):
+					errors.append("%s has invalid wall data" % stage.get("id", "<missing-id>"))
+					continue
+				var wall_cell := Vector2i(int(cell[0]), int(cell[1]))
+				if blocked.has(wall_cell) or wall_cell == Vector2i(int(core_cell[0]), int(core_cell[1])) or wall_cells.has(wall_cell):
+					errors.append("%s has a conflicting wall cell" % stage.get("id", "<missing-id>"))
+				wall_cells[wall_cell] = true
 		if columns > 0 and rows > 0 and core_cell is Array and core_cell.size() == 2 and _is_nonnegative_integer(core_cell[0]) and _is_nonnegative_integer(core_cell[1]) and int(core_cell[0]) < columns and int(core_cell[1]) < rows:
 			for reference in stage.get("references", []):
 				for wave in wave_items:

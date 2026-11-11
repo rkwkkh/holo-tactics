@@ -22,6 +22,7 @@ var units: Array[Dictionary] = []
 var enemies: Array[Dictionary] = []
 var rewarded_waves: Array[int] = []
 var blocked_cells: Dictionary = {}
+var walls: Array[Dictionary] = []
 var wave_elapsed := 0.0
 var pending_reinforcements: Array[Dictionary] = []
 
@@ -54,11 +55,13 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 	core_cell = Vector2i(stage.core_cell[0], stage.core_cell[1])
 	for cell in stage.get("blocked_cells", []):
 		blocked_cells[Vector2i(cell[0], cell[1])] = true
+	for wall in stage.get("walls", []):
+		walls.append({"cell": Vector2i(wall.cell[0], wall.cell[1]), "hp": float(wall.hp), "max_hp": float(wall.hp)})
 	core_hp = stage.core_hp
 	combat_gold = stage.start_resource
 
 func deploy(kind: String, cell: Vector2i) -> bool:
-	if not balance_seed.has(kind) or balance_seed[kind].team != "ally" or not _is_inside(cell) or cell.y < 6 or cell == core_cell or blocked_cells.has(cell) or _occupied(cell):
+	if not balance_seed.has(kind) or balance_seed[kind].team != "ally" or not _is_inside(cell) or cell.y < 6 or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied(cell):
 		return false
 	var cost: int = balance_seed[kind].cost
 	if combat_gold < cost:
@@ -71,7 +74,7 @@ func deploy(kind: String, cell: Vector2i) -> bool:
 
 func move_unit(unit_id: int, destination: Vector2i) -> bool:
 	var unit := _unit_by_id(unit_id)
-	if unit.is_empty() or phase != "combat" or not _is_inside(destination) or destination.y < 5 or destination == core_cell or blocked_cells.has(destination) or _occupied(destination):
+	if unit.is_empty() or phase != "combat" or not _is_inside(destination) or destination.y < 5 or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or _occupied(destination):
 		return false
 	unit.destination = destination
 	unit.cooldown = maxf(unit.cooldown, 0.5)
@@ -133,10 +136,16 @@ func tick(delta: float) -> void:
 		var decision := _choose_enemy_action(enemy)
 		match decision.kind:
 			"attack_unit": _strike(enemy, units[decision.target_index])
+			"attack_wall":
+				walls[decision.wall_index].hp = maxf(0.0, walls[decision.wall_index].hp - enemy.damage)
+				enemy.cooldown = balance_seed[enemy.kind].attack_time
+				if walls[decision.wall_index].hp <= 0.0:
+					walls.remove_at(decision.wall_index)
 			"attack_core":
 				core_hp = maxf(0.0, core_hp - enemy.damage)
 				enemy.cooldown = balance_seed[enemy.kind].attack_time
 			"advance": enemy.cell = decision.route[0]
+			"advance_wall": enemy.cell = decision.route[0]
 	if stage.mode == "siege" and units.all(func(unit: Dictionary) -> bool: return not unit.alive):
 		phase = "finished"
 		battle_result = "defeat"
@@ -166,16 +175,21 @@ func tick(delta: float) -> void:
 
 func to_dict() -> Dictionary:
 	var saved_units: Array[Dictionary] = []
+	var saved_walls: Array[Dictionary] = []
 	for unit in units:
 		var saved_unit := unit.duplicate(true)
 		saved_unit.cell = [unit.cell.x, unit.cell.y]
 		if unit.has("destination"):
 			saved_unit.destination = [unit.destination.x, unit.destination.y]
 		saved_units.append(saved_unit)
-	return {"stage_id": stage_id, "mode": stage.get("mode", "defense"), "content_version": ProjectVersions.CONTENT_VERSION, "schema_version": ProjectVersions.SCHEMA_VERSION, "save_version": ProjectVersions.SAVE_VERSION, "wave": wave, "phase": phase, "core_hp": core_hp, "combat_gold": combat_gold, "next_id": next_id, "units": saved_units, "rewarded_waves": rewarded_waves}
+	for definition in stage.get("walls", []):
+		var cell := Vector2i(definition.cell[0], definition.cell[1])
+		var wall_index := _wall_at(cell)
+		saved_walls.append({"cell": [cell.x, cell.y], "hp": walls[wall_index].hp if wall_index >= 0 else 0.0})
+	return {"stage_id": stage_id, "mode": stage.get("mode", "defense"), "content_version": ProjectVersions.CONTENT_VERSION, "schema_version": ProjectVersions.SCHEMA_VERSION, "save_version": ProjectVersions.SAVE_VERSION, "wave": wave, "phase": phase, "core_hp": core_hp, "combat_gold": combat_gold, "next_id": next_id, "units": saved_units, "walls": saved_walls, "rewarded_waves": rewarded_waves}
 
 func restore(snapshot: Dictionary) -> bool:
-	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _version_matches(snapshot.get("save_version"), ProjectVersions.SAVE_VERSION) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array:
+	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _version_matches(snapshot.get("save_version"), ProjectVersions.SAVE_VERSION) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array or (snapshot.has("walls") and not snapshot.walls is Array):
 		return false
 	var restored_core := float(snapshot.get("core_hp", 0.0))
 	var restored_gold := int(snapshot.get("combat_gold", -1))
@@ -211,6 +225,25 @@ func restore(snapshot: Dictionary) -> bool:
 	for rewarded_wave in snapshot.get("rewarded_waves", []):
 		if not _is_integer_value(rewarded_wave) or int(rewarded_wave) < 1 or int(rewarded_wave) >= int(snapshot.wave):
 			return false
+	var restored_walls: Array[Dictionary] = []
+	var saved_wall_hp: Dictionary = {}
+	if snapshot.has("walls"):
+		for saved_wall in snapshot.walls:
+			if not saved_wall is Dictionary or not _is_valid_cell(saved_wall.get("cell")) or not _is_finite_nonnegative(saved_wall.get("hp")):
+				return false
+			var cell := Vector2i(int(saved_wall.cell[0]), int(saved_wall.cell[1]))
+			if saved_wall_hp.has(cell):
+				return false
+			saved_wall_hp[cell] = float(saved_wall.hp)
+	for definition in stage.get("walls", []):
+		var cell := Vector2i(definition.cell[0], definition.cell[1])
+		var hp := float(definition.hp) if not snapshot.has("walls") else float(saved_wall_hp.get(cell, -1.0))
+		if hp < 0.0 or hp > float(definition.hp):
+			return false
+		if hp > 0.0:
+			restored_walls.append({"cell": cell, "hp": hp, "max_hp": float(definition.hp)})
+	if snapshot.has("walls") and saved_wall_hp.size() != stage.get("walls", []).size():
+		return false
 	if restored_next_id <= max_id:
 		return false
 	wave = int(snapshot.wave)
@@ -219,6 +252,7 @@ func restore(snapshot: Dictionary) -> bool:
 	combat_gold = restored_gold
 	next_id = restored_next_id
 	units.assign(restored_units)
+	walls.assign(restored_walls)
 	rewarded_waves.assign(snapshot.get("rewarded_waves", []))
 	enemies.clear()
 	return true
@@ -323,6 +357,12 @@ func _occupied(cell: Vector2i) -> bool:
 			return true
 	return false
 
+func _wall_at(cell: Vector2i) -> int:
+	for index in walls.size():
+		if walls[index].hp > 0.0 and walls[index].cell == cell:
+			return index
+	return -1
+
 func _path_to_core(enemy: Dictionary) -> Array[Vector2i]:
 	var best: Array[Vector2i] = []
 	var goals: Array[Vector2i] = [core_cell]
@@ -356,8 +396,20 @@ func _choose_enemy_action(enemy: Dictionary) -> Dictionary:
 		return options[0]
 	var route := _path_to_core(enemy)
 	if not route.is_empty():
-		var objective_score: float = weights.get("objective", 1.0) * (0.5 + 0.5 / float(route.size()))
+		var objective_score: float = weights.get("objective", 1.0) / float(route.size() + 1)
 		options.append({"kind": "attack_core" if route[0] == core_cell else "advance", "route": route, "score": objective_score})
+	for wall_index in walls.size():
+		var wall: Dictionary = walls[wall_index]
+		var wall_route: Variant = _path_to_wall(enemy, wall.cell)
+		if wall_route == null:
+			continue
+		var after_route: Array[Vector2i] = _path_to_core_after_wall(enemy, wall_route.target, wall_index)
+		var breaking_turns := ceili(float(wall.hp) / float(enemy.damage))
+		var detour_cost: int = route.size() if not route.is_empty() else 1000
+		var breach_cost: int = wall_route.path.size() + breaking_turns + after_route.size()
+		var breach_score: float = float(weights.get("objective", 1.0)) / float(breach_cost + 1)
+		if route.is_empty() or breach_cost < detour_cost:
+			options.append({"kind": "attack_wall" if wall_route.path.is_empty() else "advance_wall", "wall_index": wall_index, "route": wall_route.path, "score": breach_score})
 	if options.is_empty():
 		enemy.fsm_state = "blocked"
 		return {"kind": "wait"}
@@ -365,15 +417,44 @@ func _choose_enemy_action(enemy: Dictionary) -> Dictionary:
 	for option in options.slice(1):
 		if option.score > best.score:
 			best = option
-	enemy.fsm_state = "attack" if best.kind in ["attack_unit", "attack_core"] else "advance"
+	enemy.fsm_state = "attack" if best.kind in ["attack_unit", "attack_core", "attack_wall"] else "advance"
 	return best
 
 func _find_path(mover: Dictionary, goal: Vector2i) -> Array[Vector2i]:
 	var blocked := blocked_cells.duplicate()
+	for wall in walls:
+		blocked[wall.cell] = true
 	for item in units + enemies:
 		if item.alive and item.id != mover.id:
 			blocked[item.cell] = true
 	return GridPathfinder.find_path(mover.cell, goal, COLUMNS, ROWS, blocked)
+
+func _path_to_wall(mover: Dictionary, wall_cell: Vector2i) -> Variant:
+	var best: Array[Vector2i] = []
+	var target := Vector2i(-1, -1)
+	for direction in [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]:
+		var adjacent: Vector2i = wall_cell + direction
+		if not _is_inside(adjacent) or blocked_cells.has(adjacent) or _wall_at(adjacent) >= 0:
+			continue
+		if adjacent == mover.cell:
+			return {"path": [], "target": adjacent}
+		var candidate := _find_path(mover, adjacent)
+		if not candidate.is_empty() and (best.is_empty() or candidate.size() < best.size()):
+			best = candidate
+			target = adjacent
+	if target.x < 0:
+		return null
+	return {"path": best, "target": target}
+
+func _path_to_core_after_wall(mover: Dictionary, start: Vector2i, removed_wall: int) -> Array[Vector2i]:
+	var blocked := blocked_cells.duplicate()
+	for index in walls.size():
+		if index != removed_wall:
+			blocked[walls[index].cell] = true
+	for item in units + enemies:
+		if item.alive and item.id != mover.id and item.cell != start:
+			blocked[item.cell] = true
+	return GridPathfinder.find_path(start, core_cell, COLUMNS, ROWS, blocked)
 
 func _is_inside(cell: Vector2i) -> bool:
 	return cell.x >= 0 and cell.x < COLUMNS and cell.y >= 0 and cell.y < ROWS
