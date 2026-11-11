@@ -1,0 +1,16 @@
+{
+  "content_version": 1,
+  "schema_version": 1,
+  "categories": {
+    "units": [],
+    "skills": [],
+    "upgrades": [],
+    "evolutions": [],
+    "facilities": [],
+    "obstacles": [],
+    "waves": [],
+    "stages": [],
+    "research": [],
+    "ai_profiles": []
+  }
+}

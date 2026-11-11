@@ -1,0 +1,21 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  godot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.7.2
+          use-dotnet: false
+      - name: Import project
+        run: godot --headless --editor --path . --quit
+      - name: Run unit tests
+        run: godot --headless --path . --script res://tests/run.gd
+      - name: Validate content (errors block CI)
+        run: godot --headless --path . --script res://scripts/validate_content.gd
