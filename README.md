@@ -17,7 +17,7 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
 - Open `project.godot` in the Godot editor to run the portrait project.
 - The enabled **Holo Content Editor** dock has stage/wave, evolution, and combat-upgrade JSON panels. Stage/wave preview runs from saved catalog data in an isolated checkpoint and does not settle rewards.
 - Android device smoke, frame-rate measurement, and private-test readiness steps are in [ANDROID_TESTING.md](ANDROID_TESTING.md).
-- The main menu exposes the seeded 6-main/2-optional campaign. Village management includes the four growth buildings and a separate permanent-research screen; research effects are still balance seeds. Battle controls expose only units and facilities available in the selected stage.
+- The main menu exposes the seeded 6-main/2-optional campaign. Village management includes the four growth buildings and a scrollable permanent-research screen. Base-stat amounts and evolution research prices are balance seeds; evolution purchase unlocks are persisted, but combat transformation still awaits the branch/re-evolution policy. Battle controls expose only units and facilities available in the selected stage.
 - The Android presets use Gradle so the manifest minimum is API 29 (Android 10); target API is 36. Install the Android build template and export the debug APK with:
 
   ```powershell
@@ -31,3 +31,6 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
 ## Data boundaries
 
 `data/catalog.json` contains bundled content definitions. Runtime battle state, permanent player progress, and editor preview data will be kept separate as their owning systems are added. Content, schema, and save versions are independent constants in `scripts/project_versions.gd`. No numeric balance seed is a locked game rule.
+
+
+진화 형태 6종은 마을 연구로 영구 해금되며 연구 결과는 체크포인트에 저장된다. 연구 비용은 임시 초기값이다. 실제 전투 변신은 분기·재진화 정책 결정 후 연결한다.

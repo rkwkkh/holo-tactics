@@ -109,5 +109,13 @@ func _run() -> void:
 	obstacle_view._on_tile_pressed(Vector2i(1, 5))
 	assert(obstacle_view.status.text.begins_with("아군 시설 · HP"))
 	obstacle_view.queue_free()
+	await process_frame
+	var research_view = load("res://scenes/village_research.tscn").instantiate()
+	root.add_child(research_view)
+	await process_frame
+	assert(research_view.research_scroll.get_child_count() == 1)
+	assert(research_view.list.get_child_count() == 11)
+	assert(research_view.research_scroll.get_v_scroll_bar().max_value > research_view.research_scroll.get_v_scroll_bar().page)
+	research_view.queue_free()
 	print("Battle result panel tests passed")
 	quit()

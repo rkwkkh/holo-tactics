@@ -217,6 +217,11 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		if not _is_nonnegative_integer(obstacle.get("cost")):
 			_append_field_error(errors, obstacle_id, "cost", "invalid obstacle data")
 	var town_buildings := _as_array(categories.get("town_buildings", []))
+	var evolution_by_id: Dictionary = {}
+	var evolution_research_counts: Dictionary = {}
+	for evolution_item in evolution_items:
+		if evolution_item is Dictionary:
+			evolution_by_id[evolution_item.get("id", "")] = evolution_item
 	for research in _as_array(categories.get("research", [])):
 		if not research is Dictionary:
 			continue
@@ -227,14 +232,26 @@ static func validate(catalog: Dictionary) -> Array[String]:
 			_append_field_error(errors, research_id, "unit_kind", "has invalid permanent research data")
 		if research_buildings.size() != 1:
 			_append_field_error(errors, research_id, "building_kind", "has invalid permanent research data")
-		if research.get("stat") != "damage":
-			_append_field_error(errors, research_id, "stat", "has invalid permanent research data")
-		if not _is_positive_number(research.get("amount")):
-			_append_field_error(errors, research_id, "amount", "has invalid permanent research data")
 		if not _is_nonnegative_integer(research.get("cost")):
 			_append_field_error(errors, research_id, "cost", "has invalid permanent research data")
 		if not ids.has(research.get("requires_stage", "")):
 			_append_field_error(errors, research_id, "requires_stage", "has invalid permanent research data")
+		if research.get("effect", "") == "unlock_evolution":
+			var research_evolution_id: String = research.get("evolution_id", "")
+			var evolution_definition: Dictionary = evolution_by_id.get(research_evolution_id, {})
+			if evolution_definition.is_empty() or evolution_definition.get("unit_kind") != research.get("unit_kind"):
+				_append_field_error(errors, research_id, "evolution_id|unit_kind", "has invalid evolution unlock data")
+			evolution_research_counts[research_evolution_id] = int(evolution_research_counts.get(research_evolution_id, 0)) + 1
+		elif research.get("effect", "") in ["", "stat"]:
+			if research.get("stat") != "damage":
+				_append_field_error(errors, research_id, "stat", "has invalid permanent research data")
+			if not _is_positive_number(research.get("amount")):
+				_append_field_error(errors, research_id, "amount", "has invalid permanent research data")
+		else:
+			_append_field_error(errors, research_id, "effect", "has invalid permanent research data")
+	for evolution_id in evolution_by_id:
+		if int(evolution_research_counts.get(evolution_id, 0)) != 1:
+			_append_field_error(errors, evolution_id, "research", "must have exactly one permanent unlock research")
 	for profile in _as_array(categories.get("ai_profiles", [])):
 		var weights: Variant = profile.get("weights") if profile is Dictionary else null
 		if not weights is Dictionary or weights.is_empty():

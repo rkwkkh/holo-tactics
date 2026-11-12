@@ -29,7 +29,7 @@ $adbPath = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 Check each flow and record pass/fail plus a short note:
 
 1. Portrait startup, safe-area placement, campaign stage locks, and opening the village.
-2. Training-hall build, free move/store/redeploy, M1 research purchase, and currency persistence after relaunch.
+2. Training-hall build, free move/store/redeploy, M1 research purchase, evolution research unlock availability/persistence, research-list scrolling, and currency persistence after relaunch.
 3. M1 unit placement, movement, attacks, both waves, intermission, victory settlement, and return to village.
    - On a 360×640-class portrait viewport, confirm the full 8×10 board stays fixed/visible, pause remains pinned outside the scroller, and lower controls scroll without clipping or horizontal scrolling; verify safe-area placement on a notched device.
    - Select a deployed unit and confirm its upgrade/skill panel appears beside it and remains inside the screen; select a facility and confirm its HP/move hint appears beside it.

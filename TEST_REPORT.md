@@ -339,3 +339,18 @@
 - 전투 UI 크기 회귀를 실제 `360×640` root window로 고정해 재실행했다. 보드 고정/조작부 overflow/컨텍스트 메뉴 경계 검사가 모두 통과했으며 전체 회귀와 validator도 재통과했다.
 
 - 고정 pause 푸터 변경 포함 Android Debug APK `build/holo-debug.apk` 249,879,286 bytes; API29/target36 및 v2 서명 확인. AAB `build/holo-test.aab` 86,288,306 bytes; bundletool validate/manifest 통과, unsigned. 실제 화면·기기 실행은 미검증.
+
+## 2026-11-12 진화 영구 연구 해금
+
+- `data/catalog.json`에 6개 진화 형태별 연구를 추가했다. 검사/궁수는 M1 시점, 창병은 M2, 지원병은 M3, 마법사는 M4 완료 이후 연구 가능하도록 스토리 조건을 연결했다. 훈련소/마법 연구소 소속은 기본 유닛 연구 분류와 일치한다.
+- 연구 비용 100은 임시 SEED이며 전투 진화 비용과 별개다. 구매 ID는 영구 저장되고 `BattleModel.set_permanent_research()` 및 체크포인트 복원에서 해금 목록을 재구성한다. Validator는 미연결/중복/잘못된 유닛 진화 연구를 Error 처리한다.
+- `tests/run.gd`에서 구매 조건·재구매 방지·비용·6형태 매핑·체크포인트 복원을 확인했다. `tests/results_view.gd`에서 360×640 연구 목록 스크롤을 확인했다.
+- 분기 선택과 재진화, 실제 전투 변신/특수 스킬 적용은 결정 대기라 미구현이다.
+
+
+## 2026-11-12 재검증: 진화 연구 해금
+
+- Godot 4.7.2 headless: tests/run.gd, tests/results_view.gd, tests/editor_preview.gd, tests/campaign_playability.gd, scripts/validate_content.gd 모두 성공. 8개 캠페인 스테이지 시뮬레이션 통과. git diff --check 통과.
+- Android APK 재생성: 249,881,554 bytes, min API 29 / target API 36, APK Signature Scheme v2 검증 성공.
+- Android AAB 재생성: 86,290,465 bytes, bundletool 1.18.3 validate 통과, manifest min API 29 / target API 36 확인. unsigned 테스트 번들.
+- 참고: 첫 bundletool XPath 조회는 element 반환 미지원으로 실패했으나 전체 manifest 출력 방식으로 재확인했다. 실제 Android 기기 실행/FPS, release signing 및 Play 업로드는 검증하지 않았다.

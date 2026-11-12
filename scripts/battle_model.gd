@@ -13,6 +13,7 @@ var balance_seed: Dictionary = {}
 var base_balance_seed: Dictionary = {}
 var research_definitions: Dictionary = {}
 var permanent_research: Array[String] = []
+var unlocked_evolutions: Array[String] = []
 var upgrade_definitions: Dictionary = {}
 var skill_definitions: Dictionary = {}
 var facility_definitions: Dictionary = {}
@@ -90,11 +91,13 @@ func set_permanent_research(research_ids: Array) -> bool:
 	if research_state.is_empty():
 		return false
 	permanent_research = research_state.ids
+	unlocked_evolutions = research_state.evolutions
 	balance_seed = research_state.balance
 	return true
 
 func _build_research_state(research_ids: Array) -> Dictionary:
 	var selected: Array[String] = []
+	var unlocked_evolutions: Array[String] = []
 	var adjusted_balance := base_balance_seed.duplicate(true)
 	for research_id in research_ids:
 		if not research_id is String or not research_definitions.has(research_id) or selected.has(research_id):
@@ -102,10 +105,13 @@ func _build_research_state(research_ids: Array) -> Dictionary:
 		selected.append(research_id)
 	for research_id in selected:
 		var research: Dictionary = research_definitions[research_id]
-		var unit_kind: String = research.unit_kind
-		if adjusted_balance.has(unit_kind) and adjusted_balance[unit_kind].team == "ally" and research.stat == "damage":
-			adjusted_balance[unit_kind].damage += float(research.amount)
-	return {"ids": selected, "balance": adjusted_balance}
+		if research.get("effect", "") == "unlock_evolution":
+			unlocked_evolutions.append(research.evolution_id)
+		else:
+			var unit_kind: String = research.unit_kind
+			if adjusted_balance.has(unit_kind) and adjusted_balance[unit_kind].team == "ally" and research.stat == "damage":
+				adjusted_balance[unit_kind].damage += float(research.amount)
+	return {"ids": selected, "balance": adjusted_balance, "evolutions": unlocked_evolutions}
 
 func select_preview_wave(wave_id: String) -> bool:
 	for index in waves.size():
@@ -619,6 +625,7 @@ func restore(snapshot: Dictionary) -> bool:
 	if restored_next_id <= max_id:
 		return false
 	permanent_research = research_state.ids
+	unlocked_evolutions = research_state.evolutions
 	balance_seed = research_state.balance
 	wave = int(snapshot.wave)
 	run_id = snapshot.get("run_id", run_id)

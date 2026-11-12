@@ -3,6 +3,7 @@ extends Control
 var model: VillageModel
 var layout: VBoxContainer
 var list: VBoxContainer
+var research_scroll: ScrollContainer
 var balance: Label
 
 func _ready() -> void:
@@ -18,8 +19,13 @@ func _ready() -> void:
 	balance = Label.new()
 	balance.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	layout.add_child(balance)
+	research_scroll = ScrollContainer.new()
+	research_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	research_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_child(research_scroll)
 	list = VBoxContainer.new()
-	layout.add_child(list)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	research_scroll.add_child(list)
 	_refresh()
 	var back := Button.new()
 	back.text = "마을로"
@@ -34,6 +40,7 @@ func _refresh() -> void:
 	for research_id in model.research_definitions:
 		var research: Dictionary = model.research_definitions[research_id]
 		var button := Button.new()
+		button.custom_minimum_size.y = 48
 		var owned: bool = model.progress.data.get("unlocked_research", []).has(research_id)
 		button.text = "%s · %d%s" % [research.label, research.cost, " · 완료" if owned else ""]
 		button.disabled = owned or not model.can_purchase_research(research_id)
