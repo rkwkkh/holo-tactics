@@ -634,3 +634,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Re-ran Godot 4.7.2 core suite, content validation (0 Errors), and seeded campaign simulation: all passed (8/8 stages).
 - Re-ran battle/facility UI regression and editor-panel structure test: both passed (24 upgrade records). The editor-headless process reports resource/ObjectDB cleanup warnings on exit; test assertions pass.
 - `git diff --check` passes. Godot was invoked by its installed console executable because no `godot` command alias is on PATH.
+
+## Godot and Android emulator execution check (2026-11-13)
+
+- Godot 4.7.2 core headless suite passed; main scene launched headlessly and exited without reported script/engine errors.
+- API 37 x86_64 emulator: installed the released debug APK with `adb install -r` (`Success`), launched `com.example.holotactics`, observed the game process and `GodotAppLauncher` as the resumed foreground activity. Screenshot shows the campaign menu and existing progress.
+- No app fatal exception was present for the launched process. Mesa logged missing rendernode messages from the emulator software renderer; this is emulator-specific and does not establish physical-device performance.
+- The user’s Galaxy S25 Ultra is not connected to this workstation, so its installation result remains unverified.
