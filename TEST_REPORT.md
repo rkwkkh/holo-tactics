@@ -331,3 +331,7 @@
 - 시설 컨텍스트 도움말을 전투 단계별로 분기(재정비에서만 이동 가능)하고 preparation/combat 문구 회귀를 추가했다. Godot editor import와 `tests/results_view.gd` 통과.
 
 - 2026-11-12 R-UI-002 문구 수정 반영 Android 산출물 재생성: APK `build/holo-debug.apk` 249,877,946 bytes (API 29/36, v2 signature true); AAB `build/holo-test.aab` 86,286,970 bytes (bundletool 1.18.3 validate, BundleConfig/base manifest/dex 존재, API 29/36). AAB는 unsigned이며 publisher release/Play 업로드용이 아님.
+
+- 세로 모바일 레이아웃 회귀: `tests/results_view.gd`가 보드가 ScrollContainer 바깥에 남고 공통 조작부가 그 내부에 있으며 세로 scroll range가 생기는지 assert한다. 360×640 클래스 화면에서의 실기기 가시성/노치 터치는 `ANDROID_TESTING.md`에 추가했으며 미검증이다. 전체 headless/콘텐츠 검증 통과.
+
+- 최신 세로 전투 레이아웃 Android 빌드 (2026-11-12 17:20 KST): APK 249,879,210 bytes, min API 29/target 36 및 apksigner v2 확인. AAB 86,288,227 bytes, bundletool 1.18.3 validate 성공, 필수 BundleConfig/manifest/dex 엔트리 및 API 29/36 확인. `jarsigner`는 unsigned로 보고. 기기에서 스크롤/노치 동작 및 FPS는 미검증.

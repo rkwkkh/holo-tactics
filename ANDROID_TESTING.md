@@ -2,8 +2,8 @@
 
 ## Current artifact
 
-- Debug APK: `build/holo-debug.apk` (generated locally; ignored by Git; latest local build includes read-only pause; unit/facility contextual panels included).
-- Test AAB: `build/holo-test.aab` (unsigned packaging artifact only; latest local build includes read-only pause; unit/facility contextual panels included; unsigned and not uploadable to Play).
+- Debug APK: `build/holo-debug.apk` (generated locally; ignored by Git; latest local build includes read-only pause and contextual panels; scrollable battle controls included).
+- Test AAB: `build/holo-test.aab` (unsigned packaging artifact only; latest local build includes read-only pause and contextual panels; scrollable battle controls included; unsigned and not uploadable to Play).
 - Package ID: `com.example.holotactics` (placeholder; replace with the publisher's permanent ID before release).
 - Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
 - The APK is debug-signed. It is for device smoke tests, not Google Play upload.
@@ -31,6 +31,7 @@ Check each flow and record pass/fail plus a short note:
 1. Portrait startup, safe-area placement, campaign stage locks, and opening the village.
 2. Training-hall build, free move/store/redeploy, M1 research purchase, and currency persistence after relaunch.
 3. M1 unit placement, movement, attacks, both waves, intermission, victory settlement, and return to village.
+   - On a 360×640-class portrait viewport, confirm the full 8×10 board stays fixed/visible and lower controls can scroll without clipping or horizontal scrolling; verify safe-area placement on a notched device.
    - Select a deployed unit and confirm its upgrade/skill panel appears beside it and remains inside the screen; select a facility and confirm its HP/move hint appears beside it.
    - Before the stage's first clear, verify 2× is unavailable; clear it, re-enter, and verify 2× changes battle and intermission cadence together.
    - Pause during preparation and combat: verify units, enemies, cooldowns, and countdown stop; tile taps show information without selecting, moving, building, spending, or queuing commands. Resume and confirm the remaining timer continues.

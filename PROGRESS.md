@@ -111,3 +111,7 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - R-UI-002 상태 안내 수정: 시설 컨텍스트 패널은 재정비 중 이동 안내, 전투 중 이동 불가 안내를 구분한다. headless UI 회귀 및 editor import 통과.
 
 - 2026-11-12: 상태별 시설 안내 포함 최신 커밋의 Android APK/AAB 재생성. Debug APK `build/holo-debug.apk` 249,877,946 bytes; manifest API 29/36, apksigner v2 pass. Test AAB `build/holo-test.aab` 86,286,970 bytes; bundletool 1.18.3 validate, 필수 bundle entries 및 API 29/36 manifest pass. AAB unsigned.
+
+- 2026-11-12: 전투 화면 보드 아래의 공통 조작부를 세로 스크롤 영역에 넣고 시설 건설 버튼을 2열로 배치했다. 보드 자체는 고정 부모에 유지된다. headless UI 테스트에서 보드/스크롤 영역 분리와 실제 세로 overflow를 확인했다. 좁은 화면·노치 실기기 확인은 미검증.
+
+- 2026-11-12: 세로 스크롤 전투 레이아웃 포함 최신 Android Debug APK `build/holo-debug.apk` 249,879,210 bytes(API29/36 manifest, v2 서명 pass) 및 Debug AAB `build/holo-test.aab` 86,288,227 bytes(bundletool 1.18.3 검증, 필수 항목·API29/36 manifest pass) 생성. AAB는 unsigned.

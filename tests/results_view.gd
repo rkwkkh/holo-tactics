@@ -10,6 +10,11 @@ func _run() -> void:
 	var view = load("res://scenes/battle.tscn").instantiate()
 	root.add_child(view)
 	await process_frame
+	await process_frame
+	assert(view.controls_scroll.get_parent() != null and view.controls_scroll.get_child_count() == 1)
+	assert(view.wave_button.get_parent().get_parent().get_parent() == view.controls_scroll)
+	assert(view.tiles[0].get_parent() != view.controls_scroll and view.controls_scroll.size.y > 0.0)
+	assert(view.controls_scroll.get_v_scroll_bar().max_value > view.controls_scroll.get_v_scroll_bar().page)
 	assert(view.speed_button.disabled and view.timer.wait_time == 0.2)
 	var initial_phase: String = view.battle.phase
 	var initial_gold: int = view.battle.combat_gold

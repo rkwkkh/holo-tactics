@@ -41,6 +41,7 @@ var skill_controls_unit := -1
 var context_panel: PanelContainer
 var context_box: VBoxContainer
 var context_info: Label
+var controls_scroll: ScrollContainer
 var status_override := ""
 var result_reward := -1
 var progress_available := false
@@ -117,10 +118,18 @@ func _ready() -> void:
 			tile.pressed.connect(_on_tile_pressed.bind(cell))
 			grid.add_child(tile)
 			tiles.append(tile)
+	controls_scroll = ScrollContainer.new()
+	controls_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	controls_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	controls_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_child(controls_scroll)
+	var controls_box := VBoxContainer.new()
+	controls_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	controls_scroll.add_child(controls_box)
 	var unit_controls := GridContainer.new()
 	unit_controls.columns = 3
 	unit_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	layout.add_child(unit_controls)
+	controls_box.add_child(unit_controls)
 	for kind in battle.stage.get("available_units", []):
 		var deploy_button := Button.new()
 		deploy_button.text = "%s %d" % [_unit_name(kind), battle.balance_seed[kind].cost]
@@ -138,13 +147,15 @@ func _ready() -> void:
 	skill_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	context_box.add_child(skill_controls)
 	set_meta("skill_controls", skill_controls)
-	var facility_controls := HBoxContainer.new()
-	facility_controls.alignment = BoxContainer.ALIGNMENT_CENTER
-	layout.add_child(facility_controls)
+	var facility_controls := GridContainer.new()
+	facility_controls.columns = 2
+	facility_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	controls_box.add_child(facility_controls)
 	for facility_id in ["facility.arrow_tower", "facility.magic_tower", "facility.support_outpost", "facility.defense_wall"]:
 		var definition: Dictionary = battle.facility_definitions[facility_id]
 		var facility_button := Button.new()
 		facility_button.text = "%s %d" % ["화살탑" if definition.kind == "arrow_tower" else "마법탑" if definition.kind == "magic_tower" else "지원" if definition.kind == "support_outpost" else "방벽", definition.cost]
+		facility_button.custom_minimum_size = Vector2(156, 40)
 		facility_button.pressed.connect(_select_facility.bind(facility_id))
 		facility_button.add_to_group("battle_commands")
 		facility_controls.add_child(facility_button)
@@ -152,11 +163,12 @@ func _ready() -> void:
 		obstacle_controls = GridContainer.new()
 		obstacle_controls.columns = 2
 		obstacle_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		layout.add_child(obstacle_controls)
+		controls_box.add_child(obstacle_controls)
 		for obstacle_id in battle.obstacle_definitions:
 			var obstacle: Dictionary = battle.obstacle_definitions[obstacle_id]
 			var install_button := Button.new()
 			install_button.text = "장애물 설치 %d" % obstacle.cost
+			install_button.custom_minimum_size = Vector2(156, 40)
 			install_button.pressed.connect(_select_obstacle_definition.bind(obstacle_id))
 			install_button.add_to_group("battle_commands")
 			obstacle_controls.add_child(install_button)
@@ -177,7 +189,7 @@ func _ready() -> void:
 	wave_button.add_to_group("battle_commands")
 	var wave_controls := HBoxContainer.new()
 	wave_controls.alignment = BoxContainer.ALIGNMENT_CENTER
-	layout.add_child(wave_controls)
+	controls_box.add_child(wave_controls)
 	wave_controls.add_child(wave_button)
 	speed_button = Button.new()
 	speed_button.pressed.connect(_toggle_speed)
@@ -191,12 +203,12 @@ func _ready() -> void:
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	status.custom_minimum_size.y = 72
-	layout.add_child(status)
+	controls_box.add_child(status)
 	back_button = Button.new()
 	back_button.text = "전투 포기"
 	back_button.pressed.connect(_on_back_pressed)
 	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	layout.add_child(back_button)
+	controls_box.add_child(back_button)
 	_build_result_panel()
 	var abandon_dialog := ConfirmationDialog.new()
 	abandon_dialog.dialog_text = "테스트를 끝내고 돌아가시겠습니까? 전투 진행과 보상은 저장되지 않습니다." if editor_preview else "전투를 포기하고 돌아가시겠습니까? 완료한 웨이브 수만큼 부분 보상을 받습니다."
