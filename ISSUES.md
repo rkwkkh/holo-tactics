@@ -67,3 +67,5 @@
 ## Resolved
 
 - 2026-11-12: `BattleModel.restore()`가 체크포인트 검증 전에 영구 연구를 적용해 실패한 복원이 전투 모델을 부분 변경할 수 있었다. 임시 연구 밸런스로 전부 검증한 다음 커밋하도록 수정하고 회귀 테스트를 추가했다.
+
+- GitHub remote/Actions 권한이 확인되지 않아 새 Android AAB CI job의 hosted run 결과는 미검증이다. workflow lint 및 동일 로컬 export 경로는 확인했다.

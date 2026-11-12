@@ -44,3 +44,42 @@ jobs:
           godot --headless --path . res://scenes/village.tscn --quit-after 2
           godot --headless --path . res://scenes/village_research.tscn --quit-after 2
           godot --headless --path . res://scenes/editor_preview.tscn --quit-after 2
+
+  android-aab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.7.2
+          use-dotnet: false
+          include-templates: true
+      - name: Import project and install Gradle template
+        run: |
+          godot --headless --editor --path . --quit
+          godot --headless --path . --install-android-build-template
+      - name: Export Android debug AAB
+        run: |
+          mkdir -p build
+          godot --headless --path . --export-debug "Android Play AAB" build/holo-test.aab
+      - name: Verify AAB structure
+        run: |
+          test -s build/holo-test.aab
+          unzip -Z1 build/holo-test.aab | grep -Fx 'BundleConfig.pb'
+          unzip -Z1 build/holo-test.aab | grep -Fx 'base/manifest/AndroidManifest.xml'
+          unzip -Z1 build/holo-test.aab | grep -Fx 'base/dex/classes.dex'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: holo-debug-aab-unsigned
+          path: build/holo-test.aab
+          if-no-files-found: error
+          retention-days: 7

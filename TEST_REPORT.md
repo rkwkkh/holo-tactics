@@ -292,3 +292,8 @@
 - R-SAVE-006 보강: permanent research가 저장된 체크포인트에 대해 `content_version`, `schema_version`, `save_version` 각각을 독립적으로 증가시켜 복원 거부와 모델 무변경을 확인했다. malformed unit stat 거부도 함께 유지되며 `tests/run.gd` 통과.
 
 - 최신 M6 코드로 Debug AAB 재생성: `build/holo-test.aab`, 86,280,839 bytes (2026-11-12 16:23 local). `jar tf`에서 `BundleConfig.pb`, `base/manifest/AndroidManifest.xml`, `base/dex/classes.dex` 확인. `jarsigner`는 `jar is unsigned`를 반환했다. 이는 패키징 smoke test이며 release 서명/AAB 또는 Play 준비 완료 증거가 아니다.
+
+## GitHub Actions Android export job
+
+- `.github/workflows/validate.yml`에 Android SDK/API 36, Godot 4.7.2 export template 및 Gradle template을 이용한 Debug AAB packaging job을 추가했다. CI verifies bundle config, base manifest, and dex, then uploads `holo-debug-aab-unsigned` for 7 days.
+- Locally: official actionlint v1.7.12 binary checksum-list digest and archive checksum were verified before execution; actionlint passed. Actual GitHub-hosted execution is pending repository/Actions access. This artifact is not a signed Play release.

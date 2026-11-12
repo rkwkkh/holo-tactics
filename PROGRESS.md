@@ -87,3 +87,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12: 손상된 진행 저장 파일 로드 거부 시 디스크 원본과 기존 메모리 진행 데이터가 보존되는 회귀 검증을 추가했다.
 
 - 2026-11-12: 최신 체크포인트 복원 수정이 포함된 Android Debug AAB 패키징과 필수 번들 엔트리 검증을 수행했다. 번들은 unsigned이며 release artifact가 아니다.
+
+- GitHub Actions에 `android-aab` job을 추가했다: JDK 17/Android SDK API 36/Godot 4.7.2 export templates를 설치하고 Gradle template로 Debug AAB를 export, 필수 bundle entry를 검증한 뒤 unsigned smoke artifact를 7일 보관한다. 로컬 actionlint v1.7.12 검증 통과. 원격 Actions 실행은 저장소/권한 미확인으로 대기 중이다.
