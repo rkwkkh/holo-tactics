@@ -104,3 +104,7 @@ Tried Android system frame collectors during an active API37 AVD M1 wave. `dumps
 ## Debug frame sample (2026-11-12)
 
 A debug-only sampler logs `[PERF]` every 10 seconds during combat/preparation. On the API37 SwiftShader AVD, an M1 wave produced two windows: 25.9/25.4 average FPS, p95 41.67/41.31ms, max 50ms. This is under the 60 FPS regular / 30 FPS high-load targets and reflects a software-rendered emulator, not a representative phone; do not use it to claim device performance. Repeat on physical Android 10+ hardware with the Godot Remote Profiler or a device GPU/frame profiler.
+
+## API29 compatibility-renderer probe (2026-11-12)
+
+A temporary APK exported with Godot Compatibility/OpenGL was installed on the API29 AVD. It selected `opengl3` but failed EGL startup (`_start_success`) on the GL thread and returned to the launcher. The project config was restored; the normal Android preset remains Mobile/Vulkan. Thus both Vulkan and Compatibility fail on this AVD. This does not establish behavior on physical Android 10 devices.

@@ -527,3 +527,9 @@
 - Godot 4.7.2 editor import and `tests/run.gd` passed. Fresh APK and AAB exports completed; APK v2 signature verification passed. APK package `com.example.holotactics`, min API 29, target API 36.
 - API37 SwiftShader AVD, M1 wave: consecutive windows measured 25.9 and 25.4 average FPS; p95 41.67 and 41.31ms; max 50ms. This virtualized software GPU result is below the stated FPS goals; it is diagnostic only and does not establish physical-device performance. No script or fatal error appeared during the sampling window.
 - Visual smoke: campaign menu and M1 board/unit sprites rendered; wave start accepted. API29 Vulkan presentation and physical Android performance remain unverified.
+
+## API29 GLES renderer fallback probe (2026-11-12)
+
+- Exported a temporary Android APK with `renderer/rendering_method.mobile="gl_compatibility"`; restored `project.godot` immediately after export. The production setting remains Godot Mobile/Vulkan.
+- Installed/launched on the API29 AVD. OpenGL selected (`renderingDevice: opengl3`) but the Android GL thread terminated with `_start_success` EGL startup failure; the app returned to the launcher. This fallback also fails on the current API29 emulator image.
+- No renderer change is justified by this emulator-only result. API29 hardware verification remains required.
