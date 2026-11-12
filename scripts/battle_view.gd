@@ -28,6 +28,11 @@ var status_override := ""
 var result_reward := -1
 var progress_available := false
 var editor_preview := false
+var result_panel: PanelContainer
+var result_title: Label
+var result_details: Label
+var result_reward_label: Label
+var result_button: Button
 
 func _ready() -> void:
 	var selected_stage_id: String = get_tree().get_meta("selected_stage_id", BattleModel.STAGE_ID)
@@ -133,6 +138,7 @@ func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	layout.add_child(back_button)
+	_build_result_panel()
 	var abandon_dialog := ConfirmationDialog.new()
 	abandon_dialog.dialog_text = "테스트를 끝내고 돌아가시겠습니까? 전투 진행과 보상은 저장되지 않습니다." if editor_preview else "전투를 포기하고 돌아가시겠습니까? 완료한 웨이브 수만큼 부분 보상을 받습니다."
 	abandon_dialog.confirmed.connect(_abandon_battle)
@@ -284,6 +290,7 @@ func _facility_at(cell: Vector2i) -> Dictionary:
 
 func _refresh() -> void:
 	hud.text = "%s · 웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [stage_title, battle.wave, battle.core_hp, battle.combat_gold]
+	_refresh_result_panel()
 	wave_button.text = "웨이브 시작 (%d)" % rest_seconds if rest_seconds > 0 else "웨이브 시작"
 	wave_button.disabled = battle.phase != "preparation"
 	back_button.text = "테스트 종료" if editor_preview else "마을로 돌아가기" if battle.phase == "finished" else "전투 포기"
@@ -324,6 +331,58 @@ func _refresh() -> void:
 		status.text = "전투 중 · 선택 유닛을 누른 뒤 이동할 칸을 선택하세요"
 	else:
 		status.text = "배치 단계 · 검사/궁수를 선택한 뒤 아군 구역을 누르세요"
+
+func _build_result_panel() -> void:
+	result_panel = PanelContainer.new()
+	result_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.035, 0.055, 0.075, 0.97)
+	style.border_color = Color("#caa65a")
+	style.set_border_width_all(2)
+	result_panel.add_theme_stylebox_override("panel", style)
+	result_panel.visible = false
+	var center := CenterContainer.new()
+	result_panel.add_child(center)
+	var content_box := VBoxContainer.new()
+	content_box.custom_minimum_size.x = 280
+	content_box.add_theme_constant_override("separation", 14)
+	center.add_child(content_box)
+	result_title = Label.new()
+	result_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	result_title.add_theme_font_size_override("font_size", 26)
+	content_box.add_child(result_title)
+	result_details = Label.new()
+	result_details.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	result_details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content_box.add_child(result_details)
+	result_reward_label = Label.new()
+	result_reward_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	result_reward_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content_box.add_child(result_reward_label)
+	result_button = Button.new()
+	result_button.text = "마을로 돌아가기"
+	result_button.pressed.connect(_on_back_pressed)
+	content_box.add_child(result_button)
+	add_child(result_panel)
+
+func _refresh_result_panel() -> void:
+	var finished := battle.phase == "finished"
+	result_panel.visible = finished
+	if not finished:
+		return
+	result_title.text = "전투 승리" if battle.battle_result == "victory" else "전투 패배" if battle.battle_result == "defeat" else "안전 종료" if battle.battle_result == "safe_abort" else "전투 포기"
+	result_details.text = "%s · 웨이브 %d / %d 완료" % [battle.stage.get("name", stage_title), mini(battle.wave - 1, battle.waves.size()), battle.waves.size()]
+	if editor_preview:
+		result_reward_label.text = "편집기 미리보기 · 진행과 보상은 저장되지 않았습니다"
+		result_button.text = "테스트 종료"
+	elif battle.battle_result == "safe_abort":
+		result_reward_label.text = "체크포인트를 보존했습니다. 문제를 수정한 뒤 이어서 다시 시작할 수 있습니다."
+	elif result_reward < 0:
+		result_reward_label.text = status_override if not status_override.is_empty() else "보상 저장 중입니다."
+	else:
+		result_reward_label.text = "영구 재화 +%d\n보유 재화 %d" % [result_reward, progress.data.permanent_currency]
+		result_button.text = "마을로 돌아가기"
+	result_button.disabled = not editor_preview and battle.battle_result != "safe_abort" and result_reward < 0
 
 func _refresh_upgrade_controls() -> void:
 	var unit := battle._unit_by_id(selected_unit)

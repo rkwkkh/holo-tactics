@@ -218,3 +218,10 @@
 - 미검증: GUI에서 ItemList 클릭 후 실제 탭/레코드 이동, Inspector 동기화 및 저장 UX. field-level 경로가 Validator에 없어 레코드 단위까지만 이동한다.
 
 - M5 오류 탐색 변경 포함 Android APK 재내보내기 통과: `build/holo-debug.apk`, 86,352,507 bytes (2026-11-12 14:10 KST). apksigner v2/v3 검증 통과. EditorPlugin은 런타임 게임 흐름을 바꾸지 않으며 실제 GUI는 여전히 미검증이다.
+
+## 2026-11-12 M4 결과 화면
+
+- 통과: `tests/results_view.gd`의 전용 결과 패널 UI-state 검사(승리/정산 재화, 안전 종료/체크포인트 안내, 정산 저장 실패 시 복귀 버튼 잠금).
+- 통과: Godot editor import, `tests/run.gd`, `tests/editor_preview.gd`, `scripts/validate_content.gd`, main/battle/village/village_research/editor_preview 씬 smoke.
+- 통과: 최신 결과 화면 포함 Android Debug APK 재생성 (`build/holo-debug.apk`, 86,356,758 bytes, 2026-11-12 14:18 KST); apksigner v2/v3 서명.
+- 미검증: 결과 패널의 실제 기기/GUI 시각 배치와 버튼 상호작용. 실기기/FPS 미검증은 계속 유지한다.
