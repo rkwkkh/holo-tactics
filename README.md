@@ -18,7 +18,14 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
 - The enabled **Holo Content Editor** dock has stage/wave, evolution, and combat-upgrade JSON panels. Stage/wave preview runs from saved catalog data in an isolated checkpoint and does not settle rewards.
 - Android device smoke, frame-rate measurement, and private-test readiness steps are in [ANDROID_TESTING.md](ANDROID_TESTING.md).
 - The main menu exposes the seeded 6-main/2-optional campaign. Village management includes the four growth buildings and a separate permanent-research screen; research effects are still balance seeds. Battle controls expose only units and facilities available in the selected stage.
-- Android SDK and OpenJDK 17 are installed and configured in the local Godot editor settings. Export templates are installed. The local debug preset exports with `--export-debug "Android Debug APK" build/holo-debug.apk` (create the ignored `build/` directory first).
+- The Android presets use Gradle so the manifest minimum is API 29 (Android 10); target API is 36. Install the Android build template and export the debug APK with:
+
+  ```powershell
+  New-Item -ItemType Directory -Force build | Out-Null
+  & $godot --headless --path . --install-android-build-template --export-debug "Android Debug APK" build/holo-debug.apk
+  ```
+
+- For a signed Play-format AAB, set `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD` in the process environment, then run `scripts/export_android_aab.ps1`. Keep the keystore and passwords outside Git. The checked-in package ID is still a placeholder.
 - `assets/icon.svg` is temporary project art; replace it before store publication. No release keystore or store credentials belong in this repository.
 
 ## Data boundaries

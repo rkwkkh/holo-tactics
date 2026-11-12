@@ -4,8 +4,14 @@
 
 - Debug APK: `build/holo-debug.apk` (generated locally; ignored by Git).
 - Package ID: `com.example.holotactics` (placeholder; replace with the publisher's permanent ID before release).
-- Export preset: `Android Debug APK`; minimum API 24, target API 36.
+- Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
 - The APK is debug-signed. It is for device smoke tests, not Google Play upload.
+
+## Release AAB export
+
+`scripts/export_android_aab.ps1` installs the Godot Android Gradle template, exports `build/holo-release.aab`, and verifies its JAR signature. Provide a publisher-owned release key through the process environment variables `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER` (key alias), and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`. The script does not print their values. Never commit the key or password.
+
+The repository's application ID is a placeholder and must be replaced by the publisher's permanent unique ID before Play upload. A locally generated throwaway key can validate packaging but its AAB is not upload-ready.
 
 ## Device smoke test
 
@@ -55,4 +61,4 @@ Record scenario, device, room temperature/power mode, run duration, average and 
 
 ## Current verification state
 
-Local Android export and APK signature verification pass. Physical Android 10+ startup, touch/UI behavior, frame-rate targets, release AAB signing, and Play Console private-test distribution are pending external device/account access.
+Local Gradle Android debug APK export, API 29 manifest, and v2 signature verification pass. A test AAB was packaged and its bundle structure inspected, but it is unsigned. Physical Android 10+ startup, touch/UI behavior, frame-rate targets, publisher-key release AAB, and Play Console private-test distribution remain pending device/account access.

@@ -75,3 +75,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 시설 `damage`가 문자열인 카탈로그에서 Validator가 문자열-정수 비교로 중단되는 결함을 재현하고, 숫자 형식 검증을 통과한 경우에만 관계 검사를 수행하도록 수정했다. `damage`, `heal`, `splash_radius`, `range`, `attack_time` 문자열 오류 테스트를 추가했다.
 - 전체 headless 테스트, Validator 검사, 콘텐츠 검증, 5개 씬 smoke 통과. 런타임 Validator 수정 포함 Android Debug APK 재생성 및 apksigner v2/v3 검사 통과.
 - M5 GUI 확인은 Computer Use 네이티브 연결 오류로 미실행, ADB의 두 AVD는 offline. M6 실기기/FPS는 미검증으로 유지한다.
+
+- 2026-11-12 Android export 재검증: Gradle APK/AAB 프리셋의 minimum API를 Android 10(API 29), target API 36으로 맞췄다. 최신 APK manifest와 v2 서명 확인 통과, AAB 패키징 생성 및 구조 확인 통과. AAB는 unsigned 테스트 산출물이다. release key 서명, Play 업로드, 실기기/FPS 검증은 미완료.

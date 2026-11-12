@@ -44,3 +44,5 @@
 - 2026-11-12: M0 검증 반복 통과. M1 수성 플레이 슬라이스는 수성 전멸 규칙 OPEN 때문에 미완료. M2는 공성 규칙, A*/적 AI, 순차 증원, 비활성 초기 배치 적/시설, 적 시설 공격·웨이브 교체, 파괴 가능 방어벽, 시설 4종의 단일/광역 공격·치유/파괴/저장·복원을 구현 중이다. M3는 5/6종 역할, stage별 배치 해금, 강화 20종, 기본 스킬 10종과 버전된 영구 진행 저장 기반을 구현 중이다. 스킬 효과·쿨타임·비용은 임시 SEED. 시설 수리는 정책 미결정으로 보류했다. 진화·연구·영구 성장 연동·마을/캠페인/툴은 남아 있다. 최신 테스트 및 Android export 증거는 `TEST_REPORT.md`.
 - 2026-11-12 사용자 결정: 기본 5종은 모두 한 시점에 풀지 않고, 스토리 진행 시점에 따라 단계적으로 해금한다. `DECISIONS.md`의 C2 순서를 구현 기준으로 삼는다. 원본 기획 문서는 변경하지 않았다.
 - 2026-11-12: M4 campaign seed 8개(메인 6+선택 2) 및 26개 wave 연결. 메뉴 진입 제한은 `ProgressStore.completed_stages` 의존 관계로 구현. 자원·맵·보상은 조정 가능한 설계초안 SEED. M4 인수에는 마을/연구 및 전체 캠페인 플레이 테스트가 남아 있다.
+
+- 2026-11-12 M6 Android packaging: Gradle APK/AAB presets use min API 29 and target API 36. APK manifest/v2 signature and unsigned AAB structure verified. Publisher signing and real-device validation remain open.

@@ -57,3 +57,6 @@
 - 남음: 편집기 GUI에서 오류 선택→레코드 이동의 시각/상호작용 검증은 자동 headless 테스트로 대체할 수 없음. Android 실기기 GLES 및 성능도 별도 기기 검증 필요.
 - 기존 OPEN 전투 규칙 결정(수성 전멸 처리, 진화 분기/재진화, 시설 수리 시점)은 사용자 답변 대기이며 코드에서 확정하지 않음.
 - 2026-11-12 추가 재검증: 문자열 숫자값에서 Validator가 중단되던 시설 필드 관계 검사를 수정하고 5개 필드의 malformed 입력 테스트를 통과했다. 단말 GUI blocker와 AVD offline 상태는 반복 확인됐지만 다른 독립 작업은 계속 가능하다.
+
+- 2026-11-12 Android export 설정 이슈 해결: 이전 non-Gradle APK의 minimum API 24는 Android 10+ 기준에 못 미쳤다. Gradle APK/AAB로 전환하고 min API 29, target API 36을 적용했으며 최신 APK manifest에서 확인했다. 이전 산출물은 사용하지 않는다.
+- 출시 AAB 서명 및 업로드는 publisher-owned package ID, release keystore와 Play 권한이 필요하다. 로컬 unsigned AAB 패키징만 확인됨.
