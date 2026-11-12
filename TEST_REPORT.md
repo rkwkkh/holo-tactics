@@ -509,3 +509,8 @@
 - Fresh Android debug APK: API29 minimum/API36 target, one debug signer verified. Fresh test AAB: bundletool 1.18.3 validation passed; unsigned.
 - API37 AVD: latest APK rendered M1 board and placed swordsman using pixel sprite atlas. API29 remains black with Vulkan present error 5 under host and SwiftShader GPU modes. No physical-device or FPS validation.
 - Visual asset is temporary placeholder art; final production art pass remains open.
+
+## Android frame-time instrumentation check (2026-11-12)
+
+- Attempted system-level frame capture during active M1 on API37 AVD. `dumpsys gfxinfo` had 0 ViewRoot frames; percentile defaults were invalid. `SurfaceFlinger --latency` exposed only 60Hz display period (16.67ms), no app frame timestamps.
+- Result: no performance conclusion. Use Godot Remote Profiler or a physical device with a GPU/frame-time profiler; performance acceptance remains pending.

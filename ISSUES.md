@@ -126,3 +126,5 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 - Renderer isolation on API29 AVD: both original `-gpu host` and clean `-gpu swiftshader_indirect` runs reproduce black output plus Vulkan present error 5. This narrows the emulator issue but does not prove a device-wide Godot/API29 defect. Obtain physical Android 10 validation or a known-good API29 Vulkan emulator before release.
 
 - Asset gap: the M1 battle board now uses temporary pixel-art sprites for all catalog unit/facility kinds plus core/walls/obstacles. Replace the hand-authored atlas with approved final art before release; current icons are functional placeholders, not production art.
+
+- Performance measurement gap: API37 AVD `gfxinfo` collected zero ViewRoot frames while Godot rendered through SurfaceView; SurfaceFlinger latency query exposed only refresh period, no game frame timestamps. Do not infer FPS from these. Need Godot Remote Profiler/physical GPU profiler before judging 60FPS regular and 30FPS high-load targets.

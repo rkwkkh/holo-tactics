@@ -96,3 +96,7 @@ On API 37 AVD, manual taps entered M1, placed two swordsmen (resource 160→60),
 
 - 2026-11-12: Current API37 AVD with the latest sprite-atlas build shows M1 battle and deployed swordsman sprite. API29 smoke remains black with Vulkan present error 5. The asset is a temporary atlas; FPS/physical device remain unverified.
 - Latest build hashes: APK `95DDFF7E99F5E30946B9626DC96A25B5E5F9B605E40EA55D5F8AFFF271A1EBA3`; AAB `90FE8D18CAB772A69E6E01305E053228D3471EFB19793CF746DC9E640FD11856`.
+
+## AVD FPS sampling limitation (2026-11-12)
+
+Tried Android system frame collectors during an active API37 AVD M1 wave. `dumpsys gfxinfo com.example.holotactics` reported zero ViewRoot frames (the Godot Vulkan game is rendered through a native SurfaceView); percentile defaults were 4950ms and are invalid. `dumpsys SurfaceFlinger --latency` returned only the display refresh period (16,666,666ns), without frame timestamps for the Godot layer. These commands cannot establish game FPS or frame-time targets on this build. Use Godot's Remote Profiler on a connected target or a physical-device GPU/frame profiler; keep 60/30 FPS acceptance pending.
