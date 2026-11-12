@@ -457,6 +457,9 @@ func _abandon_battle() -> void:
 		_process_result()
 		_refresh()
 
+func _completed_waves_for_result() -> int:
+	return clampi(battle.wave if battle.battle_result == "victory" else battle.wave - 1, 0, battle.waves.size())
+
 func _process_result() -> void:
 	if editor_preview:
 		result_reward = 0
@@ -468,7 +471,7 @@ func _process_result() -> void:
 	if not progress_available:
 		status_override = "영구 진행 저장을 읽지 못해 보상 정산을 중단했습니다."
 		return
-	var amount := progress.settle_run(battle.run_id, battle.stage_id, battle.battle_result, battle.wave - 1, int(battle.stage.permanent_first_bonus), int(battle.stage.permanent_repeat_reward), int(battle.stage.permanent_partial_per_wave))
+	var amount := progress.settle_run(battle.run_id, battle.stage_id, battle.battle_result, _completed_waves_for_result(), int(battle.stage.permanent_first_bonus), int(battle.stage.permanent_repeat_reward), int(battle.stage.permanent_partial_per_wave))
 	if amount < 0:
 		status_override = "보상 저장에 실패했습니다. 체크포인트를 보존하고 다시 저장을 시도합니다."
 		return
@@ -720,7 +723,7 @@ func _refresh_result_panel() -> void:
 	if not finished:
 		return
 	result_title.text = "전투 승리" if battle.battle_result == "victory" else "전투 패배" if battle.battle_result == "defeat" else "안전 종료" if battle.battle_result == "safe_abort" else "전투 포기"
-	result_details.text = "%s · 웨이브 %d / %d 완료" % [battle.stage.get("name", stage_title), mini(battle.wave - 1, battle.waves.size()), battle.waves.size()]
+	result_details.text = "%s · 웨이브 %d / %d 완료" % [battle.stage.get("name", stage_title), _completed_waves_for_result(), battle.waves.size()]
 	if editor_preview:
 		result_reward_label.text = "편집기 미리보기 · 진행과 보상은 저장되지 않았습니다"
 		result_button.text = "테스트 종료"

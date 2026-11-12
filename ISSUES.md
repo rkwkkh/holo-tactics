@@ -146,3 +146,8 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 - 2026-11-12 API37 interaction follow-up: corrected touch coordinates entered M1; deploy/resource deduction and first enemy attack/core damage were visually observed. This verifies only a short AVD combat path. Full stage, API29 hardware, GUI editor and FPS checks remain open.
 
 - API37 checkpoint reproduction (2026-11-12): saved pre-wave snapshot was inspected on-device; force-stop/relaunch returned to same M1 run and deployed unit; core-zero defeat settled and removed checkpoint. No duplicate reward was observed. AVD combat FPS remained below numeric target (23.7–25.2 average, p95 42.80–45.68ms); physical performance is still unverified.
+
+## Resolved: victory result wave count (2026-11-12)
+
+- M1 victory UI used `wave - 1`, so the final wave was omitted from the result label. The shared completed-wave calculation now includes the current wave on victory and prior waves on defeat, clamped to stage bounds. Tests cover both outcomes; API37 emulator victory displayed 2/2.
+- No known save migration or reward-rule change; only the count passed to settlement and displayed UI now reflects actual completed waves.

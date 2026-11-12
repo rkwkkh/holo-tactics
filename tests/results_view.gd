@@ -57,7 +57,8 @@ func _run() -> void:
 	view.editor_preview = false
 	view.battle.phase = "finished"
 	view.battle.battle_result = "victory"
-	view.battle.wave = view.battle.waves.size() + 1
+	view.battle.wave = view.battle.waves.size()
+	assert(view._completed_waves_for_result() == view.battle.waves.size())
 	view.result_reward = 30
 	view.progress.data.permanent_currency = 123
 	view._refresh_speed_control()
@@ -74,6 +75,7 @@ func _run() -> void:
 	assert(view.result_title.text == "안전 종료" and not view.result_button.disabled)
 	assert(view.result_reward_label.text.contains("체크포인트를 보존"))
 	view.battle.battle_result = "defeat"
+	assert(view._completed_waves_for_result() == view.battle.waves.size() - 1)
 	view.status_override = "보상 저장 실패"
 	view._refresh_result_panel()
 	assert(view.result_title.text == "전투 패배" and view.result_button.disabled)

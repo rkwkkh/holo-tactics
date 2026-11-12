@@ -245,3 +245,7 @@ Added tracked `build/.gdignore`. Godot 4.7.2 headless editor initialization now 
 ## API37 checkpoint reboot path (2026-11-12)
 
 Reproduced on the current APK: verified the M1 wave-start checkpoint JSON directly in Android app storage, force-stopped/relaunched the app, then observed the same stage/unit in resumed combat. The resumed unattended battle ended in a normal core-zero defeat; settlement kept permanent currency 115 and cleared the checkpoint. This validates routing, restore, and defeat cleanup on API37, not a win path. Four SwiftShader profiler windows averaged 23.7–25.2 FPS (p95 42.80–45.68ms); physical-device performance remains unknown.
+
+## M1 victory result count fix (2026-11-12)
+
+API37 emulator repeat-play smoke completed the two-wave M1 defense. The result panel now reports `웨이브 2 / 2 완료`; the prior count incorrectly displayed 1/2 after victory. This was a presentation/counting defect; reward settlement did not depend on that count. Updated APK SHA-256: `B8845B0ECDA245D51EA6234D898C19B925982FB92C470111E3E141D806F0A5BA`. Updated test AAB SHA-256: `3941E299153244DB5BD4698DA95C6F2A9D9B6AD86C52A1E1CB038F8A8CED59E0`.

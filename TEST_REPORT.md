@@ -597,3 +597,10 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 
 - API37 M1 checkpoint file inspection, force-stop/relaunch resume, defeat settlement and checkpoint removal passed on the current APK. Permanent-currency balance stayed at 115 (no duplicate reward on this zero-reward defeat).
 - SwiftShader AVD combat samples: average 25.2/24.5/23.7/24.4 FPS, p95 43.45/43.75/45.68/42.80ms. Under target in this software emulator; not a physical-device result.
+
+## M1 result-count fix and Android artifact revalidation (2026-11-12)
+
+- Godot 4.7.2: `tests/results_view.gd`, `tests/run.gd`, and `tests/campaign_playability.gd` passed; seeded playability simulation won all 8 stages. `git diff --check` passed.
+- API37/Emulator 37.2.13: installed fixed APK and manually replayed M1 to victory. Result panel displayed 2/2 completed waves and repeat reward +10; screenshot `build/mvp-fixed-result.png` is a local ignored artifact. This is emulator gameplay evidence only.
+- APK SHA-256 `B8845B0ECDA245D51EA6234D898C19B925982FB92C470111E3E141D806F0A5BA`; `apksigner verify --verbose` passed (v2 signature). Test AAB SHA-256 `3941E299153244DB5BD4698DA95C6F2A9D9B6AD86C52A1E1CB038F8A8CED59E0`; `bundletool validate` passed. Manifest: `com.example.holotactics`, min API 29, target API 36.
+- Release signing is not configured; this AAB is for testing. Physical Android 10 compatibility, physical FPS targets, GUI interaction of M5 panels, and Play private-test upload remain unverified.
