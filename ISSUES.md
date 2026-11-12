@@ -40,7 +40,7 @@
 - Android 10(API 29) AVD 이미지(`android-29/google_apis/x86_64`)는 GLES 2로 보고되어 Godot Android 실행에 필요한 GLES3 컨텍스트를 생성하지 못했다. 이는 AVD 이미지 한계로 보이며 Android 10 물리 기기 호환성 판정이 아니다.
 - 최신 APK를 API 37 AVD에 설치·실행했으나 Godot GLES3 `CanvasShaderGLES3`/`SceneShaderGLES3`에서 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)` 초과 오류가 기록됐다. 프로세스는 유지됐지만 화면/입력 플레이는 통과로 판정하지 않았으며, 실제 GLES3 기기 또는 지원 렌더러로 재검증이 필요하다.
 
-- M5 Inspector 동기화 모델과 검증 오류별 레코드 이동은 구현됐지만 GUI에서 편집→가져오기→저장/오류 이동 흐름은 직접 확인하지 않았다. Validator 오류에 필드 위치 정보가 없어 필드 단위 선택은 미구현이다.
+- M5 Inspector 동기화 모델, Validator의 ID·필드 경로 표시, 오류별 레코드 이동은 구현됐지만 GUI에서 편집→가져오기→저장/오류 이동 흐름은 직접 확인하지 않았다.
 
 - 2026-11-12: computer-use 네이티브 연결이 unavailable 상태라 Godot 편집기 GUI 직접 검증이 막혔다. 자동 파싱/모델 검사와 씬 실행은 통과하지만, Inspector GUI 상호작용 및 모바일 실기기 UI/FPS 검증 증거는 없다.
 
@@ -52,3 +52,4 @@
 - 해결: Validator 오류를 ID/필드 경로와 함께 표시하고, 연구 데이터의 개별 필드 경로를 테스트함.
 - 남음: 편집기 GUI에서 오류 선택→레코드 이동의 시각/상호작용 검증은 자동 headless 테스트로 대체할 수 없음. Android 실기기 GLES 및 성능도 별도 기기 검증 필요.
 - 기존 OPEN 전투 규칙 결정(수성 전멸 처리, 진화 분기/재진화, 시설 수리 시점)은 사용자 답변 대기이며 코드에서 확정하지 않음.
+- 2026-11-12 추가 재검증: 문자열 숫자값에서 Validator가 중단되던 시설 필드 관계 검사를 수정하고 5개 필드의 malformed 입력 테스트를 통과했다. 단말 GUI blocker와 AVD offline 상태는 반복 확인됐지만 다른 독립 작업은 계속 가능하다.

@@ -153,6 +153,11 @@ func _initialize() -> void:
 	var invalid_research_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_research_catalog.categories.research[0].amount = 0
 	assert(ContentValidator.validate(invalid_research_catalog).any(func(error): return error == "research.swordsman.damage.amount: has invalid permanent research data"))
+	for malformed_field in ["damage", "heal", "splash_radius", "range", "attack_time"]:
+		var malformed_facility_catalog: Dictionary = seeded_catalog.duplicate(true)
+		malformed_facility_catalog.categories.facilities[0][malformed_field] = "invalid"
+		var malformed_facility_errors := ContentValidator.validate(malformed_facility_catalog)
+		assert(malformed_facility_errors.any(func(error): return error.begins_with("facility.arrow_tower.%s:" % malformed_field)))
 	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "ally").size() == 5)
 	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "enemy").size() == 6)
 	var story_rosters := {"stage.m1.frontier": ["swordsman", "archer"], "stage.m2.crossroads": ["swordsman", "archer", "spearman"], "stage.m3.fortress": ["swordsman", "archer", "spearman"], "stage.m4.forest": ["swordsman", "archer", "spearman", "support"], "stage.m5.citadel": ["swordsman", "archer", "spearman", "support", "mage"]}

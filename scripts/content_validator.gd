@@ -128,35 +128,40 @@ static func validate(catalog: Dictionary) -> Array[String]:
 			continue
 		facility_teams[facility.get("id", "")] = facility.get("team", "")
 		var facility_id: String = facility.get("id", "<missing-id>")
+		var valid_damage := _is_nonnegative_number(facility.get("damage"))
+		var valid_heal := _is_nonnegative_number(facility.get("heal", 0))
+		var valid_splash_radius := _is_nonnegative_integer(facility.get("splash_radius", 0))
+		var valid_range := _is_nonnegative_integer(facility.get("range"))
+		var valid_attack_time := _is_nonnegative_number(facility.get("attack_time"))
 		if facility.get("team") not in ["ally", "enemy"]:
 			_append_field_error(errors, facility_id, "team", "invalid facility data")
 		if not _is_positive_number(facility.get("hp")):
 			_append_field_error(errors, facility_id, "hp", "invalid facility data")
-		if not _is_nonnegative_number(facility.get("damage")):
+		if not valid_damage:
 			_append_field_error(errors, facility_id, "damage", "invalid facility data")
-		if not _is_nonnegative_number(facility.get("heal", 0)):
+		if not valid_heal:
 			_append_field_error(errors, facility_id, "heal", "invalid facility data")
-		if not _is_nonnegative_integer(facility.get("splash_radius", 0)):
+		if not valid_splash_radius:
 			_append_field_error(errors, facility_id, "splash_radius", "invalid facility data")
-		if not _is_nonnegative_integer(facility.get("range")):
+		if not valid_range:
 			_append_field_error(errors, facility_id, "range", "invalid facility data")
-		if not _is_nonnegative_number(facility.get("attack_time")):
+		if not valid_attack_time:
 			_append_field_error(errors, facility_id, "attack_time", "invalid facility data")
 		if not _is_nonnegative_integer(facility.get("cost")):
 			_append_field_error(errors, facility_id, "cost", "invalid facility data")
 		if not facility.get("blocks_path") is bool:
 			_append_field_error(errors, facility_id, "blocks_path", "invalid facility data")
-		if facility.damage > 0 and facility.range < 1:
+		if valid_damage and facility.damage > 0 and valid_range and facility.range < 1:
 			_append_field_error(errors, facility_id, "range", "invalid facility attack data")
-		if facility.damage > 0 and facility.attack_time <= 0:
+		if valid_damage and facility.damage > 0 and valid_attack_time and facility.attack_time <= 0:
 			_append_field_error(errors, facility_id, "attack_time", "invalid facility attack data")
-		if float(facility.get("splash_radius", 0)) > 0.0 and facility.damage <= 0:
+		if valid_splash_radius and facility.splash_radius > 0 and valid_damage and facility.damage <= 0:
 			_append_field_error(errors, facility_id, "damage", "invalid facility splash data")
-		if facility.heal > 0 and facility.range < 1:
+		if valid_heal and facility.heal > 0 and valid_range and facility.range < 1:
 			_append_field_error(errors, facility_id, "range", "invalid facility healing data")
-		if facility.heal > 0 and facility.attack_time <= 0:
+		if valid_heal and facility.heal > 0 and valid_attack_time and facility.attack_time <= 0:
 			_append_field_error(errors, facility_id, "attack_time", "invalid facility healing data")
-		if facility.heal > 0 and facility.team != "ally":
+		if valid_heal and facility.heal > 0 and facility.team != "ally":
 			_append_field_error(errors, facility_id, "team", "invalid facility healing data")
 	var town_buildings := _as_array(categories.get("town_buildings", []))
 	for research in _as_array(categories.get("research", [])):

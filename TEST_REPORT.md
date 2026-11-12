@@ -215,7 +215,7 @@
 
 - 통과: editor import/플러그인 스크립트 parse check, 전체 `tests/run.gd`, `tests/editor_preview.gd`, 카탈로그 validator.
 - 추가 검사: Error 메시지에서 가장 구체적인 stable ID를 찾고, 글로벌 오류/잘못된 categories는 안전하게 빈 ID를 돌려준다. 오류 이동 시 저장 전 패널 초안을 ID별로 유지하도록 구현.
-- 미검증: GUI에서 ItemList 클릭 후 실제 탭/레코드 이동, Inspector 동기화 및 저장 UX. field-level 경로가 Validator에 없어 레코드 단위까지만 이동한다.
+- 미검증: GUI에서 ItemList 클릭 후 실제 탭/레코드 이동, Inspector 동기화 및 저장 UX. field path는 오류 메시지에 표시되나 Inspector의 특정 속성 자동 포커스는 없다.
 
 - M5 오류 탐색 변경 포함 Android APK 재내보내기 통과: `build/holo-debug.apk`, 86,352,507 bytes (2026-11-12 14:10 KST). apksigner v2/v3 검증 통과. EditorPlugin은 런타임 게임 흐름을 바꾸지 않으며 실제 GUI는 여전히 미검증이다.
 
@@ -230,3 +230,10 @@
 - 환경: Godot 4.7.2 stable, Windows, headless.
 - 통과: editor import, validator `--check-only`, `tests/run.gd` (연구 amount 오류의 정확한 `research.swordsman.damage.amount` 경로 포함), `tests/editor_preview.gd`, `tests/results_view.gd`, `scripts/validate_content.gd`, `git diff --check`.
 - 범위 제한: 편집기 GUI 사용성, Android 실기기 렌더링/FPS는 이 실행에서 확인하지 않음.
+
+## 2026-11-12 Validator malformed facility 회귀
+
+- 재현: `facility.arrow_tower.damage = "invalid"`일 때 기존 후속 비교가 Godot 런타임 오류를 냈다.
+- 수정/검증: 관계 검사를 유효한 숫자 타입에 한정하고 `damage`, `heal`, `splash_radius`, `range`, `attack_time` 각각 문자열 입력에서 필드 오류를 반환하는 테스트를 추가.
+- 통과: editor import, validator parse, 전체 `tests/run.gd`, `tests/editor_preview.gd`, `tests/results_view.gd`, 콘텐츠 Error 0, 5개 씬 smoke, `git diff --check`.
+- Android: APK 86,360,854 bytes (2026-11-12 14:36 KST), apksigner v2/v3 검증 통과. ADB emulator-5554/5556은 offline. 물리 기기/FPS 미검증.
