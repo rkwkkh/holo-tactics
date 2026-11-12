@@ -7,7 +7,7 @@ var data: Dictionary = {}
 
 func _init(save_path: String = PATH) -> void:
 	path = save_path
-	data = {"progress_version": ProjectVersions.PROGRESS_VERSION, "permanent_currency": 0, "unlocked_research": [], "completed_stages": [], "reward_events": {}}
+	data = {"progress_version": ProjectVersions.PROGRESS_VERSION, "permanent_currency": ProjectVersions.STARTING_PERMANENT_CURRENCY, "unlocked_research": [], "completed_stages": [], "reward_events": {}, "buildings": [{"kind": "headquarters", "cell": [2, 2], "stored": false}]}
 
 func load_progress() -> bool:
 	if not FileAccess.file_exists(path):
@@ -22,6 +22,8 @@ func load_progress() -> bool:
 	data.permanent_currency = int(data.permanent_currency)
 	for event_id in data.reward_events:
 		data.reward_events[event_id] = int(data.reward_events[event_id])
+	if not data.has("buildings"):
+		data.buildings = [{"kind": "headquarters", "cell": [2, 2], "stored": false}]
 	return true
 
 func save_progress() -> bool:
@@ -89,6 +91,12 @@ func _is_valid(candidate: Dictionary) -> bool:
 		return false
 	for key in ["unlocked_research", "completed_stages"]:
 		if not candidate.get(key) is Array or candidate[key].any(func(value): return not value is String or value.is_empty()):
+			return false
+	if not candidate.get("buildings", []) is Array:
+		return false
+	for building in candidate.get("buildings", []):
+		var cell: Variant = building.get("cell", []) if building is Dictionary else null
+		if not building is Dictionary or not building.get("kind", "") is String or building.kind.is_empty() or not building.get("stored", false) is bool or not cell is Array or cell.size() != 2 or not _is_nonnegative_integer(cell[0]) or not _is_nonnegative_integer(cell[1]) or int(cell[0]) >= 6 or int(cell[1]) >= 6:
 			return false
 	var events: Variant = candidate.get("reward_events")
 	if not events is Dictionary:

@@ -1,5 +1,12 @@
 # Test report
 
+## 마을 최소 기능 (2026-11-12)
+
+- Godot 4.7.2 headless editor import, `tests/run.gd`, `scripts/validate_content.gd`, `scenes/village.tscn` 실행 스모크, `git diff --check` 통과.
+- 검사 항목: 신규 저장 기본값, 훈련소 비용 차감/이동/보관 후 무료 재배치, 공방 선행 스테이지 잠금 및 해금 후 구매, 저장 유효성.
+- 시작 재화와 가격은 SEED. 터치 화면 레이아웃, Android 실기기 및 FPS는 이번 변경에서 검증하지 않았다.
+- 변경 포함 Android Debug APK export 통과: `build/holo-debug.apk`, 86,326,570 bytes (2026-11-12 12:44 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 기기 실행과 실제 성능은 미검증.
+
 ## M0
 
 - 실행 환경: Windows, Godot 4.7.2 stable, Java 17; Android SDK 경로는 `%LOCALAPPDATA%/Android/Sdk`.

@@ -100,6 +100,12 @@
       {"id":"stage.s1.canyon","name":"S1 협곡 방어전","campaign_kind":"optional","campaign_order":1,"mode":"defense","columns":8,"rows":10,"core_cell":[4,9],"enemy_spawn_row":0,"blocked_cells":[[3,4],[4,4],[3,5],[4,5]],"walls":[{"cell":[2,6],"hp":60}],"core_hp":300,"start_resource":180,"kill_reward":10,"wave_reward":35,"permanent_first_bonus":28,"permanent_repeat_reward":10,"permanent_partial_per_wave":5,"intermission_seconds":30,"available_units":["swordsman","archer","spearman"],"references":["unit.swordsman","unit.archer","unit.spearman","facility.arrow_tower","facility.magic_tower","facility.support_outpost","facility.defense_wall","wave.s1.canyon.1","wave.s1.canyon.2","wave.s1.canyon.3"],"dependencies":["stage.m2.crossroads"]},
       {"id":"stage.s2.supply","name":"S2 비밀 보급로","campaign_kind":"optional","campaign_order":2,"mode":"siege","columns":8,"rows":10,"core_cell":[4,0],"enemy_spawn_row":2,"blocked_cells":[[3,4],[4,4]],"walls":[{"cell":[3,3],"hp":70}],"core_hp":120,"start_resource":200,"kill_reward":11,"wave_reward":40,"permanent_first_bonus":34,"permanent_repeat_reward":12,"permanent_partial_per_wave":6,"intermission_seconds":30,"available_units":["swordsman","archer","spearman","support","mage"],"references":["unit.swordsman","unit.archer","unit.spearman","unit.support","unit.mage","facility.arrow_tower","facility.magic_tower","facility.support_outpost","facility.defense_wall","wave.s2.supply.1","wave.s2.supply.2","wave.s2.supply.3"],"dependencies":["stage.m4.forest"]}
     ],
+    "town_buildings": [
+      {"id":"building.headquarters","kind":"headquarters","label":"본부","cost":0,"requires_stage":"","references":[],"dependencies":[]},
+      {"id":"building.training_hall","kind":"training_hall","label":"훈련소","cost":75,"requires_stage":"","references":[],"dependencies":[]},
+      {"id":"building.arcane_lab","kind":"arcane_lab","label":"마법 연구소","cost":100,"requires_stage":"stage.m3.fortress","references":["stage.m3.fortress"],"dependencies":["stage.m3.fortress"]},
+      {"id":"building.workshop","kind":"workshop","label":"공방","cost":100,"requires_stage":"stage.m2.crossroads","references":["stage.m2.crossroads"],"dependencies":["stage.m2.crossroads"]}
+    ],
     "research": [],
     "ai_profiles": [
       {"id": "ai.goblin.warrior", "weights": {"attack": 1.2, "objective": 1.0}, "references": [], "dependencies": []},

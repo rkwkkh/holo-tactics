@@ -10,20 +10,42 @@ func _initialize() -> void:
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(old_path))
 	var progress_test := ProgressStore.new(progress_test_path)
 	assert(progress_test.load_progress())
+	assert(progress_test.data.permanent_currency == ProjectVersions.STARTING_PERMANENT_CURRENCY)
 	assert(progress_test.grant_reward_once("clear.stage.1.first", 12))
 	assert(not progress_test.grant_reward_once("clear.stage.1.first", 12))
 	var progress_restore := ProgressStore.new(progress_test_path)
-	assert(progress_restore.load_progress() and progress_restore.data.permanent_currency == 12)
+	assert(progress_restore.load_progress() and progress_restore.data.permanent_currency == 112)
 	assert(progress_restore.settle_run("attempt-1", "stage.m1.frontier", "victory", 2, 30, 10, 5) == 40)
 	assert(progress_restore.data.completed_stages.has("stage.m1.frontier"))
 	assert(progress_restore.settle_run("attempt-1", "stage.m1.frontier", "victory", 2, 30, 10, 5) == 40)
 	assert(progress_restore.settle_run("attempt-2", "stage.m1.frontier", "victory", 2, 30, 10, 5) == 10)
 	assert(progress_restore.settle_run("attempt-3", "stage.m2.siege", "abandoned", 2, 40, 12, 6) == 12)
-	assert(progress_restore.data.permanent_currency == 74)
+	assert(progress_restore.data.permanent_currency == 174)
 	assert(progress_restore.settle_run("attempt-4", "stage.m2.siege", "defeat", 0, 40, 12, 6) == 0)
 	progress_restore.data.permanent_currency = -1
 	assert(not progress_restore.save_progress())
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(progress_test_path))
+	var village_test_path := "user://village_model_test.json"
+	for suffix in ["", ".tmp", ".bak"]:
+		var old_village_path: String = village_test_path + suffix
+		if FileAccess.file_exists(old_village_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(old_village_path))
+	var village_test := VillageModel.new(village_test_path)
+	assert(load("res://scenes/village.tscn") != null)
+	assert(village_test.has_building("headquarters") and village_test.place_building("training_hall", Vector2i(0, 0)))
+	assert(village_test.progress.data.permanent_currency == 25)
+	assert(village_test.move_building("training_hall", Vector2i(1, 0)))
+	assert(village_test.store_building("training_hall") and not village_test.has_building("training_hall"))
+	assert(village_test.place_building("training_hall", Vector2i(0, 1)) and village_test.progress.data.permanent_currency == 25)
+	var village_unlock_path := "user://village_unlock_test.json"
+	var village_unlock_test := VillageModel.new(village_unlock_path)
+	assert(not village_unlock_test.place_building("workshop", Vector2i(0, 0)))
+	village_unlock_test.progress.data.completed_stages.append("stage.m2.crossroads")
+	assert(village_unlock_test.progress.save_progress() and village_unlock_test.place_building("workshop", Vector2i(0, 0)))
+	assert(village_unlock_test.has_building("workshop") and village_unlock_test.progress.data.permanent_currency == 0)
+	for path in [village_test_path, village_unlock_path]:
+		for suffix in ["", ".tmp", ".bak"]:
+			var cleanup_path: String = path + suffix
+			if FileAccess.file_exists(cleanup_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(cleanup_path))
 	var duplicate := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "same"}], "skills": [{"id": "same"}]}}
 	assert(ContentValidator.validate(duplicate).any(func(error): return error.contains("duplicate content id")))
 	var dangling := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.a", "references": ["missing"]}]}}

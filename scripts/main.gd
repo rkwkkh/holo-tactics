@@ -37,6 +37,12 @@ func _ready() -> void:
 		button.disabled = not unlocked or not progress_ok
 		button.pressed.connect(_start_stage.bind(stage.id))
 		campaign.add_child(button)
+	var village := Button.new()
+	village.text = "마을 관리"
+	village.custom_minimum_size = Vector2(220, 52)
+	village.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	village.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/village.tscn"))
+	layout.add_child(village)
 
 func _start_stage(stage_id: String) -> void:
 	get_tree().set_meta("selected_stage_id", stage_id)
