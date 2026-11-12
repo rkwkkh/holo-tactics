@@ -178,3 +178,8 @@
 - `aapt dump badging`: package `com.example.holotactics`, min API 24, target API 36. Android 10(API29)+에 설치 가능한 설정이나 API29 실행은 GLES2 전용 AVD 문제로 미검증이다.
 - 현재 ADB 재확인: `emulator-5554`, `emulator-5556` 모두 offline. 새 강화 UI 포함 APK를 설치·터치 확인하지 못했다. API29/37 GLES 한계와 실제 Android 10·실기기 FPS 미검증은 그대로다.
 - 실패/수정 이력: 새 UI 함수 삽입 위치가 `_refresh()` 내부 루프를 끊어 battle scene 파싱이 실패해 함수를 올바른 최상위 위치로 옮겼다. 비용 검증 테스트가 소환 비용을 포함하지 않아 기대 재화를 고쳤고, 빈 적 fixture가 웨이브 완료/회복을 유발해 비활성 생존 적을 추가했다. 최종 전 항목은 성공 sentinel로 재확인했다.
+
+## Android device-test procedure
+
+- `ANDROID_TESTING.md`에 APK 설치/로그 수집, 캠페인·저장 복원 검수, Godot Remote Profiler 및 `dumpsys gfxinfo` 성능 계측, Google Play 비공개 테스트 준비 항목을 정리했다.
+- 이 문서는 재현 절차이며 실기기 검증 증거가 아니다. 물리 기기/Android 10 UI/FPS와 release AAB·Play 배포는 접근 권한이 없어 미실행이다.
