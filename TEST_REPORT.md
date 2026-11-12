@@ -252,3 +252,8 @@
 - 통과: editor import, validator parse, 전체 모델·에디터 미리보기·전투 UI 테스트, 콘텐츠 검사, 5개 씬 smoke, `git diff --check`.
 - APK 갱신: 86,369,046 bytes (2026-11-12 15:14 KST), apksigner v2/v3 서명 검증 통과. Debug 서명, 실기기/FPS 및 Play 업로드 미검증.
 - 후속 회귀 추가: 이동 유형이 없는 레거시 유닛 스냅샷은 `ground`로 복원되고, 카탈로그와 불일치하는 명시 유형은 복원을 거부한다. `tests/run.gd` 통과.
+
+## 2026-11-12 Android AVD 재검증
+
+- 최신 Debug APK 설치는 API 29/37 AVD 모두 성공했다. API 29 실행은 GLThread `createContext failed: EGL_SUCCESS`로 중단; API 37은 Godot `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)` 초과를 기록했다.
+- 별도 API 36 AVD는 설정 경로가 가리키는 SDK 시스템 이미지가 없어서 시작하지 못했다. 실기기/FPS는 미검증이며, APK 설치 성공은 Android 호환성 통과로 계산하지 않는다.
