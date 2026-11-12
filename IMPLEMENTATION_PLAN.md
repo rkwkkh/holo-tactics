@@ -119,3 +119,7 @@ Status-effect changes are now included in fresh APK/AAB exports; manifest and pa
 M1 battle view now shows temporary nearest-filtered pixel sprites for the roster, facilities, core, walls and obstacles. Tests enforce atlas-region size and catalog coverage. Refreshed APK/AAB pass package checks; API37 emulator visually confirms battle-board and deployed unit sprites. Next replace placeholder art with production assets and continue M5 GUI + M6 physical-device/performance/signing validation. Android 10 AVD currently fails Vulkan presentation.
 
 - M6 performance collection attempt returned invalid AVD data for Godot's native SurfaceView; retain the FPS blocker and switch to Godot Remote Profiler/physical-device instrumentation.
+
+## M5 editor follow-up (2026-11-12)
+
+Error-blocking and Warning-only catalog save behavior, stable-ID protection, atomic temp/backup cleanup, and field-focused error navigation are implemented and covered in headless tests. Remaining M5 gate is hands-on Godot dock/Inspector/panel interaction and preview launch through the GUI.

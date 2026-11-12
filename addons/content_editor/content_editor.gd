@@ -161,44 +161,55 @@ func _import_inspector(key: String) -> void:
 func _save_record(key: String) -> void:
 	var panel: Dictionary = panels[key]
 	var edited: Variant = JSON.parse_string(panel.edit.text)
-	if not edited is Dictionary or not edited.get("id", "") is String:
-		panel.feedback.text = "Error: 항목은 안정 ID가 포함된 JSON 객체여야 합니다."
-		return
 	if panel.picker.item_count == 0 or panel.picker.selected < 0:
 		panel.feedback.text = "Error: 저장할 항목을 선택하세요."
 		return
 	var item_meta: Dictionary = panel.picker.get_item_metadata(panel.picker.selected)
-	if edited.id != item_meta.id:
-		panel.feedback.text = "Error: 안정 ID 변경은 참조 무결성을 깨뜨릴 수 있어 여기서 허용하지 않습니다."
+	var result := save_catalog_record(CATALOG_PATH, item_meta.category, item_meta.id, edited)
+	if not result.saved:
+		var errors: Array[String] = result.get("errors", [])
+		if not errors.is_empty():
+			panel.feedback.text = "Error · 저장 차단\n" + "\n".join(errors.slice(0, 5))
+			_show_validation_errors(key, errors, result.catalog, result.warnings)
+		else:
+			panel.feedback.text = "Error: " + result.get("error", "카탈로그 저장에 실패했습니다.")
 		return
-	var catalog: Variant = read_catalog()
-	if not catalog is Dictionary:
-		panel.feedback.text = "Error: 카탈로그를 읽거나 백업에서 복구할 수 없습니다."
-		return
-	var replaced := false
-	for index in catalog.categories.get(item_meta.category, []).size():
-		if catalog.categories[item_meta.category][index].id == item_meta.id:
-			catalog.categories[item_meta.category][index] = edited
-			replaced = true
-			break
-	if not replaced:
-		panel.feedback.text = "Error: 선택 항목이 카탈로그에서 사라졌습니다. 새로 고침 후 다시 시도하세요."
-		return
-	var errors := ContentValidator.validate(catalog)
-	var warnings := ContentValidator.warnings(catalog)
-	if not errors.is_empty():
-		panel.feedback.text = "Error · 저장 차단\n" + "\n".join(errors.slice(0, 5))
-		_show_validation_errors(key, errors, catalog, warnings)
-		return
-	if not _write_catalog(JSON.stringify(catalog, "\t")):
-		panel.feedback.text = "Error: 원자적 저장에 실패했습니다. 원본을 보존했습니다."
-		return
+	var catalog: Dictionary = result.catalog
+	var warnings: Array[String] = result.warnings
 	panel.feedback.text = "검증 통과 · 저장했습니다." if warnings.is_empty() else "저장했습니다. 경고: " + "\n".join(warnings)
 	_show_validation_errors(key, [], catalog, warnings)
 	panel.drafts.erase(item_meta.id)
 	panel.active_id = ""
 	EditorInterface.get_resource_filesystem().scan()
 	_refresh_records(key, item_meta.id)
+
+static func save_catalog_record(path: String, category: String, selected_id: String, edited: Variant) -> Dictionary:
+	if not edited is Dictionary or not edited.get("id", "") is String:
+		return {"saved": false, "error": "항목은 안정 ID가 포함된 JSON 객체여야 합니다."}
+	if edited.id != selected_id:
+		return {"saved": false, "error": "안정 ID 변경은 참조 무결성을 깨뜨릴 수 있어 여기서 허용하지 않습니다."}
+	var catalog: Variant = read_catalog(path)
+	if not catalog is Dictionary:
+		return {"saved": false, "error": "카탈로그를 읽거나 백업에서 복구할 수 없습니다."}
+	var categories: Variant = catalog.get("categories", {})
+	if not categories is Dictionary or not categories.get(category, []) is Array:
+		return {"saved": false, "error": "편집할 카테고리를 찾을 수 없습니다."}
+	var replaced := false
+	for index in categories[category].size():
+		var item: Variant = categories[category][index]
+		if item is Dictionary and item.get("id", "") == selected_id:
+			categories[category][index] = edited
+			replaced = true
+			break
+	if not replaced:
+		return {"saved": false, "error": "선택 항목이 카탈로그에서 사라졌습니다. 새로 고침 후 다시 시도하세요."}
+	var errors := ContentValidator.validate(catalog)
+	var warnings := ContentValidator.warnings(catalog)
+	if not errors.is_empty():
+		return {"saved": false, "errors": errors, "warnings": warnings, "catalog": catalog}
+	if not _write_catalog(JSON.stringify(catalog, "\t"), path):
+		return {"saved": false, "error": "원자적 저장에 실패했습니다. 원본을 보존했습니다."}
+	return {"saved": true, "warnings": warnings, "catalog": catalog}
 
 func _show_validation_errors(key: String, errors: Array[String], catalog: Dictionary, warnings: Array[String] = []) -> void:
 	var panel: Dictionary = panels[key]
@@ -215,6 +226,7 @@ func _open_error_record(index: int, source_key: String) -> void:
 	var target_id: String = source.errors.get_item_metadata(index)
 	if target_id.is_empty():
 		return
+	var error_text: String = source.errors.get_item_text(index).trim_prefix("Error · ")
 	for key in ["stages_waves", "evolutions", "upgrades"]:
 		var picker: OptionButton = panels[key].picker
 		for item_index in picker.item_count:
@@ -222,7 +234,35 @@ func _open_error_record(index: int, source_key: String) -> void:
 				tabs.current_tab = ["stages_waves", "evolutions", "upgrades"].find(key)
 				picker.select(item_index)
 				_select_record(item_index, key)
+				_focus_error_field(panels[key].edit, error_text, target_id)
 				return
+
+static func _focus_error_field(edit: TextEdit, error_text: String, target_id: String) -> void:
+	var separator := error_text.find(":")
+	if separator < 0:
+		return
+	var path := error_text.substr(0, separator).trim_prefix(target_id + ".").get_slice("|", 0)
+	var search_from := 0
+	var selected_start := -1
+	var selected_end := -1
+	for part in path.replace("[]", "").split("."):
+		if part.is_empty():
+			continue
+		var key_token := "\"%s\"" % part
+		var position := edit.text.find(key_token, search_from)
+		if position < 0:
+			break
+		selected_start = position
+		selected_end = position + key_token.length()
+		search_from = selected_end
+	if selected_start < 0:
+		return
+	var prefix := edit.text.substr(0, selected_start)
+	var line := prefix.count("\n")
+	var column := prefix.length() - prefix.rfind("\n") - 1 if prefix.contains("\n") else prefix.length()
+	edit.set_caret_line(line)
+	edit.set_caret_column(column)
+	edit.select(line, column, line, column + selected_end - selected_start)
 
 func _preview_selected(direct_wave: bool) -> void:
 	var picker: OptionButton = panels.stages_waves.picker
@@ -267,9 +307,9 @@ func _preview_selected(direct_wave: bool) -> void:
 	EditorInterface.play_custom_scene("res://scenes/editor_preview.tscn")
 	panels.stages_waves.feedback.text = "저장된 콘텐츠로 격리 테스트를 시작했습니다."
 
-func _write_catalog(contents: String) -> bool:
-	var temp_path := CATALOG_PATH + ".tmp"
-	var backup_path := CATALOG_PATH + ".bak"
+static func _write_catalog(contents: String, path: String = CATALOG_PATH) -> bool:
+	var temp_path := path + ".tmp"
+	var backup_path := path + ".bak"
 	var file := FileAccess.open(temp_path, FileAccess.WRITE)
 	if file == null:
 		return false
@@ -280,7 +320,7 @@ func _write_catalog(contents: String) -> bool:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(temp_path))
 		return false
 	file.close()
-	var target_abs := ProjectSettings.globalize_path(CATALOG_PATH)
+	var target_abs := ProjectSettings.globalize_path(path)
 	var temp_abs := ProjectSettings.globalize_path(temp_path)
 	var backup_abs := ProjectSettings.globalize_path(backup_path)
 	if DirAccess.rename_absolute(target_abs, backup_abs) != OK:

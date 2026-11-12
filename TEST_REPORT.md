@@ -514,3 +514,9 @@
 
 - Attempted system-level frame capture during active M1 on API37 AVD. `dumpsys gfxinfo` had 0 ViewRoot frames; percentile defaults were invalid. `SurfaceFlinger --latency` exposed only 60Hz display period (16.67ms), no app frame timestamps.
 - Result: no performance conclusion. Use Godot Remote Profiler or a physical device with a GPU/frame-time profiler; performance acceptance remains pending.
+
+## M5 catalog editor safety tests (2026-11-12)
+
+- Passed core tests including: Error edit rejected with byte-for-byte unchanged catalog; stable-ID rename rejected without writes; Warning-only 27-wave edit accepted and persisted; temporary/backup files cleaned; simple and nested error fields selected in the editor JSON control.
+- Passed results view, seeded 8-stage campaign simulation, preview isolation, content validator (0 errors), editor-preview headless scene start.
+- Godot 4.7.2 stable, Windows headless. Editor GUI dock/Inspector flow remains unverified.

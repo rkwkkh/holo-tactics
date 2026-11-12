@@ -128,3 +128,5 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 - Asset gap: the M1 battle board now uses temporary pixel-art sprites for all catalog unit/facility kinds plus core/walls/obstacles. Replace the hand-authored atlas with approved final art before release; current icons are functional placeholders, not production art.
 
 - Performance measurement gap: API37 AVD `gfxinfo` collected zero ViewRoot frames while Godot rendered through SurfaceView; SurfaceFlinger latency query exposed only refresh period, no game frame timestamps. Do not infer FPS from these. Need Godot Remote Profiler/physical GPU profiler before judging 60FPS regular and 30FPS high-load targets.
+
+- Resolved in code/tests: M5 editor Error-vs-Warning save gate and content-id/field navigation now have regressions. GUI interaction remains open; headless tests do not prove actual dock/Inspector usability.

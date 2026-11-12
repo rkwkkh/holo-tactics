@@ -19,6 +19,14 @@ func _initialize() -> void:
 	catalog_backup.store_string("{\"recovered\":true}")
 	catalog_backup.close()
 	var content_editor_script: Script = load("res://addons/content_editor/content_editor.gd")
+	var error_field_edit := TextEdit.new()
+	error_field_edit.text = JSON.stringify({"id": "unit.test", "hp": 0, "special_skill": {"mode": "broken"}}, "\t")
+	content_editor_script._focus_error_field(error_field_edit, "unit.test.hp: invalid unit data", "unit.test")
+	assert(error_field_edit.get_selected_text() == "\"hp\"")
+	error_field_edit.deselect()
+	content_editor_script._focus_error_field(error_field_edit, "evolution.test.special_skill.mode|effect: invalid skill", "evolution.test")
+	assert(error_field_edit.get_selected_text() == "\"mode\"")
+	error_field_edit.free()
 	var battle_view_script: Script = load("res://scripts/battle_view.gd")
 	var sprite_probe: Variant = battle_view_script.new()
 	sprite_probe.battle_sprite_atlas = load("res://assets/battle_sprites.svg")
@@ -306,6 +314,33 @@ func _initialize() -> void:
 	off_target_campaign.categories.stages[0].references.append("wave.s2.supply.3")
 	assert(ContentValidator.validate(off_target_campaign).is_empty())
 	assert(ContentValidator.warnings(off_target_campaign).size() == 1 and ContentValidator.warnings(off_target_campaign)[0].contains("27 waves"))
+	var editor_save_path := "user://content_editor_save_test.json"
+	for suffix in ["", ".tmp", ".bak"]:
+		if FileAccess.file_exists(editor_save_path + suffix):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(editor_save_path + suffix))
+	var initial_editor_catalog := FileAccess.open(editor_save_path, FileAccess.WRITE)
+	assert(initial_editor_catalog != null)
+	initial_editor_catalog.store_string(JSON.stringify(seeded_catalog, "\t"))
+	initial_editor_catalog.close()
+	var catalog_before_rejected_edit := FileAccess.get_file_as_string(editor_save_path)
+	var invalid_wave: Dictionary = seeded_catalog.categories.waves[0].duplicate(true)
+	invalid_wave.enemy_id = "enemy.missing"
+	var rejected_editor_save: Dictionary = content_editor_script.save_catalog_record(editor_save_path, "waves", invalid_wave.id, invalid_wave)
+	assert(not rejected_editor_save.saved and not rejected_editor_save.errors.is_empty())
+	assert(FileAccess.get_file_as_string(editor_save_path) == catalog_before_rejected_edit)
+	var renamed_wave: Dictionary = seeded_catalog.categories.waves[0].duplicate(true)
+	renamed_wave.id = "wave.renamed"
+	var rejected_rename: Dictionary = content_editor_script.save_catalog_record(editor_save_path, "waves", seeded_catalog.categories.waves[0].id, renamed_wave)
+	assert(not rejected_rename.saved and rejected_rename.get("errors", []).is_empty())
+	assert(FileAccess.get_file_as_string(editor_save_path) == catalog_before_rejected_edit)
+	var warned_stage: Dictionary = off_target_campaign.categories.stages[0]
+	var warning_editor_save: Dictionary = content_editor_script.save_catalog_record(editor_save_path, "stages", warned_stage.id, warned_stage)
+	assert(warning_editor_save.saved and warning_editor_save.warnings.size() == 1)
+	assert(content_editor_script.read_catalog(editor_save_path).categories.stages[0].references.has("wave.s2.supply.3"))
+	assert(not FileAccess.file_exists(editor_save_path + ".tmp") and not FileAccess.file_exists(editor_save_path + ".bak"))
+	for suffix in ["", ".tmp", ".bak"]:
+		if FileAccess.file_exists(editor_save_path + suffix):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(editor_save_path + suffix))
 	assert(seeded_catalog.categories.evolutions.size() == 6)
 	for evolution in seeded_catalog.categories.evolutions:
 		assert(evolution.references.has("unit.%s" % evolution.unit_kind))

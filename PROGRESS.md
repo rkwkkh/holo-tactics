@@ -191,3 +191,9 @@ Replaced battle-cell text glyphs for units, facilities, core, walls, and obstacl
 Verified every atlas region and every catalog unit/facility mapping in `tests/run.gd`. Godot 4.7.2 editor import, core/results/campaign/editor-preview/content tests and main/battle/village headless scene starts pass. Refreshed APK/AAB validate; API37 AVD rendered the M1 board and a placed swordsman sprite. APK SHA-256 `95DDFF7E99F5E30946B9626DC96A25B5E5F9B605E40EA55D5F8AFFF271A1EBA3`; AAB SHA-256 `90FE8D18CAB772A69E6E01305E053228D3471EFB19793CF746DC9E640FD11856`.
 
 - 2026-11-12 M6 perf follow-up: Android system frame collectors cannot observe the Godot native SurfaceView in current API37 AVD (gfxinfo 0 frames; SurfaceFlinger query only refresh period). FPS target verification remains open; next use Godot Remote Profiler or physical-device GPU profiler.
+
+## M5 catalog editing safety (2026-11-12)
+
+Catalog writes now pass through a testable save path: stable IDs cannot change, any Validator Error blocks persistence without touching the source file, Warning-only edits save atomically, and error-list selection opens the record at the reported nested JSON key. Added regression cases for invalid wave reference, ID change, 27-wave warning-only edit, temp/backup cleanup, and simple/nested field selection.
+
+All headless core/results/campaign/editor-preview/content tests pass. The editor GUI itself remains unverified because the native Computer Use connection is unavailable.
