@@ -327,3 +327,5 @@
 - R-UI-002 반영 Android artifacts (2026-11-12): Debug APK `build/holo-debug.apk`, 249,877,422 bytes; `aapt` min API 29/target API 36, `apksigner` v2 signature true. Test AAB `build/holo-test.aab`, 86,286,445 bytes; bundletool 1.18.3 validation pass and manifest min API 29/target API 36. AAB is unsigned. Both artifacts are local/ignored; neither proves physical device rendering or performance.
 
 - 기본 유닛 해금 충돌 회귀: 사용자 승인된 순차 해금 정책을 캠페인 테스트에 명시했다. 시작/M2/M4/M5 스테이지의 유닛 구성과 직전 시점 잠금을 확인한 뒤 전체 8개 stage seeded playability 통과.
+
+- 시설 컨텍스트 도움말을 전투 단계별로 분기(재정비에서만 이동 가능)하고 preparation/combat 문구 회귀를 추가했다. Godot editor import와 `tests/results_view.gd` 통과.

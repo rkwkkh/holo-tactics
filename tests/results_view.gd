@@ -94,6 +94,10 @@ func _run() -> void:
 	assert(obstacle_view.battle.build_facility("facility.arrow_tower", Vector2i(1, 5)))
 	obstacle_view._on_tile_pressed(Vector2i(1, 5))
 	assert(obstacle_view.context_panel.visible and obstacle_view.context_info.text.begins_with("시설 · HP"))
+	assert(obstacle_view.context_info.text.contains("다른 타일을 눌러 이동"))
+	obstacle_view.battle.phase = "combat"
+	obstacle_view._refresh()
+	assert(obstacle_view.context_info.text.contains("전투 중 이동 불가"))
 	obstacle_view._toggle_pause()
 	obstacle_view._on_tile_pressed(Vector2i(1, 5))
 	assert(obstacle_view.status.text.begins_with("아군 시설 · HP"))

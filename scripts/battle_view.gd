@@ -527,7 +527,8 @@ func _refresh_context_panel() -> void:
 	if not unit.is_empty():
 		context_info.text = "%s · HP %.0f/%.0f" % [_unit_name(unit.kind), unit.hp, battle.balance_seed[unit.kind].hp]
 	else:
-		context_info.text = "시설 · HP %.0f/%.0f\n다른 타일을 눌러 이동" % [facility.hp, battle.facility_definitions[facility.facility_id].hp]
+		var move_hint := "다른 타일을 눌러 이동" if battle.phase == "preparation" else "전투 중 이동 불가"
+		context_info.text = "시설 · HP %.0f/%.0f\n%s" % [facility.hp, battle.facility_definitions[facility.facility_id].hp, move_hint]
 	var cell: Vector2i = unit.cell if not unit.is_empty() else facility.cell
 	var tile_rect := tiles[cell.y * BattleModel.COLUMNS + cell.x].get_global_rect()
 	var menu_size := context_panel.get_combined_minimum_size()
