@@ -16,6 +16,10 @@
 - `tests/run.gd`, 콘텐츠 validator, battle/village/research 씬 headless 기동 및 `git diff --check` 통과. 연구 수치는 SEED다.
 - 영구 연구 포함 Android Debug APK 재생성: `build/holo-debug.apk`, 86,335,165 bytes (2026-11-12 13:01 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 실기기 UI/FPS는 미검증.
 
+## 결과 화면 후 이동 (2026-11-12)
+
+- 전투 결과 상태에서 “마을로 돌아가기” 버튼의 목적지를 캠페인 메뉴에서 마을 화면으로 수정했다. headless 전투 씬 기동 및 전체 테스트/콘텐츠 검증 통과. 터치 기반 전환은 실기기 미검증.
+
 ## M0
 
 - 실행 환경: Windows, Godot 4.7.2 stable, Java 17; Android SDK 경로는 `%LOCALAPPDATA%/Android/Sdk`.

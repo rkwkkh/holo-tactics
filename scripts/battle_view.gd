@@ -206,7 +206,7 @@ func _cast_skill(unit_id: int, skill_id: String) -> void:
 
 func _on_back_pressed() -> void:
 	if battle.phase == "finished":
-		get_tree().change_scene_to_file("res://scenes/main.tscn")
+		get_tree().change_scene_to_file("res://scenes/village.tscn")
 	else:
 		(get_meta("abandon_dialog") as ConfirmationDialog).popup_centered()
 
