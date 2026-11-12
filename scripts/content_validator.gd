@@ -96,6 +96,46 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	for unit in unit_items:
 		if categories.has("upgrades") and unit is Dictionary and unit.get("team") == "ally" and upgrade_counts.get(unit.get("kind", ""), 0) != 4:
 			errors.append("%s must have exactly four combat upgrades" % unit.get("id", "<missing-id>"))
+	var evolution_items := _as_array(categories.get("evolutions", []))
+	if categories.has("evolutions") and evolution_items.size() != 6:
+		errors.append("evolutions must contain exactly six forms")
+	var upgrade_definitions: Dictionary = {}
+	for upgrade in _as_array(categories.get("upgrades", [])):
+		if upgrade is Dictionary:
+			upgrade_definitions[upgrade.get("id", "")] = upgrade
+	for evolution in evolution_items:
+		if not evolution is Dictionary:
+			continue
+		var evolution_id: String = evolution.get("id", "<missing-id>")
+		var evolution_unit: String = evolution.get("unit_kind", "")
+		var matching_units: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("team") == "ally" and unit.get("kind") == evolution_unit)
+		if matching_units.size() != 1 or not evolution.get("label") is String or evolution.get("label", "").is_empty() or not _is_positive_integer(evolution.get("total_upgrade_levels")) or int(evolution.get("total_upgrade_levels", 0)) > 12 or not _is_positive_integer(evolution.get("combat_cost")):
+			_append_field_error(errors, evolution_id, "unit_kind|label|total_upgrade_levels|combat_cost", "invalid evolution data")
+		var requirements: Variant = evolution.get("required_upgrades")
+		if not requirements is Dictionary or requirements.is_empty():
+			_append_field_error(errors, evolution_id, "required_upgrades", "invalid evolution requirements")
+		else:
+			var required_levels := 0
+			for upgrade_id in requirements:
+				var upgrade: Dictionary = upgrade_definitions.get(upgrade_id, {})
+				var level: Variant = requirements[upgrade_id]
+				if upgrade.is_empty() or upgrade.get("unit_kind") != evolution_unit or not _is_positive_integer(level) or int(level) > 3:
+					_append_field_error(errors, evolution_id, "required_upgrades", "invalid evolution requirements")
+				else:
+					required_levels += int(level)
+			if _is_positive_integer(evolution.get("total_upgrade_levels")) and required_levels > int(evolution.total_upgrade_levels):
+				_append_field_error(errors, evolution_id, "required_upgrades", "invalid evolution requirements")
+		var references: Variant = evolution.get("references", [])
+		if not references is Array or not references.has("unit.%s" % evolution_unit):
+			_append_field_error(errors, evolution_id, "references", "invalid evolution references")
+		elif requirements is Dictionary:
+			for upgrade_id in requirements:
+				if not references.has(upgrade_id):
+					_append_field_error(errors, evolution_id, "references", "invalid evolution references")
+					break
+		var special_skill: Variant = evolution.get("special_skill")
+		if not special_skill is Dictionary or special_skill.get("mode") not in ["automatic", "manual"] or special_skill.get("effect") not in ["strike", "area", "heal", "shield"] or not _is_positive_number(special_skill.get("cooldown")) or not _is_nonnegative_integer(special_skill.get("cost")) or not _is_positive_number(special_skill.get("value")) or not _is_nonnegative_integer(special_skill.get("radius")) or not special_skill.get("label") is String or special_skill.get("label", "").is_empty():
+			_append_field_error(errors, evolution_id, "special_skill.mode|effect|cooldown|cost|value|radius|label", "invalid evolution special skill")
 	var skill_modes: Dictionary = {}
 	for skill in _as_array(categories.get("skills", [])):
 		if not skill is Dictionary:
@@ -381,6 +421,7 @@ static func _append_field_error(errors: Array[String], id: String, field: String
 static func _field_for_error(message: String) -> String:
 	var hints := [
 		["unsupported content_version", "content_version"], ["unsupported schema_version", "schema_version"],
+		["evolutions must contain", "evolutions"],
 		["content_version must", "content_version"], ["schema_version must", "schema_version"],
 		["contains an item without a stable id", "id"], ["duplicate content id", "id"],
 		["unresolved dependency", "dependencies"], ["dependencies must", "dependencies"], ["unresolved reference", "references"], ["references must", "references"],
@@ -391,7 +432,8 @@ static func _field_for_error(message: String) -> String:
 		["invalid permanent research", "unit_kind|building_kind|stat|amount|cost|requires_stage"], ["AI weights", "weights"], ["AI weight", "weights.*"],
 		["enemy and have a positive integer count", "enemy_id|count|references"], ["AI weight overrides", "ai_weight_overrides"], ["invalid reinforcement", "reinforcements[]"],
 		["enemy_facilities must", "enemy_facilities"], ["invalid enemy facility placement", "enemy_facilities[].facility_id|cell"], ["enemy facility must be referenced", "references"], ["conflicting enemy facility cell", "enemy_facilities[].cell"], ["conflicts with initial spawn", "enemy_facilities[].cell"], ["conflicts with reinforcement spawn", "enemy_facilities[].cell"],
-		["unsupported movement type", "movement_type"], ["invalid obstacle movement types", "blocked_movement_types"], ["invalid obstacle data", "kind|cost"], ["invalid obstacle limits", "obstacle_max_owned|obstacle_max_placed|references"], ["invalid available unit", "available_units"], ["must list available units", "available_units"], ["invalid board dimensions or core cell", "columns|rows|core_cell"], ["unknown battle mode", "mode"], ["invalid enemy spawn row", "enemy_spawn_row"], ["blocked_cells must", "blocked_cells"], ["invalid blocked cell", "blocked_cells[]"], ["duplicate blocked cell", "blocked_cells[]"], ["blocks its core cell", "blocked_cells[]|core_cell"], ["walls must", "walls"], ["invalid wall data", "walls[].cell|hp"], ["conflicting wall cell", "walls[].cell"], ["blocks a required wave route", "blocked_cells|walls|core_cell|waves"], ["blocks a reinforcement route", "blocked_cells|walls|core_cell|reinforcements"], ["must reference at least one wave", "references"], ["invalid core or resource values", "core_hp|start_resource|kill_reward|wave_reward|permanent_first_bonus|permanent_repeat_reward|permanent_partial_per_wave|intermission_seconds"], ["invalid campaign order", "campaign_order"], ["duplicates campaign order", "campaign_order"], ["campaign must contain", "stages|waves"], ["cyclic dependency", "dependencies"]
+		["invalid evolution data", "unit_kind|label|total_upgrade_levels|combat_cost"], ["invalid evolution requirements", "required_upgrades"], ["invalid evolution references", "references"], ["invalid evolution special skill", "special_skill.mode|effect|cooldown|cost|value|radius|label"],
+		["unsupported movement type", "movement_type"], ["invalid obstacle movement types", "blocked_movement_types"], ["invalid obstacle data", "kind|cost"], ["invalid obstacle limits", "obstacle_max_owned|obstacle_max_placed|references"], ["invalid available unit", "available_units"], ["must list available units", "available_units"], ["invalid board dimensions or core cell", "columns|rows|core_cell"], ["unknown battle mode", "mode"], ["invalid enemy spawn row", "enemy_spawn_row"], ["blocked_cells must", "blocked_cells"], ["invalid blocked cell", "blocked_cells[]"], ["duplicate blocked cell", "blocked_cells[]"], ["blocks its core cell", "blocked_cells[]|core_cell"], ["walls must", "walls"], ["invalid wall data", "walls[].cell|hp"], ["conflicting wall cell", "walls[].cell"], ["blocks a required wave route", "blocked_cells|walls|core_cell|waves"], ["blocks a reinforcement route", "blocked_cells|core_cell|waves|reinforcements"], ["must reference at least one wave", "references"], ["invalid core or resource values", "core_hp|start_resource|kill_reward|wave_reward|permanent_first_bonus|permanent_repeat_reward|permanent_partial_per_wave|intermission_seconds"], ["invalid campaign order", "campaign_order"], ["duplicates campaign order", "campaign_order"], ["campaign must contain", "stages|waves"], ["cyclic dependency", "dependencies"]
 	]
 	for hint in hints:
 		if message.contains(hint[0]):

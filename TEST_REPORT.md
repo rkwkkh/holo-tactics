@@ -257,3 +257,10 @@
 
 - 최신 Debug APK 설치는 API 29/37 AVD 모두 성공했다. API 29 실행은 GLThread `createContext failed: EGL_SUCCESS`로 중단; API 37은 Godot `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)` 초과를 기록했다.
 - 별도 API 36 AVD는 설정 경로가 가리키는 SDK 시스템 이미지가 없어서 시작하지 못했다. 실기기/FPS는 미검증이며, APK 설치 성공은 Android 호환성 통과로 계산하지 않는다.
+
+## 2026-11-12 진화 콘텐츠 편집 스키마
+
+- 카탈로그 진화 탭에 기획서의 6형태를 등록했다. Validator는 형태 수, 아군 기본 유닛, 같은 유닛의 강화 ID/단계, 총 강화 단계, 양수 전투 비용, 특수 스킬 필드를 검사하고 오류 필드 경로를 반환한다.
+- 통과: `tests/run.gd`(잘못된 유닛 강화 참조·특수 스킬 형태/쿨타임·0 비용·누락 형태), `tests/editor_preview.gd`, `tests/results_view.gd`, 콘텐츠 검증, `git diff --check`.
+- 한계: 이름·조건·비용·특수 스킬 수치는 제안/임시 SEED다. 연구 해금과 전투 적용, 실제 Godot GUI 조작은 아직 검증되지 않았다.
+- 추가 통과: Godot headless 편집기 초기화/플러그인 로드와 main/battle/village/village_research/editor_preview 5개 씬 smoke. 최신 소스로 Android Debug APK 재생성 및 apksigner v2/v3 검증 통과: 86,369,046 bytes (2026-11-12 15:34 KST). 에뮬레이터 렌더 실패와 별개로 실기기 검증은 미완료.

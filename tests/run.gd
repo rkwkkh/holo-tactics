@@ -155,6 +155,25 @@ func _initialize() -> void:
 	assert(GridPathfinder.find_path(Vector2i(0, 0), Vector2i(2, 0), 3, 1, {Vector2i(1, 0): true}).is_empty())
 	var seeded_catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/catalog.json"))
 	assert(ContentValidator.validate(seeded_catalog).is_empty())
+	assert(seeded_catalog.categories.evolutions.size() == 6)
+	for evolution in seeded_catalog.categories.evolutions:
+		assert(evolution.references.has("unit.%s" % evolution.unit_kind))
+		assert(evolution.required_upgrades.size() > 0 and evolution.special_skill.has("mode"))
+	var invalid_evolution_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_evolution_catalog.categories.evolutions[0].required_upgrades = {"upgrade.mage.chain": 1}
+	assert(ContentValidator.validate(invalid_evolution_catalog).any(func(error): return error == "evolution.spearman.guardian.required_upgrades: invalid evolution requirements"))
+	invalid_evolution_catalog = seeded_catalog.duplicate(true)
+	invalid_evolution_catalog.categories.evolutions[0].special_skill.cooldown = 0
+	assert(ContentValidator.validate(invalid_evolution_catalog).any(func(error): return error == "evolution.spearman.guardian.special_skill.mode|effect|cooldown|cost|value|radius|label: invalid evolution special skill"))
+	invalid_evolution_catalog = seeded_catalog.duplicate(true)
+	invalid_evolution_catalog.categories.evolutions[0].special_skill = []
+	assert(ContentValidator.validate(invalid_evolution_catalog).any(func(error): return error.begins_with("evolution.spearman.guardian.special_skill.mode|effect|cooldown|cost|value|radius|label:")))
+	invalid_evolution_catalog = seeded_catalog.duplicate(true)
+	invalid_evolution_catalog.categories.evolutions[0].combat_cost = 0
+	assert(ContentValidator.validate(invalid_evolution_catalog).any(func(error): return error == "evolution.spearman.guardian.unit_kind|label|total_upgrade_levels|combat_cost: invalid evolution data"))
+	invalid_evolution_catalog = seeded_catalog.duplicate(true)
+	invalid_evolution_catalog.categories.evolutions.pop_back()
+	assert(ContentValidator.validate(invalid_evolution_catalog).has("evolutions: evolutions must contain exactly six forms"))
 	assert(ContentValidator.content_id_from_error("stage.m1.frontier has invalid core data", seeded_catalog) == "stage.m1.frontier")
 	assert(ContentValidator.content_id_from_error("campaign must have six main stages", seeded_catalog).is_empty())
 	assert(ContentValidator.content_id_from_error("stage.m1.frontier failed", {"categories": 1}).is_empty())

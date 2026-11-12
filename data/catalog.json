@@ -49,7 +49,14 @@
       {"id":"upgrade.mage.burn","unit_kind":"mage","label":"화상","effect":"burn","costs":[25,40,60],"values":[3,4,5]},
       {"id":"upgrade.mage.burst","unit_kind":"mage","label":"마력 폭발","effect":"mana_burst","costs":[30,45,65],"values":[1.2,1.5,2.0]}
     ],
-    "evolutions": [],
+    "evolutions": [
+      {"id":"evolution.spearman.guardian","unit_kind":"spearman","label":"수호 창병","total_upgrade_levels":5,"required_upgrades":{"upgrade.spearman.shield":2},"combat_cost":80,"special_skill":{"mode":"automatic","effect":"shield","cooldown":14.0,"cost":0,"value":15,"radius":2,"label":"수호 오라"},"references":["unit.spearman","upgrade.spearman.shield"],"dependencies":[]},
+      {"id":"evolution.swordsman.knight","unit_kind":"swordsman","label":"기사","total_upgrade_levels":5,"required_upgrades":{"upgrade.swordsman.charge":2},"combat_cost":85,"special_skill":{"mode":"manual","effect":"strike","cooldown":14.0,"cost":20,"value":30,"radius":0,"label":"영웅 돌격"},"references":["unit.swordsman","upgrade.swordsman.charge"],"dependencies":[]},
+      {"id":"evolution.archer.ice","unit_kind":"archer","label":"얼음궁수","total_upgrade_levels":5,"required_upgrades":{"upgrade.archer.freeze":3},"combat_cost":85,"special_skill":{"mode":"manual","effect":"area","cooldown":18.0,"cost":25,"value":32,"radius":2,"label":"서리 폭풍"},"references":["unit.archer","upgrade.archer.freeze"],"dependencies":[]},
+      {"id":"evolution.archer.bomber","unit_kind":"archer","label":"폭파레인저","total_upgrade_levels":4,"required_upgrades":{"upgrade.archer.explosive":2,"upgrade.archer.multi":2},"combat_cost":90,"special_skill":{"mode":"manual","effect":"area","cooldown":18.0,"cost":25,"value":30,"radius":2,"label":"폭발 화살비"},"references":["unit.archer","upgrade.archer.explosive","upgrade.archer.multi"],"dependencies":[]},
+      {"id":"evolution.mage.archmage","unit_kind":"mage","label":"대마법사","total_upgrade_levels":5,"required_upgrades":{"upgrade.mage.chain":2},"combat_cost":100,"special_skill":{"mode":"manual","effect":"area","cooldown":20.0,"cost":25,"value":40,"radius":2,"label":"비전 폭풍"},"references":["unit.mage","upgrade.mage.chain"],"dependencies":[]},
+      {"id":"evolution.support.priest","unit_kind":"support","label":"사제","total_upgrade_levels":4,"required_upgrades":{"upgrade.support.heal_area":2},"combat_cost":90,"special_skill":{"mode":"manual","effect":"heal","cooldown":16.0,"cost":20,"value":25,"radius":2,"label":"성역"},"references":["unit.support","upgrade.support.heal_area"],"dependencies":[]}
+    ],
     "facilities": [
       {"id": "facility.arrow_tower", "kind": "arrow_tower", "team": "ally", "hp": 120, "damage": 16, "heal": 0, "splash_radius": 0, "range": 3, "attack_time": 1.2, "cost": 80, "blocks_path": true, "references": [], "dependencies": []},
       {"id": "facility.magic_tower", "kind": "magic_tower", "team": "ally", "hp": 90, "damage": 25, "heal": 0, "splash_radius": 1, "range": 4, "attack_time": 1.8, "cost": 110, "blocks_path": true, "references": [], "dependencies": []},
