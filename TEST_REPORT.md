@@ -85,7 +85,7 @@
 
 - 화살탑·마법탑·지원 초소·방어벽 4종을 카탈로그 데이터로 정의하고, 아군 시설의 유효 타일 건설·자원 차감, 재정비 무료 이동, HP/피해/파괴 상태 체크포인트 복원을 연결했다. 화살탑·마법탑은 범위 안 적을 자동 공격하고 적은 공격 가능한 아군 시설을 선택해 공격한다. 경로 차단 시설은 적의 우회/돌파 판단에도 참여한다.
 - 통과: 잘못된 시설 스탯 검증, 중복 배치 무차감, 자원 지불, 타워 피해, 시설 피해/파괴, 방벽 설치 후 적 돌파 경로, 재정비 이동/전투 중 이동 거부, 손상·파괴 및 같은 칸 재건 저장/복원 테스트.
-- 수리 허용 시점·비용·파괴 후 재건은 문서상 OPEN/SEED로 남아 기능을 추가하지 않았다. 지원 초소 효과 및 공성 적 시설 웨이브 처리도 미구현.
+- 당시 테스트 시점에는 수리 정책 결정 전이라 기능을 추가하지 않았다. 2026-11-12 이후 사용자 결정으로 전투 중 수리를 허용했고 모델/UI 테스트를 추가해 검증했다. 지원 초소 효과 및 공성 적 시설 웨이브 처리도 미구현.
 - 최종 개발 export: `build/holo-debug.apk` (86,268,535 bytes, Godot 4.7.2, target API 36 / min API 24) 생성 및 APK 서명/검증 통과. 이번 확인 시 API 36/37 ADB 에뮬레이터가 모두 offline 상태라 시설 UI가 포함된 APK를 기기에서 실행하지 못했다. 이전 API 37 GLES shader uniform 오류도 아직 해결/재검증되지 않았다.
 
 ## 지원 초소 및 재검증 (2026-11-12)
@@ -444,3 +444,9 @@
 - Android test AAB: 86,236,526 bytes. Google bundletool 1.18.3 validate 통과, base manifest API 29 / target 36 확인. 테스트 AAB는 unsigned.
 - API 37 AVD: 최신 APK 설치 성공, Godot Activity foreground 유지. 화면 캡처는 검정이며 CanvasShaderGLES3 fragment uniform 261 오류 반복. 플레이/렌더 검증 실패.
 - 실제 Android 기기 실행/FPS, release keystore 서명, Google Play 비공개 테스트는 여전히 미검증.- 추가 smoke: village_research.tscn, editor_preview.tscn headless 실행 통과.
+
+## 이어하기 문서 상태 정정 (2026-11-12)
+
+- ISSUES/PROGRESS의 과거 문구 중 수성 승패, 진화 고정, 전투 중 수리를 여전히 미결정·미구현으로 표기한 항목을 최신 사용자 결정 및 구현 결과에 맞게 정정했다. 원본 기획 4종은 수정하지 않았다.
+- Godot 4.7.2 headless `tests/run.gd: 통과. `scripts/validate_content.gd`: 통과 (콘텐츠 Error 0). `git diff --check`: 통과.
+- 범위: 문서 상태 정합성만 수정. Android 산출물은 코드 변경이 없어 재생성하지 않았다.
