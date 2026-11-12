@@ -264,3 +264,9 @@
 - 통과: `tests/run.gd`(잘못된 유닛 강화 참조·특수 스킬 형태/쿨타임·0 비용·누락 형태), `tests/editor_preview.gd`, `tests/results_view.gd`, 콘텐츠 검증, `git diff --check`.
 - 한계: 이름·조건·비용·특수 스킬 수치는 제안/임시 SEED다. 연구 해금과 전투 적용, 실제 Godot GUI 조작은 아직 검증되지 않았다.
 - 추가 통과: Godot headless 편집기 초기화/플러그인 로드와 main/battle/village/village_research/editor_preview 5개 씬 smoke. 최신 소스로 Android Debug APK 재생성 및 apksigner v2/v3 검증 통과: 86,369,046 bytes (2026-11-12 15:34 KST). 에뮬레이터 렌더 실패와 별개로 실기기 검증은 미완료.
+
+## 2026-11-12 캠페인 8스테이지 시드 플레이 검사
+
+- 신규 `tests/campaign_playability.gd`가 메인 6·선택 2 스테이지를 순서대로 실제 `BattleModel`에 로드한다. 의존 스테이지 완료를 확인하고, 로스터에 맞춘 유닛 배치·공성 수동 이동·재정비 증원으로 전 웨이브를 승리한 뒤 `ProgressStore` 정산·완료 저장·중복 보상 방지를 확인한다.
+- 통과: `All 8 campaign stages won in the seeded playability simulation`. GitHub Actions에도 별도 단계로 추가했다.
+- 범위 제한: 게임 UI 없이 스테이지 ID를 직접 실행하므로 마을 UI/수동 조작 흐름은 검증하지 않는다. 한 개의 자동 전술 시드는 승리 가능성 증거이며 전체 전략 밸런스 승인은 아니다.

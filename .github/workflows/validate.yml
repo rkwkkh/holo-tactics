@@ -30,6 +30,11 @@ jobs:
           output="$(godot --headless --path . --script res://tests/results_view.gd 2>&1)"
           echo "$output"
           grep -q "Battle result panel tests passed" <<< "$output"
+      - name: Simulate campaign stage playability
+        run: |
+          output="$(godot --headless --path . --script res://tests/campaign_playability.gd 2>&1)"
+          echo "$output"
+          grep -q "All 8 campaign stages won in the seeded playability simulation" <<< "$output"
       - name: Validate content (errors block CI)
         run: godot --headless --path . --script res://scripts/validate_content.gd
       - name: Smoke test game scenes
