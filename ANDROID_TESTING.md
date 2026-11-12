@@ -132,3 +132,9 @@ Re-exported with the restored Mobile/Vulkan Android renderer after the temporary
 - Started `MaDangStage6_API37` on Emulator 37.2.13/API 37, installed `build/holo-debug.apk` (249,834,691 bytes, exported 2026-11-12 20:58 KST), and launched `com.example.holotactics`.
 - Vulkan initialized on Goldfish GFXStream/SwiftShader. The campaign menu rendered in the captured 1080x2400 frame; no Godot script or AndroidRuntime error appeared in the captured log window.
 - ADB tap injection did not navigate into M1, so this smoke verifies launch/menu only, not combat. This API37 result does not establish Android 10 compatibility or FPS acceptance.
+
+## API37 M1 touch gameplay smoke (2026-11-12)
+
+- After correcting for the screenshot viewer's downscaled coordinates, ADB touch entered M1 and deployed a swordsman on the board. On Emulator 37.2.13/API37, HUD resource changed 160→110 after the 50-cost deployment.
+- Started wave 1; the game changed to combat state, enemies moved into the defense area, and core HP changed 300→280 after an enemy attack. Battle board, sprites, core HUD, build controls, and combat controls rendered in the 1080x2400 capture (`build/mvp-followup-api37-wave.png`, ignored artifact).
+- This is a short SwiftShader AVD gameplay smoke. It does not verify full stage completion, Android 10 physical compatibility, or FPS targets.

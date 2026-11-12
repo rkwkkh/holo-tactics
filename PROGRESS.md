@@ -233,3 +233,7 @@ The computer-use native pipe again failed before listing Windows apps, so M5 GUI
 ## M6 fresh API37 launch check (2026-11-12)
 
 Reinstalled the current local Debug APK on `MaDangStage6_API37` with Emulator 37.2.13/API 37. The campaign menu rendered and no Godot/AndroidRuntime error was captured. ADB tap injection did not enter M1, so the check is limited to launch/menu; Android 10 and FPS remain unverified. Screenshot artifact is ignored under `build/mvp-followup-api37.png`.
+
+## API37 M1 touch gameplay smoke (2026-11-12)
+
+Corrected ADB coordinates entered M1 on `MaDangStage6_API37`/Emulator 37.2.13. The board and controls rendered; deploying a swordsman charged 50 (resource 160→110), and wave 1 combat reduced core HP 300→280 after an enemy hit. This confirms a short deploy/start/attack path on the emulator only. Full campaign, Android 10 physical device, and FPS acceptance remain separate. Screenshot: ignored `build/mvp-followup-api37-wave.png`.

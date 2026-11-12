@@ -584,3 +584,5 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 - 전투 규칙 재검증: `tests/run.gd` — Godot 4.7.2 headless, 통과. 출혈/화상 보호막 우선·방어력 후순위와 빙결/기절 최대 남은 시간 동작 확인 포함.
 
 - 2026-11-12: fresh API37 install smoke showed the current APK campaign menu with Vulkan/SwiftShader and no captured runtime error. ADB touch did not enter M1. Count only as launch/menu evidence; no combat, Android 10 hardware, or FPS acceptance.
+
+- API37 emulator smoke (2026-11-12): touch entered M1; unit deployment charged the expected 50 resources (160→110), and wave 1 enemy attack reduced core HP (300→280). This strengthens launch-only evidence to a short interactive combat path; it is not a full-stage or physical-device/FPS pass.
