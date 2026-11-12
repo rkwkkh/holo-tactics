@@ -551,4 +551,4 @@ Marked M0–M4 complete in `PROGRESS.md`: M1 has API37 manual defense evidence p
 
 ## CI build gate correction (2026-11-12)
 
-The Android AAB job now declares `needs: godot`, so export and artifact upload are skipped unless import, tests, content validation, and scene smoke all succeed. Reviewed the workflow diff and `git diff --check`; no local actionlint/YAML parser is installed, so a hosted GitHub Actions run remains the authoritative workflow validation.
+The Android AAB job now declares `needs: godot`, so export and artifact upload are skipped unless import, tests, content validation, and scene smoke all succeed. Cached actionlint v1.7.12 linted `.github/workflows/validate.yml` with no diagnostics, and `git diff --check` passed. A hosted GitHub Actions run remains pending repository/Actions access.
