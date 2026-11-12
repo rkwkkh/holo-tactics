@@ -204,3 +204,9 @@
 - 결론: AVD 시작/설치 자체는 가능하나 Android 실행 수직 슬라이스는 통과하지 못했다. Android 10+ 실기기 GLES3 확인과 API 37 shader 문제의 분리가 필요하다.
 
 - 보강: 사용자 결정으로 확정한 스토리 단계별 기본 유닛 해금 순서(검사·궁수 → 창병 → 지원병 → 마법사)가 스테이지 `available_units` 카탈로그에 유지되는지 `tests/run.gd` 회귀 assertion으로 확인.
+
+## 2026-11-12 렌더러 분리 실험
+
+- 공식 Godot 이슈 [#109550](https://github.com/godotengine/godot/issues/109550)은 Godot 4.7.2 + Android Emulator SwiftShader에서 동일한 261-vector 로그를 재현하며 SwiftShader의 GLES3 불완전 구현을 지적한다. 이 경고만으로 실기기 실패를 단정하지 않는다.
+- Android 10 API 29 Compatibility 렌더러는 GLES 3.0이 필요하지만 현재 AVD 이미지는 GLES 2.0만 제공해 실행 실패가 예상 범위다.
+- 비교용 Mobile/Vulkan 변형 APK export까지 성공했으나 설치 시 API 37 AVD가 offline이어서 비교 실행은 성립하지 않았다. 임시 설정/산출물은 제거하고 Compatibility 설정을 복원한 뒤 기본 APK를 재생성·서명 검증했다.
