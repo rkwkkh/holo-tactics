@@ -561,3 +561,8 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 
 - Godot 4.7.2 editor-headless test passed: three tabs created, catalog counts were stages/waves 37, evolutions 6, upgrades 20; both stage and direct-wave preview controls exist. Added to CI and actionlint passes.
 - Limitation: this does not exercise actual visible dock/Inspector interactions. Godot exits successfully but prints renderer/ObjectDB leak diagnostics while closing this headless editor-script process; this is recorded as harness teardown noise pending a GUI session.
+
+## M6 AVD reconnection smoke (2026-11-12)
+
+- Using the installed SDK ADB, reconnected and installed the current APK (SHA-256 `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC`) on API29 and API37 AVDs. API37 displayed the campaign menu and initialized Vulkan/SwiftShader. API29 resumed its activity but logged repeated Vulkan queue present error 5.
+- ADB touch injection did not change the API37 menu in this run; M1 entry is not claimed from this check. This does not validate physical Android compatibility or FPS.

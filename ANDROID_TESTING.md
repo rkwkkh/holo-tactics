@@ -113,3 +113,9 @@ A temporary APK exported with Godot Compatibility/OpenGL was installed on the AP
 
 Re-exported with the restored Mobile/Vulkan Android renderer after the temporary API29 Compatibility probe. APK v2 signature verification and AAB ZIP structure (`BundleConfig.pb`, base manifest, dex) pass. API29/API37 AVDs were offline at this check, so there is no fresh installation/render smoke result for these exact artifact hashes.
 - Fresh API37 smoke for the current official APK hash `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC` (2026-11-12): after ADB server restart and cold-start delay, campaign menu and M1 defense board rendered; tapped M1 and confirmed the board, unit sprites, core HUD, and controls. No script, Vulkan-present, or fatal exception was logged during the short smoke. This is emulator-only.
+
+## Latest AVD reconnection and recheck (2026-11-12)
+
+- Located ADB under `%LOCALAPPDATA%\Android\Sdk\platform-tools`; `adb reconnect offline` brought `MaDang_API29` (Android 10/API 29) and `MaDangStage6_API37` (Android 17/API 37) online.
+- Installed the exact APK SHA-256 above on both AVDs. API 37 resumed the Godot launcher and rendered the campaign menu; Vulkan initialized on SwiftShader. Current ADB touch injection did not change the menu, so this pass did not reconfirm M1 entry.
+- API 29 resumed the activity but repeatedly logged `Couldn't present to Vulkan queue (VkResult error 5)`. No physical Android device was attached; API 29 support and FPS acceptance remain unverified.

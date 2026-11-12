@@ -211,3 +211,7 @@ The user reconfirmed shield-first then armor for bleed/burn and longest remainin
 ## M5 editor panels structural validation (2026-11-12)
 
 Added `tests/editor_panels.gd` and wired it into GitHub Actions. Godot 4.7.2 editor-headless check creates all three EditorPlugin tabs and confirms they load stages/waves, six evolutions, 20 upgrades, and both stage/wave preview controls. Core suite, content validation, and actionlint pass. GUI interaction remains unverified; editor-headless shutdown emits renderer/object cleanup leak diagnostics despite exit code 0.
+
+## M6 current AVD recheck (2026-11-12)
+
+Recovered the offline API29/API37 AVDs using the local Android SDK's ADB and installed current APK SHA `E0B817...`. API37 rendered the campaign menu with Vulkan/SwiftShader. API29 resumed the activity but repeated Vulkan present error 5. Headless ADB touch injection did not navigate to M1, so this run is only a launch/render smoke. No physical device was present; details in `ANDROID_TESTING.md`.
