@@ -110,7 +110,7 @@
 
 - Android 전용 Mobile/Vulkan 렌더러는 API 37 SwiftShader AVD에서 메뉴와 M1 보드 표시까지 개선됐다. 동일 설정 API 29 AVD는 Vulkan present error 5로 실패했다. 에뮬레이터 결과는 Android 10 실기기 호환 증거가 아니며, 보급형 실기기 및 전투 장시간 FPS/P95 측정이 필요하다.
 - AVD 시작 구간 17프레임의 p50 61ms/p90 300ms는 앱 실행/셰이더 준비가 포함된 불충분 샘플이다. 성능 목표 통과로 처리하지 않는다.
-- R-EFFECT-005 상태이상 저항, 행동불가 중첩 우선순위, 지속 피해의 방어/보호막 상호작용은 원문상 OPEN이다. 현재 SEED 동작은 개별 회귀 테스트로 검증되나 제품 규칙 확정은 아니다.
+- R-EFFECT-005: user has resolved bleed/burn mitigation (shield first, then armor) and overlapping freeze/stun (longer remaining duration). Hit resistance/immunity remains open; code and regression tests cover the confirmed rules.
 - M5 EditorPlugin은 headless 초기화/데이터 편집 모델 테스트를 통과했으나 편집기 GUI에서 3개 탭의 실제 Inspector/저장/오류 이동 조작은 검증 대기다.
 
 - 2026-11-12 M5 GUI 재시도: Computer Use `getState()`에서 native app pipe의 지정 파일 없음과 browser host unavailable을 받았다. GUI 실행/클릭은 시작되지 않았고 M5 시각/Inspector 저장 흐름은 미검증이다. Headless EditorPlugin 초기화와 자동 테스트는 통과했다.
@@ -132,3 +132,5 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 - Resolved in code/tests: M5 editor Error-vs-Warning save gate and content-id/field navigation now have regressions. GUI interaction remains open; headless tests do not prove actual dock/Inspector usability.
 
 - M6 perf sample on API37 SwiftShader AVD is below target (25.4–25.9 FPS, p95 41–42ms). Emulator software GPU makes this a diagnostic result only; physical device/frame-profiler measurement is still required before acceptance. Debug sampler is excluded from release builds.
+
+- 2026-11-12 M5 GUI retry: both Computer Use state checks failed because the native app pipe and browser host were unavailable. No UI action occurred; plugin/editor GUI interaction remains unverified, while headless plugin initialization and model tests pass.
