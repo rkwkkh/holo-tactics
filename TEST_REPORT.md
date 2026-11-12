@@ -189,3 +189,10 @@
 - 통과: Godot 4.7.2 editor import 및 `content_editor.gd --check-only`, `tests/run.gd`, `tests/editor_preview.gd`, `scripts/validate_content.gd`, `git diff --check`.
 - 추가 검사: Inspector용 `EditableCatalogRecord`의 동적 속성 get/set과 미등록 속성 거부를 자동 검사.
 - 미검증: 실제 Inspector GUI 입력/JSON 가져오기/저장 버튼 조작. headless 검사는 스크립트 파싱과 모델 로직까지만 확인한다.
+
+## 2026-11-12 추가 M6 재검증
+
+- 통과: main, battle, village, village_research, editor_preview 5개 씬 headless smoke.
+- 통과: 현재 저장소 소스로 Android Debug APK 재생성 (`build/holo-debug.apk`, 86,356,603 bytes, 2026-11-12 13:51 KST); apksigner v2/v3 서명 검증.
+- UI 확인: computer-use 연결이 세션에서 native pipe unavailable로 실패하여 Godot 도크/Inspector의 시각·상호작용 검증은 수행하지 못했다.
+- 여전히 대기: 실기기(Android 10+), FPS/P95, release AAB/Play 비공개 테스트. API 37 AVD의 GLES3 오류 기록은 해결되지 않았다.

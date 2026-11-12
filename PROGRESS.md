@@ -49,3 +49,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 최종 재검증 (2026-11-12 11:04 KST): 전체 headless 테스트·콘텐츠 검증·메인/전투 씬 실행 통과. APK 86,313,754 bytes 생성 및 서명 v2/v3 검증 통과. GUI helper가 연결되지 않아 화면 검증은 미완료.
 
 - 2026-11-12 이어하기: 기존 M0–M4 회귀 상태를 headless로 재검증했다. M5 패널에 선택 레코드 Inspector 편집/값 가져오기를 추가했고, 모델 속성 테스트가 통과했다. GUI 상호작용, 저장 UX, 오류 위치 이동은 미검증 또는 미구현이라 M5는 진행 중이다.
+
+- 2026-11-12 M6 이어하기: 5개 주요 씬 smoke 및 현재 소스 Android Debug APK 재생성/서명(v2/v3) 통과. Editor GUI 검증은 computer-use native pipe 연결 불가로 진행되지 않았다. 실기기/성능/release AAB/Play 배포는 검증 대기이며 M6 완료가 아니다.
