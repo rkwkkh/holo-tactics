@@ -124,4 +124,6 @@ M1 battle view now shows temporary nearest-filtered pixel sprites for the roster
 
 Error-blocking and Warning-only catalog save behavior, stable-ID protection, atomic temp/backup cleanup, and field-focused error navigation are implemented and covered in headless tests. Remaining M5 gate is hands-on Godot dock/Inspector/panel interaction and preview launch through the GUI.
 
+- 2026-11-12: Added a Godot editor-headless structural check for all three panels, populated records, and the full-stage/direct-wave launch controls; CI runs it after editor import. It proves the panels construct with current catalog data, not that a person can use their dock/Inspector layouts.
+
 - M6 follow-up: debug frame sampler and synthetic-stat tests are implemented. Emulator sample is below target and is not physical-device evidence. Remaining M6 gates: measure regular/high-load frame time on representative Android hardware, verify Android 10 rendering, and prepare a publisher-signed AAB after package ID and release credentials are supplied.

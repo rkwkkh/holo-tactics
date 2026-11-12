@@ -556,3 +556,8 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 ## Status-effect policy revalidation (2026-11-12)
 
 - Godot 4.7.2 `tests/run.gd` passes after the user reconfirmed the rules. Existing assertions verify bleed/burn consume an 8-point shield before applying 50% damage reduction (10 total post-shield damage results in 6.5 HP loss) and that a shorter freeze application does not shorten an overlapping 0.8-second stun. No runtime code change was needed.
+
+## M5 editor panel structure (2026-11-12)
+
+- Godot 4.7.2 editor-headless test passed: three tabs created, catalog counts were stages/waves 37, evolutions 6, upgrades 20; both stage and direct-wave preview controls exist. Added to CI and actionlint passes.
+- Limitation: this does not exercise actual visible dock/Inspector interactions. Godot exits successfully but prints renderer/ObjectDB leak diagnostics while closing this headless editor-script process; this is recorded as harness teardown noise pending a GUI session.

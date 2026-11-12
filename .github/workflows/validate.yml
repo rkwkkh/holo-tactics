@@ -28,6 +28,11 @@ jobs:
           output="$(godot --headless --path . --script res://tests/editor_preview.gd 2>&1)"
           echo "$output"
           grep -q "Editor preview isolation passed" <<< "$output"
+      - name: Verify content editor panels
+        run: |
+          output="$(godot --headless --editor --path . --script res://tests/editor_panels.gd 2>&1)"
+          echo "$output"
+          grep -q "Editor content panels passed" <<< "$output"
       - name: Test battle results UI state
         run: |
           output="$(godot --headless --path . --script res://tests/results_view.gd 2>&1)"

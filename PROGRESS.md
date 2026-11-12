@@ -207,3 +207,7 @@ All headless core/results/campaign/editor-preview/content tests pass. The editor
 ## 2026-11-12 status-effect decision reconfirmation
 
 The user reconfirmed shield-first then armor for bleed/burn and longest remaining time for overlapping freeze/stun. Existing BattleModel behavior matches; `tests/run.gd` passes. No gameplay code changed. M5 GUI and M6 real-device/FPS/signing checks remain open.
+
+## M5 editor panels structural validation (2026-11-12)
+
+Added `tests/editor_panels.gd` and wired it into GitHub Actions. Godot 4.7.2 editor-headless check creates all three EditorPlugin tabs and confirms they load stages/waves, six evolutions, 20 upgrades, and both stage/wave preview controls. Core suite, content validation, and actionlint pass. GUI interaction remains unverified; editor-headless shutdown emits renderer/object cleanup leak diagnostics despite exit code 0.
