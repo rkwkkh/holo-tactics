@@ -197,3 +197,5 @@ Verified every atlas region and every catalog unit/facility mapping in `tests/ru
 Catalog writes now pass through a testable save path: stable IDs cannot change, any Validator Error blocks persistence without touching the source file, Warning-only edits save atomically, and error-list selection opens the record at the reported nested JSON key. Added regression cases for invalid wave reference, ID change, 27-wave warning-only edit, temp/backup cleanup, and simple/nested field selection.
 
 All headless core/results/campaign/editor-preview/content tests pass. The editor GUI itself remains unverified because the native Computer Use connection is unavailable.
+
+- 2026-11-12 M6: added debug-only battle frame sampling (10-second windows) with average FPS and p50/p95/max frame times; core tests cover the percentile calculation. Fresh Android APK/AAB exported. API37 SwiftShader AVD showed M1 gameplay at 25.9 and 25.4 average FPS (p95 41.67/41.31ms, max 50ms); this software-emulated result misses the numeric target and is not representative of physical hardware. Physical-device FPS remains unverified.

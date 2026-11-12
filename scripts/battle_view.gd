@@ -2,6 +2,7 @@ extends Control
 
 const TILE_SIZE := Vector2(40, 39)
 const BATTLE_TICK_SECONDS := 0.2
+const FRAME_SAMPLE_SECONDS := 10.0
 const BATTLE_SPRITE_CELLS := {
 	"swordsman": Vector2i(0, 0), "archer": Vector2i(1, 0), "spearman": Vector2i(2, 0), "support": Vector2i(3, 0), "mage": Vector2i(4, 0),
 	"goblin": Vector2i(5, 0), "goblin_archer": Vector2i(6, 0), "orc_warrior": Vector2i(7, 0), "orc_charger": Vector2i(8, 0), "enemy_mage": Vector2i(9, 0), "enemy_support": Vector2i(10, 0),
@@ -17,6 +18,8 @@ var tiles: Array[Button] = []
 var tile_sprites: Array[TextureRect] = []
 var battle_sprite_cache: Dictionary = {}
 var battle_sprite_atlas: Texture2D
+var frame_sample_times: Array[float] = []
+var frame_sample_elapsed := 0.0
 var status: Label
 var hud: Label
 var selected_kind := "swordsman"
@@ -267,6 +270,37 @@ func _ready() -> void:
 		rest_seconds = 3
 		rest_timer.start()
 	_refresh()
+
+func _process(delta: float) -> void:
+	if not OS.is_debug_build() or battle == null:
+		return
+	if paused or battle.phase not in ["combat", "preparation"]:
+		frame_sample_times.clear()
+		frame_sample_elapsed = 0.0
+		return
+	frame_sample_times.append(delta)
+	frame_sample_elapsed += delta
+	if frame_sample_elapsed < FRAME_SAMPLE_SECONDS or frame_sample_times.size() < 30:
+		return
+	var stats := summarize_frame_times(frame_sample_times)
+	print("[PERF] stage=%s frames=%d avg_fps=%.1f p50_ms=%.2f p95_ms=%.2f max_ms=%.2f" % [battle.stage_id, frame_sample_times.size(), stats.avg_fps, stats.p50_ms, stats.p95_ms, stats.max_ms])
+	frame_sample_times.clear()
+	frame_sample_elapsed = 0.0
+
+static func summarize_frame_times(samples: Array[float]) -> Dictionary:
+	if samples.is_empty():
+		return {}
+	var sorted := samples.duplicate()
+	sorted.sort()
+	var total := 0.0
+	for frame_time in sorted:
+		total += frame_time
+	return {
+		"avg_fps": float(sorted.size()) / total,
+		"p50_ms": sorted[int((sorted.size() - 1) * 0.50)] * 1000.0,
+		"p95_ms": sorted[mini(sorted.size() - 1, ceili(sorted.size() * 0.95) - 1)] * 1000.0,
+		"max_ms": sorted[-1] * 1000.0
+	}
 
 func _on_tile_pressed(cell: Vector2i) -> void:
 	if paused:

@@ -520,3 +520,10 @@
 - Passed core tests including: Error edit rejected with byte-for-byte unchanged catalog; stable-ID rename rejected without writes; Warning-only 27-wave edit accepted and persisted; temporary/backup files cleaned; simple and nested error fields selected in the editor JSON control.
 - Passed results view, seeded 8-stage campaign simulation, preview isolation, content validator (0 errors), editor-preview headless scene start.
 - Godot 4.7.2 stable, Windows headless. Editor GUI dock/Inspector flow remains unverified.
+
+## M6 debug frame sampler (2026-11-12)
+
+- Added debug-build-only sampling across combat and preparation so short waves do not reset a sample before its 10-second window. Tests verify average FPS and frame-time percentiles using synthetic data.
+- Godot 4.7.2 editor import and `tests/run.gd` passed. Fresh APK and AAB exports completed; APK v2 signature verification passed. APK package `com.example.holotactics`, min API 29, target API 36.
+- API37 SwiftShader AVD, M1 wave: consecutive windows measured 25.9 and 25.4 average FPS; p95 41.67 and 41.31ms; max 50ms. This virtualized software GPU result is below the stated FPS goals; it is diagnostic only and does not establish physical-device performance. No script or fatal error appeared during the sampling window.
+- Visual smoke: campaign menu and M1 board/unit sprites rendered; wave start accepted. API29 Vulkan presentation and physical Android performance remain unverified.

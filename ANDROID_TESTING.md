@@ -100,3 +100,7 @@ On API 37 AVD, manual taps entered M1, placed two swordsmen (resource 160→60),
 ## AVD FPS sampling limitation (2026-11-12)
 
 Tried Android system frame collectors during an active API37 AVD M1 wave. `dumpsys gfxinfo com.example.holotactics` reported zero ViewRoot frames (the Godot Vulkan game is rendered through a native SurfaceView); percentile defaults were 4950ms and are invalid. `dumpsys SurfaceFlinger --latency` returned only the display refresh period (16,666,666ns), without frame timestamps for the Godot layer. These commands cannot establish game FPS or frame-time targets on this build. Use Godot's Remote Profiler on a connected target or a physical-device GPU/frame profiler; keep 60/30 FPS acceptance pending.
+
+## Debug frame sample (2026-11-12)
+
+A debug-only sampler logs `[PERF]` every 10 seconds during combat/preparation. On the API37 SwiftShader AVD, an M1 wave produced two windows: 25.9/25.4 average FPS, p95 41.67/41.31ms, max 50ms. This is under the 60 FPS regular / 30 FPS high-load targets and reflects a software-rendered emulator, not a representative phone; do not use it to claim device performance. Repeat on physical Android 10+ hardware with the Godot Remote Profiler or a device GPU/frame profiler.

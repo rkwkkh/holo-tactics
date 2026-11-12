@@ -28,6 +28,9 @@ func _initialize() -> void:
 	assert(error_field_edit.get_selected_text() == "\"mode\"")
 	error_field_edit.free()
 	var battle_view_script: Script = load("res://scripts/battle_view.gd")
+	var synthetic_frame_times: Array[float] = [0.01, 0.02, 0.03, 0.04]
+	var frame_stats: Dictionary = battle_view_script.summarize_frame_times(synthetic_frame_times)
+	assert(is_equal_approx(frame_stats.avg_fps, 40.0) and is_equal_approx(frame_stats.p50_ms, 20.0) and is_equal_approx(frame_stats.p95_ms, 40.0) and is_equal_approx(frame_stats.max_ms, 40.0))
 	var sprite_probe: Variant = battle_view_script.new()
 	sprite_probe.battle_sprite_atlas = load("res://assets/battle_sprites.svg")
 	for sprite_id in battle_view_script.BATTLE_SPRITE_CELLS:

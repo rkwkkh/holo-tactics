@@ -130,3 +130,5 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 - Performance measurement gap: API37 AVD `gfxinfo` collected zero ViewRoot frames while Godot rendered through SurfaceView; SurfaceFlinger latency query exposed only refresh period, no game frame timestamps. Do not infer FPS from these. Need Godot Remote Profiler/physical GPU profiler before judging 60FPS regular and 30FPS high-load targets.
 
 - Resolved in code/tests: M5 editor Error-vs-Warning save gate and content-id/field navigation now have regressions. GUI interaction remains open; headless tests do not prove actual dock/Inspector usability.
+
+- M6 perf sample on API37 SwiftShader AVD is below target (25.4–25.9 FPS, p95 41–42ms). Emulator software GPU makes this a diagnostic result only; physical device/frame-profiler measurement is still required before acceptance. Debug sampler is excluded from release builds.

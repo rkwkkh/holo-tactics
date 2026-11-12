@@ -123,3 +123,5 @@ M1 battle view now shows temporary nearest-filtered pixel sprites for the roster
 ## M5 editor follow-up (2026-11-12)
 
 Error-blocking and Warning-only catalog save behavior, stable-ID protection, atomic temp/backup cleanup, and field-focused error navigation are implemented and covered in headless tests. Remaining M5 gate is hands-on Godot dock/Inspector/panel interaction and preview launch through the GUI.
+
+- M6 follow-up: debug frame sampler and synthetic-stat tests are implemented. Emulator sample is below target and is not physical-device evidence. Remaining M6 gates: measure regular/high-load frame time on representative Android hardware, verify Android 10 rendering, and prepare a publisher-signed AAB after package ID and release credentials are supplied.
