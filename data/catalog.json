@@ -11,12 +11,12 @@
     "upgrades": [],
     "evolutions": [],
     "facilities": [
-      {"id": "facility.arrow_tower", "kind": "arrow_tower", "team": "ally", "hp": 120, "damage": 16, "heal": 0, "range": 3, "attack_time": 1.2, "cost": 80, "blocks_path": true, "references": [], "dependencies": []},
-      {"id": "facility.magic_tower", "kind": "magic_tower", "team": "ally", "hp": 90, "damage": 25, "heal": 0, "range": 4, "attack_time": 1.8, "cost": 110, "blocks_path": true, "references": [], "dependencies": []},
-      {"id": "facility.support_outpost", "kind": "support_outpost", "team": "ally", "hp": 140, "damage": 0, "heal": 8, "range": 2, "attack_time": 1.5, "cost": 95, "blocks_path": true, "references": [], "dependencies": []},
-      {"id": "facility.defense_wall", "kind": "defense_wall", "team": "ally", "hp": 60, "damage": 0, "heal": 0, "range": 0, "attack_time": 0, "cost": 25, "blocks_path": true, "references": [], "dependencies": []},
-      {"id": "facility.enemy_watchtower", "kind": "watchtower", "team": "enemy", "hp": 100, "damage": 12, "heal": 0, "range": 3, "attack_time": 1.5, "cost": 0, "blocks_path": false, "references": [], "dependencies": []},
-      {"id": "facility.enemy_mage_tower", "kind": "mage_tower", "team": "enemy", "hp": 80, "damage": 18, "heal": 0, "range": 4, "attack_time": 2.0, "cost": 0, "blocks_path": false, "references": [], "dependencies": []}
+      {"id": "facility.arrow_tower", "kind": "arrow_tower", "team": "ally", "hp": 120, "damage": 16, "heal": 0, "splash_radius": 0, "range": 3, "attack_time": 1.2, "cost": 80, "blocks_path": true, "references": [], "dependencies": []},
+      {"id": "facility.magic_tower", "kind": "magic_tower", "team": "ally", "hp": 90, "damage": 25, "heal": 0, "splash_radius": 1, "range": 4, "attack_time": 1.8, "cost": 110, "blocks_path": true, "references": [], "dependencies": []},
+      {"id": "facility.support_outpost", "kind": "support_outpost", "team": "ally", "hp": 140, "damage": 0, "heal": 8, "splash_radius": 0, "range": 2, "attack_time": 1.5, "cost": 95, "blocks_path": true, "references": [], "dependencies": []},
+      {"id": "facility.defense_wall", "kind": "defense_wall", "team": "ally", "hp": 60, "damage": 0, "heal": 0, "splash_radius": 0, "range": 0, "attack_time": 0, "cost": 25, "blocks_path": true, "references": [], "dependencies": []},
+      {"id": "facility.enemy_watchtower", "kind": "watchtower", "team": "enemy", "hp": 100, "damage": 12, "heal": 0, "splash_radius": 0, "range": 3, "attack_time": 1.5, "cost": 0, "blocks_path": false, "references": [], "dependencies": []},
+      {"id": "facility.enemy_mage_tower", "kind": "mage_tower", "team": "enemy", "hp": 80, "damage": 18, "heal": 0, "splash_radius": 0, "range": 4, "attack_time": 2.0, "cost": 0, "blocks_path": false, "references": [], "dependencies": []}
     ],
     "obstacles": [],
     "waves": [

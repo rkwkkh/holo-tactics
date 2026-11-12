@@ -94,7 +94,7 @@ func build_facility(facility_id: String, cell: Vector2i) -> bool:
 	if definition.team != "ally" or combat_gold < definition.cost:
 		return false
 	combat_gold -= definition.cost
-	facilities.append({"id": next_id, "facility_id": facility_id, "kind": definition.kind, "cell": cell, "hp": definition.hp, "damage": definition.damage, "heal": definition.get("heal", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": 0.0, "alive": true})
+	facilities.append({"id": next_id, "facility_id": facility_id, "kind": definition.kind, "cell": cell, "hp": definition.hp, "damage": definition.damage, "heal": definition.get("heal", 0), "splash_radius": definition.get("splash_radius", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": 0.0, "alive": true})
 	next_id += 1
 	return true
 
@@ -166,9 +166,13 @@ func tick(delta: float) -> void:
 			continue
 		facility.cooldown = maxf(0.0, facility.cooldown - delta)
 		if facility.damage > 0:
-			var target_index := _closest_target(facility.cell, enemies + enemy_facilities, facility.range)
+			var targets: Array[Dictionary] = enemies + enemy_facilities
+			var target_index := _closest_target(facility.cell, targets, facility.range)
 			if target_index >= 0:
-				_strike(facility, (enemies + enemy_facilities)[target_index])
+				if facility.splash_radius > 0:
+					_strike_area(facility, targets, targets[target_index].cell, facility.splash_radius)
+				else:
+					_strike(facility, targets[target_index])
 		elif facility.heal > 0 and facility.cooldown <= 0.0:
 			var ally_index := _lowest_hp_ally(facility.cell, facility.range)
 			if ally_index >= 0:
@@ -293,7 +297,7 @@ func restore(snapshot: Dictionary) -> bool:
 		var cell := Vector2i(int(saved_facility.cell[0]), int(saved_facility.cell[1]))
 		if definition.team != "ally" or ids.has(id) or cell.y < 5 or (saved_facility.alive and (cell == core_cell or occupied.has(cell) or blocked_cells.has(cell) or _wall_at(cell) >= 0)) or not _is_finite_nonnegative(saved_facility.get("hp")) or float(saved_facility.hp) > float(definition.hp) or not _is_finite_nonnegative(saved_facility.get("cooldown")) or (saved_facility.alive and saved_facility.hp <= 0.0) or (not saved_facility.alive and saved_facility.hp > 0.0):
 			return false
-		var facility: Dictionary = {"id": id, "facility_id": saved_facility.facility_id, "kind": definition.kind, "cell": cell, "hp": float(saved_facility.hp), "damage": definition.damage, "heal": definition.get("heal", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": float(saved_facility.cooldown), "alive": saved_facility.alive}
+		var facility: Dictionary = {"id": id, "facility_id": saved_facility.facility_id, "kind": definition.kind, "cell": cell, "hp": float(saved_facility.hp), "damage": definition.damage, "heal": definition.get("heal", 0), "splash_radius": definition.get("splash_radius", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": float(saved_facility.cooldown), "alive": saved_facility.alive}
 		ids[id] = true
 		if facility.alive:
 			occupied[cell] = true
@@ -379,8 +383,20 @@ func _lowest_hp_ally(cell: Vector2i, heal_range: int) -> int:
 func _strike(attacker: Dictionary, target: Dictionary) -> void:
 	if attacker.cooldown > 0.0:
 		return
-	target.hp -= attacker.damage
+	_apply_damage(attacker, target)
 	attacker.cooldown = float(attacker.attack_time) if attacker.has("attack_time") else float(balance_seed[attacker.kind].attack_time)
+
+func _strike_area(attacker: Dictionary, targets: Array[Dictionary], center: Vector2i, radius: int) -> void:
+	if attacker.cooldown > 0.0:
+		return
+	for target in targets:
+		var distance := absi(center.x - target.cell.x) + absi(center.y - target.cell.y)
+		if target.alive and target.get("active", true) and distance <= radius:
+			_apply_damage(attacker, target)
+	attacker.cooldown = float(attacker.attack_time) if attacker.has("attack_time") else float(balance_seed[attacker.kind].attack_time)
+
+func _apply_damage(attacker: Dictionary, target: Dictionary) -> void:
+	target.hp -= attacker.damage
 	if target.hp <= 0.0:
 		target.hp = 0.0
 		target.alive = false

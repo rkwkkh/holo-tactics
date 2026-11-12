@@ -66,10 +66,12 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		if not facility is Dictionary:
 			continue
 		facility_teams[facility.get("id", "")] = facility.get("team", "")
-		if facility.get("team") not in ["ally", "enemy"] or not _is_positive_number(facility.get("hp")) or not _is_nonnegative_number(facility.get("damage")) or not _is_nonnegative_number(facility.get("heal", 0)) or not _is_nonnegative_integer(facility.get("range")) or not _is_nonnegative_number(facility.get("attack_time")) or not _is_nonnegative_integer(facility.get("cost")) or not facility.get("blocks_path") is bool:
+		if facility.get("team") not in ["ally", "enemy"] or not _is_positive_number(facility.get("hp")) or not _is_nonnegative_number(facility.get("damage")) or not _is_nonnegative_number(facility.get("heal", 0)) or not _is_nonnegative_integer(facility.get("splash_radius", 0)) or not _is_nonnegative_integer(facility.get("range")) or not _is_nonnegative_number(facility.get("attack_time")) or not _is_nonnegative_integer(facility.get("cost")) or not facility.get("blocks_path") is bool:
 			errors.append("%s has invalid facility data" % facility.get("id", "<missing-id>"))
 		elif facility.damage > 0 and (facility.range < 1 or facility.attack_time <= 0):
 			errors.append("%s has invalid facility attack data" % facility.get("id", "<missing-id>"))
+		elif float(facility.get("splash_radius", 0)) > 0.0 and facility.damage <= 0:
+			errors.append("%s has invalid facility splash data" % facility.get("id", "<missing-id>"))
 		elif facility.heal > 0 and (facility.range < 1 or facility.attack_time <= 0 or facility.team != "ally"):
 			errors.append("%s has invalid facility healing data" % facility.get("id", "<missing-id>"))
 	for profile in _as_array(categories.get("ai_profiles", [])):

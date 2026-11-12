@@ -42,6 +42,9 @@ func _initialize() -> void:
 	var invalid_facility_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_facility_catalog.categories.facilities[0].hp = 0
 	assert(ContentValidator.validate(invalid_facility_catalog).any(func(error): return error.contains("invalid facility data")))
+	var invalid_splash_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_splash_catalog.categories.facilities[1].damage = 0
+	assert(ContentValidator.validate(invalid_splash_catalog).any(func(error): return error.contains("invalid facility splash data")))
 	var invalid_healer_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_healer_catalog.categories.facilities[2].range = 0
 	assert(ContentValidator.validate(invalid_healer_catalog).any(func(error): return error.contains("invalid facility healing data")))
@@ -191,6 +194,17 @@ func _initialize() -> void:
 	var support_heal_snapshot := support_heal_test.to_dict()
 	var support_heal_restore := BattleModel.new()
 	assert(support_heal_restore.restore(support_heal_snapshot) and support_heal_restore.facilities[0].heal == 8)
+	var magic_splash_test := BattleModel.new()
+	magic_splash_test.phase = "combat"
+	assert(magic_splash_test.build_facility("facility.magic_tower", Vector2i(1, 8)))
+	magic_splash_test.enemies.append({"id": 50, "kind": "goblin", "cell": Vector2i(1, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
+	magic_splash_test.enemies.append({"id": 51, "kind": "goblin", "cell": Vector2i(2, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
+	magic_splash_test.enemies.append({"id": 52, "kind": "goblin", "cell": Vector2i(4, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
+	magic_splash_test.tick(0.2)
+	assert(magic_splash_test.enemies[0].hp == 40.0 and magic_splash_test.enemies[1].hp == 40.0 and magic_splash_test.enemies[2].hp == 65.0)
+	magic_splash_test.phase = "preparation"
+	var magic_splash_restore := BattleModel.new()
+	assert(magic_splash_restore.restore(magic_splash_test.to_dict()) and magic_splash_restore.facilities[0].splash_radius == 1)
 	var rebuilt_cell_model := BattleModel.new()
 	assert(rebuilt_cell_model.deploy("swordsman", Vector2i(3, 8)))
 	rebuilt_cell_model.units[0].alive = false
