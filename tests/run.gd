@@ -220,6 +220,30 @@ func _initialize() -> void:
 	var seeded_catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/catalog.json"))
 	assert(ContentValidator.validate(seeded_catalog).is_empty())
 	assert(ContentValidator.warnings(seeded_catalog).is_empty())
+	var stale_catalog_path := "user://catalog_stale_backup_test.json"
+	for suffix in ["", ".bak"]:
+		var stale_catalog_file: String = stale_catalog_path + suffix
+		if FileAccess.file_exists(stale_catalog_file):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(stale_catalog_file))
+	for catalog_path in [stale_catalog_path, stale_catalog_path + ".bak"]:
+		var catalog_file := FileAccess.open(catalog_path, FileAccess.WRITE)
+		assert(catalog_file != null)
+		catalog_file.store_string(JSON.stringify(seeded_catalog))
+		catalog_file.close()
+	assert(content_editor_script.read_catalog(stale_catalog_path) is Dictionary)
+	assert(not FileAccess.file_exists(stale_catalog_path + ".bak"))
+	var invalid_catalog_file := FileAccess.open(stale_catalog_path, FileAccess.WRITE)
+	assert(invalid_catalog_file != null)
+	invalid_catalog_file.store_string("{}")
+	invalid_catalog_file.close()
+	var invalid_catalog_backup := FileAccess.open(stale_catalog_path + ".bak", FileAccess.WRITE)
+	assert(invalid_catalog_backup != null)
+	invalid_catalog_backup.store_string(JSON.stringify(seeded_catalog))
+	invalid_catalog_backup.close()
+	assert(content_editor_script.read_catalog(stale_catalog_path) is Dictionary)
+	assert(FileAccess.file_exists(stale_catalog_path + ".bak"))
+	for suffix in ["", ".bak"]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(stale_catalog_path + suffix))
 	var off_target_campaign: Dictionary = seeded_catalog.duplicate(true)
 	off_target_campaign.categories.stages[0].references.append("wave.s2.supply.3")
 	assert(ContentValidator.validate(off_target_campaign).is_empty())

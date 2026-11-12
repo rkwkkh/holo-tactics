@@ -15,7 +15,12 @@ static func read_catalog(path: String = CATALOG_PATH) -> Variant:
 		return null
 	var catalog: Variant = JSON.parse_string(file.get_as_text())
 	file.close()
-	return catalog if catalog is Dictionary else null
+	if not catalog is Dictionary:
+		return null
+	var backup_path := path + ".bak"
+	if FileAccess.file_exists(backup_path) and ContentValidator.validate(catalog).is_empty() and DirAccess.remove_absolute(ProjectSettings.globalize_path(backup_path)) != OK:
+		return null
+	return catalog
 
 func _enter_tree() -> void:
 	tabs = TabContainer.new()

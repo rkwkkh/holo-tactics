@@ -420,3 +420,9 @@
 - `tests/run.gd`: 320/360/412px viewport에서 캠페인 버튼 2개의 총 최소 폭이 viewport를 넘지 않는지 검사. `scenes/main.tscn` smoke 통과.
 - 전체 필수 테스트(run/results_view/editor_preview/campaign_playability/content validator) 통과.
 - APK 249,824,757 bytes: min API29/target36, v2 검증 통과. AAB 86,232,522 bytes: bundletool 1.18.3 validate, manifest API29/36 통과, unsigned.
+
+## 2026-11-12 stale catalog backup 회귀 검사
+
+- 통과: tests/run.gd (유효 주 파일 + stale backup 정리, 오류 주 파일 + backup 보존).
+- 통과: editor_preview.gd, results_view.gd, campaign_playability.gd (8개 스테이지), validate_content.gd, headless editor import, editor_preview.tscn smoke, git diff --check.
+- 실행 엔진: Godot 4.7.2 stable, Windows headless. Android 산출물은 에디터 플러그인/테스트 전용 변경이라 재생성하지 않음.
