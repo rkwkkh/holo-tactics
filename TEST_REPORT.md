@@ -286,3 +286,5 @@
 - First test run exposed `_apply_unit_upgrades()` reading the live model balance; it now accepts the candidate balance for restore validation. Re-run passed: editor import, `tests/run.gd`, campaign playability, and content validator. `git diff --check` passed.
 
 - After the checkpoint restore fix, Android Debug APK was re-exported successfully from the updated source: `build/holo-debug.apk`, 249,871,658 bytes (2026-11-12 16:15 local). `aapt` confirmed min API 29/target API 36; `apksigner` confirmed v2=true and v3=false. This is a debug APK, not Play release evidence.
+
+- 추가 회귀: 직접 `ProgressStore.load_progress()`에 잘못된 JSON을 넣었을 때 로드 실패, 기존 메모리 재화 777 유지, 원본 파일 `{}` 보존을 확인했다. Godot 4.7.2 `tests/run.gd` 통과.

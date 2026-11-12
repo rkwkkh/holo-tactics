@@ -141,6 +141,10 @@ func _initialize() -> void:
 	var protected_village := VillageModel.new(corrupt_path)
 	assert(not protected_village.available and not protected_village.place_building("training_hall", Vector2i(0, 0)))
 	assert(FileAccess.get_file_as_string(corrupt_path) == "{}")
+	var protected_progress := ProgressStore.new(corrupt_path)
+	protected_progress.data.permanent_currency = 777
+	assert(not protected_progress.load_progress())
+	assert(protected_progress.data.permanent_currency == 777 and FileAccess.get_file_as_string(corrupt_path) == "{}")
 	for path in [village_test_path, village_unlock_path, research_path]:
 		for suffix in ["", ".tmp", ".bak"]:
 			var cleanup_path: String = path + suffix
