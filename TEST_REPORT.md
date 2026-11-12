@@ -297,3 +297,5 @@
 
 - `.github/workflows/validate.yml`에 Android SDK/API 36, Godot 4.7.2 export template 및 Gradle template을 이용한 Debug AAB packaging job을 추가했다. CI verifies bundle config, base manifest, and dex, then uploads `holo-debug-aab-unsigned` for 7 days.
 - Locally: official actionlint v1.7.12 binary checksum-list digest and archive checksum were verified before execution; actionlint passed. Actual GitHub-hosted execution is pending repository/Actions access. This artifact is not a signed Play release.
+
+- Android AAB manifest 직접 검사: Google bundletool 1.18.3 `dump manifest --bundle=build/holo-test.aab` 출력에서 `android:minSdkVersion="29"`, `android:targetSdkVersion="36"`을 각각 assert하여 통과했다. 번들 파일 자체가 Android 10+ manifest 조건을 충족함을 확인했다. 이 검사는 unsigned Debug AAB만 대상으로 하며 release 서명/Play 업로드를 입증하지 않는다.

@@ -89,3 +89,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12: 최신 체크포인트 복원 수정이 포함된 Android Debug AAB 패키징과 필수 번들 엔트리 검증을 수행했다. 번들은 unsigned이며 release artifact가 아니다.
 
 - GitHub Actions에 `android-aab` job을 추가했다: JDK 17/Android SDK API 36/Godot 4.7.2 export templates를 설치하고 Gradle template로 Debug AAB를 export, 필수 bundle entry를 검증한 뒤 unsigned smoke artifact를 7일 보관한다. 로컬 actionlint v1.7.12 검증 통과. 원격 Actions 실행은 저장소/권한 미확인으로 대기 중이다.
+
+- M6 manifest 검증 추가: bundletool로 최신 Android Debug AAB 내부 manifest의 min API 29/target API 36을 직접 확인했다. AAB는 unsigned 테스트 산출물이다.
