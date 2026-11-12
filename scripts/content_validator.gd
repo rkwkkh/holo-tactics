@@ -163,6 +163,14 @@ static func validate(catalog: Dictionary) -> Array[String]:
 			_append_field_error(errors, facility_id, "attack_time", "invalid facility healing data")
 		if valid_heal and facility.heal > 0 and facility.team != "ally":
 			_append_field_error(errors, facility_id, "team", "invalid facility healing data")
+	for obstacle in _as_array(categories.get("obstacles", [])):
+		if not obstacle is Dictionary:
+			continue
+		var obstacle_id: String = obstacle.get("id", "<missing-id>")
+		if not obstacle.get("kind") is String or obstacle.get("kind", "").is_empty():
+			_append_field_error(errors, obstacle_id, "kind", "invalid obstacle data")
+		if not _is_nonnegative_integer(obstacle.get("cost")):
+			_append_field_error(errors, obstacle_id, "cost", "invalid obstacle data")
 	var town_buildings := _as_array(categories.get("town_buildings", []))
 	for research in _as_array(categories.get("research", [])):
 		if not research is Dictionary:
@@ -216,6 +224,18 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	for stage in stage_items:
 		if not stage is Dictionary:
 			continue
+		if stage.has("obstacle_max_owned") or stage.has("obstacle_max_placed"):
+			var max_owned: Variant = stage.get("obstacle_max_owned")
+			var max_placed: Variant = stage.get("obstacle_max_placed")
+			var obstacle_refs := _ids_in(_as_array(categories.get("obstacles", [])))
+			var stage_references: Variant = stage.get("references", [])
+			var invalid_limits := not _is_nonnegative_integer(max_owned) or not _is_nonnegative_integer(max_placed)
+			if not invalid_limits:
+				invalid_limits = max_placed > max_owned
+			if not invalid_limits and max_owned > 0:
+				invalid_limits = not stage_references is Array or not stage_references.any(func(reference): return obstacle_refs.has(reference))
+			if invalid_limits:
+				_append_field_error(errors, stage.get("id", "<missing-id>"), "obstacle_max_owned|obstacle_max_placed|references", "invalid obstacle limits or missing obstacle reference")
 		var available_units: Variant = stage.get("available_units", [])
 		var stage_references: Variant = stage.get("references", [])
 		if not available_units is Array or available_units.is_empty():
@@ -366,7 +386,7 @@ static func _field_for_error(message: String) -> String:
 		["invalid permanent research", "unit_kind|building_kind|stat|amount|cost|requires_stage"], ["AI weights", "weights"], ["AI weight", "weights.*"],
 		["enemy and have a positive integer count", "enemy_id|count|references"], ["AI weight overrides", "ai_weight_overrides"], ["invalid reinforcement", "reinforcements[]"],
 		["enemy_facilities must", "enemy_facilities"], ["invalid enemy facility placement", "enemy_facilities[].facility_id|cell"], ["enemy facility must be referenced", "references"], ["conflicting enemy facility cell", "enemy_facilities[].cell"], ["conflicts with initial spawn", "enemy_facilities[].cell"], ["conflicts with reinforcement spawn", "enemy_facilities[].cell"],
-		["invalid available unit", "available_units"], ["must list available units", "available_units"], ["invalid board dimensions or core cell", "columns|rows|core_cell"], ["unknown battle mode", "mode"], ["invalid enemy spawn row", "enemy_spawn_row"], ["blocked_cells must", "blocked_cells"], ["invalid blocked cell", "blocked_cells[]"], ["duplicate blocked cell", "blocked_cells[]"], ["blocks its core cell", "blocked_cells[]|core_cell"], ["walls must", "walls"], ["invalid wall data", "walls[].cell|hp"], ["conflicting wall cell", "walls[].cell"], ["blocks a required wave route", "blocked_cells|walls|core_cell|waves"], ["blocks a reinforcement route", "blocked_cells|walls|core_cell|reinforcements"], ["must reference at least one wave", "references"], ["invalid core or resource values", "core_hp|start_resource|kill_reward|wave_reward|permanent_first_bonus|permanent_repeat_reward|permanent_partial_per_wave|intermission_seconds"], ["invalid campaign order", "campaign_order"], ["duplicates campaign order", "campaign_order"], ["campaign must contain", "stages|waves"], ["cyclic dependency", "dependencies"]
+		["invalid obstacle data", "kind|cost"], ["invalid obstacle limits", "obstacle_max_owned|obstacle_max_placed|references"], ["invalid available unit", "available_units"], ["must list available units", "available_units"], ["invalid board dimensions or core cell", "columns|rows|core_cell"], ["unknown battle mode", "mode"], ["invalid enemy spawn row", "enemy_spawn_row"], ["blocked_cells must", "blocked_cells"], ["invalid blocked cell", "blocked_cells[]"], ["duplicate blocked cell", "blocked_cells[]"], ["blocks its core cell", "blocked_cells[]|core_cell"], ["walls must", "walls"], ["invalid wall data", "walls[].cell|hp"], ["conflicting wall cell", "walls[].cell"], ["blocks a required wave route", "blocked_cells|walls|core_cell|waves"], ["blocks a reinforcement route", "blocked_cells|walls|core_cell|reinforcements"], ["must reference at least one wave", "references"], ["invalid core or resource values", "core_hp|start_resource|kill_reward|wave_reward|permanent_first_bonus|permanent_repeat_reward|permanent_partial_per_wave|intermission_seconds"], ["invalid campaign order", "campaign_order"], ["duplicates campaign order", "campaign_order"], ["campaign must contain", "stages|waves"], ["cyclic dependency", "dependencies"]
 	]
 	for hint in hints:
 		if message.contains(hint[0]):

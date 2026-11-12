@@ -12,6 +12,8 @@ var hud: Label
 var selected_kind := "swordsman"
 var selected_facility_id := ""
 var selected_facility_instance := -1
+var selected_obstacle_id := ""
+var selected_obstacle_instance := -1
 var selected_unit := -1
 var timer: Timer
 var rest_timer: Timer
@@ -19,6 +21,10 @@ var rest_seconds := 0
 var wave_button: Button
 var back_button: Button
 var deploy_buttons: Array[Button] = []
+var obstacle_controls: GridContainer
+var obstacle_install_buttons: Array[Button] = []
+var obstacle_reuse_button: Button
+var obstacle_store_button: Button
 var upgrade_controls: GridContainer
 var upgrade_buttons: Array[Button] = []
 var upgrade_controls_unit := -1
@@ -120,6 +126,26 @@ func _ready() -> void:
 		facility_button.text = "%s %d" % ["화살탑" if definition.kind == "arrow_tower" else "마법탑" if definition.kind == "magic_tower" else "지원" if definition.kind == "support_outpost" else "방벽", definition.cost]
 		facility_button.pressed.connect(_select_facility.bind(facility_id))
 		facility_controls.add_child(facility_button)
+	if int(battle.stage.get("obstacle_max_owned", 0)) > 0:
+		obstacle_controls = GridContainer.new()
+		obstacle_controls.columns = 2
+		obstacle_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		layout.add_child(obstacle_controls)
+		for obstacle_id in battle.obstacle_definitions:
+			var obstacle: Dictionary = battle.obstacle_definitions[obstacle_id]
+			var install_button := Button.new()
+			install_button.text = "장애물 설치 %d" % obstacle.cost
+			install_button.pressed.connect(_select_obstacle_definition.bind(obstacle_id))
+			obstacle_controls.add_child(install_button)
+			obstacle_install_buttons.append(install_button)
+		obstacle_reuse_button = Button.new()
+		obstacle_reuse_button.text = "보관 장애물 재설치"
+		obstacle_reuse_button.pressed.connect(_select_stored_obstacle)
+		obstacle_controls.add_child(obstacle_reuse_button)
+		obstacle_store_button = Button.new()
+		obstacle_store_button.text = "선택 장애물 회수"
+		obstacle_store_button.pressed.connect(_store_selected_obstacle)
+		obstacle_controls.add_child(obstacle_store_button)
 	wave_button = Button.new()
 	wave_button.text = "웨이브 시작"
 	wave_button.pressed.connect(_start_wave)
@@ -164,17 +190,37 @@ func _on_tile_pressed(cell: Vector2i) -> void:
 	if not unit.is_empty():
 		selected_unit = unit.id
 		selected_facility_instance = -1
+		selected_obstacle_instance = -1
+		selected_obstacle_id = ""
 		selected_kind = ""
 		selected_facility_id = ""
 	elif not _facility_at(cell).is_empty():
 		selected_facility_instance = _facility_at(cell).id
 		selected_unit = -1
+		selected_obstacle_instance = -1
+		selected_obstacle_id = ""
+		selected_kind = ""
+		selected_facility_id = ""
+	elif battle._obstacle_at(cell) >= 0:
+		selected_obstacle_instance = int(battle.obstacles[battle._obstacle_at(cell)].id)
+		selected_obstacle_id = ""
+		selected_unit = -1
+		selected_facility_instance = -1
 		selected_kind = ""
 		selected_facility_id = ""
 	elif selected_facility_instance >= 0:
 		if not battle.move_facility(selected_facility_instance, cell):
 			status_override = "시설은 재정비 중에만 이동할 수 있습니다"
 		selected_facility_instance = -1
+	elif selected_obstacle_instance >= 0:
+		var obstacle_index := battle._obstacle_index(selected_obstacle_instance)
+		var succeeded := battle.place_stored_obstacle(selected_obstacle_instance, cell) if obstacle_index >= 0 and not battle.obstacles[obstacle_index].placed else battle.move_obstacle(selected_obstacle_instance, cell)
+		if not succeeded:
+			status_override = "장애물 위치, 경로 또는 전투 단계를 확인하세요"
+		selected_obstacle_instance = -1
+	elif not selected_obstacle_id.is_empty():
+		if not battle.install_obstacle(selected_obstacle_id, cell):
+			status_override = "장애물 위치, 경로, 보유 한도 또는 전투 자원을 확인하세요"
 	elif selected_unit >= 0:
 		if not battle.move_unit(selected_unit, cell):
 			status_override = "이동할 수 없는 칸입니다"
@@ -191,6 +237,8 @@ func _select_unit_kind(kind: String) -> void:
 	selected_facility_id = ""
 	selected_facility_instance = -1
 	selected_unit = -1
+	selected_obstacle_id = ""
+	selected_obstacle_instance = -1
 	status_override = ""
 	_refresh()
 
@@ -199,7 +247,40 @@ func _select_facility(facility_id: String) -> void:
 	selected_facility_instance = -1
 	selected_kind = ""
 	selected_unit = -1
+	selected_obstacle_id = ""
+	selected_obstacle_instance = -1
 	status_override = "시설을 배치할 타일을 선택하세요"
+	_refresh()
+
+func _select_obstacle_definition(obstacle_id: String) -> void:
+	selected_obstacle_id = obstacle_id
+	selected_obstacle_instance = -1
+	selected_kind = ""
+	selected_facility_id = ""
+	selected_facility_instance = -1
+	selected_unit = -1
+	status_override = "장애물을 설치할 타일을 선택하세요"
+	_refresh()
+
+func _select_stored_obstacle() -> void:
+	for obstacle in battle.obstacles:
+		if not obstacle.placed:
+			selected_obstacle_instance = int(obstacle.id)
+			selected_obstacle_id = ""
+			selected_kind = ""
+			selected_facility_id = ""
+			selected_facility_instance = -1
+			selected_unit = -1
+			status_override = "저장된 장애물을 놓을 타일을 선택하세요"
+			_refresh()
+			return
+
+func _store_selected_obstacle() -> void:
+	if selected_obstacle_instance < 0 or not battle.store_obstacle(selected_obstacle_instance):
+		status_override = "재정비 중 배치된 장애물을 선택하세요"
+	else:
+		selected_obstacle_instance = -1
+		status_override = "장애물을 회수했습니다. 재화는 환급되지 않습니다"
 	_refresh()
 
 func _start_wave() -> void:
@@ -298,12 +379,15 @@ func _refresh() -> void:
 		button.disabled = battle.phase != "preparation"
 	_refresh_upgrade_controls()
 	_refresh_skill_controls()
+	_refresh_obstacle_controls()
 	for y in BattleModel.ROWS:
 		for x in BattleModel.COLUMNS:
 			var cell := Vector2i(x, y)
 			var index := y * BattleModel.COLUMNS + x
 			var tile := tiles[index]
 			tile.text = "◆" if cell == battle.core_cell else "▧" if battle.blocked_cells.has(cell) else "▤" if battle._wall_at(cell) >= 0 else ""
+			if battle._obstacle_at(cell) >= 0:
+				tile.text = "▨"
 			for unit in battle.units:
 				if unit.alive and unit.cell == cell:
 					tile.text = {"swordsman": "검", "archer": "궁", "spearman": "창", "support": "지", "mage": "법"}.get(unit.kind, "유")
@@ -331,6 +415,23 @@ func _refresh() -> void:
 		status.text = "전투 중 · 선택 유닛을 누른 뒤 이동할 칸을 선택하세요"
 	else:
 		status.text = "배치 단계 · 검사/궁수를 선택한 뒤 아군 구역을 누르세요"
+
+func _refresh_obstacle_controls() -> void:
+	if obstacle_controls == null:
+		return
+	var max_owned := int(battle.stage.get("obstacle_max_owned", 0))
+	var max_placed := int(battle.stage.get("obstacle_max_placed", 0))
+	var placed := battle._placed_obstacle_count()
+	var stored := battle.obstacles.size() - placed
+	var definitions: Array = battle.obstacle_definitions.values()
+	for index in obstacle_install_buttons.size():
+		var definition: Dictionary = definitions[index]
+		obstacle_install_buttons[index].text = "새 장애물 %d · 보유 %d/%d" % [definition.cost, battle.obstacles.size(), max_owned]
+		obstacle_install_buttons[index].disabled = battle.phase not in ["preparation", "combat"] or battle.obstacles.size() >= max_owned or placed >= max_placed or battle.combat_gold < int(definition.cost)
+	obstacle_reuse_button.text = "보관 장애물 재설치 (%d)" % stored
+	obstacle_reuse_button.disabled = stored == 0 or placed >= max_placed or battle.phase not in ["preparation", "combat"]
+	var selected_index := battle._obstacle_index(selected_obstacle_instance)
+	obstacle_store_button.disabled = selected_index < 0 or battle.phase != "preparation" or not battle.obstacles[selected_index].placed if selected_index >= 0 else true
 
 func _build_result_panel() -> void:
 	result_panel = PanelContainer.new()

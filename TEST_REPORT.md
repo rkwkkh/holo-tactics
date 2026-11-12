@@ -237,3 +237,11 @@
 - 수정/검증: 관계 검사를 유효한 숫자 타입에 한정하고 `damage`, `heal`, `splash_radius`, `range`, `attack_time` 각각 문자열 입력에서 필드 오류를 반환하는 테스트를 추가.
 - 통과: editor import, validator parse, 전체 `tests/run.gd`, `tests/editor_preview.gd`, `tests/results_view.gd`, 콘텐츠 Error 0, 5개 씬 smoke, `git diff --check`.
 - Android: APK 86,360,854 bytes (2026-11-12 14:36 KST), apksigner v2/v3 검증 통과. ADB emulator-5554/5556은 offline. 물리 기기/FPS 미검증.
+
+## 2026-11-12 M2 불가침 장애물
+
+- 콘텐츠 Validator: obstacle data 필수 필드와 스테이지 보유/배치 한도·참조 검증 통과. 현재 시드 `obstacle.barricade` 비용 20, 보유 3, 동시 배치 2는 테스트용.
+- `tests/run.gd`: 최초 비용/보유·배치 상한, 자원 미차감 실패, 타일 점유·A* 우회, 회수 및 재배치 무상/전투 중 이동·회수 거부, 체크포인트에서 배치/보관 상태와 자원 복원을 검사.
+- `tests/results_view.gd`: M2 battle view에 장애물 도구가 생성되고 설치→회수→저장 개체 선택→재설치가 동작하는 상태 검사.
+- 통과: 전체 headless 모델·미리보기·화면 테스트, 콘텐츠 검증, main/battle/village/village_research/editor_preview 씬 smoke, diff 검사.
+- Android Debug APK 갱신 통과: `build/holo-debug.apk`, 86,364,950 bytes (2026-11-12 15:03 KST), apksigner v2/v3 검증. Debug 서명이라 Play 업로드용은 아니다. AVD offline 및 실기기/FPS 미검증 상태 유지.

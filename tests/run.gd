@@ -153,6 +153,12 @@ func _initialize() -> void:
 	var invalid_research_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_research_catalog.categories.research[0].amount = 0
 	assert(ContentValidator.validate(invalid_research_catalog).any(func(error): return error == "research.swordsman.damage.amount: has invalid permanent research data"))
+	var invalid_obstacle_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_obstacle_catalog.categories.obstacles[0].cost = "20"
+	assert(ContentValidator.validate(invalid_obstacle_catalog).any(func(error): return error == "obstacle.barricade.cost: invalid obstacle data"))
+	var invalid_obstacle_limits: Dictionary = seeded_catalog.duplicate(true)
+	invalid_obstacle_limits.categories.stages.filter(func(stage): return stage.id == "stage.m2.crossroads")[0].obstacle_max_owned = "3"
+	assert(ContentValidator.validate(invalid_obstacle_limits).any(func(error): return error.begins_with("stage.m2.crossroads.obstacle_max_owned|obstacle_max_placed|references:")))
 	for malformed_field in ["damage", "heal", "splash_radius", "range", "attack_time"]:
 		var malformed_facility_catalog: Dictionary = seeded_catalog.duplicate(true)
 		malformed_facility_catalog.categories.facilities[0][malformed_field] = "invalid"
@@ -516,6 +522,35 @@ func _initialize() -> void:
 	var facility_snapshot: Dictionary = facility_snapshot_source.to_dict()
 	var facility_snapshot_target := BattleModel.new()
 	assert(facility_snapshot_target.restore(facility_snapshot) and facility_snapshot_target.facilities[0].hp == 35.0)
+	var obstacle_test := BattleModel.new("stage.m2.crossroads")
+	assert(obstacle_test.install_obstacle("obstacle.barricade", Vector2i(3, 6)))
+	assert(obstacle_test.install_obstacle("obstacle.barricade", Vector2i(1, 1)))
+	assert(obstacle_test.combat_gold == 150 and not obstacle_test.install_obstacle("obstacle.barricade", Vector2i(7, 8)))
+	assert(not obstacle_test.deploy("swordsman", Vector2i(3, 6)) and obstacle_test.combat_gold == 150)
+	var obstacle_route_enemy := {"id": 900, "cell": Vector2i(3, 7)}
+	assert(not obstacle_test._find_path(obstacle_route_enemy, obstacle_test.core_cell).has(Vector2i(3, 6)))
+	var obstacle_instance_id: int = obstacle_test.obstacles[0].id
+	assert(obstacle_test.store_obstacle(obstacle_instance_id) and obstacle_test.combat_gold == 150)
+	assert(obstacle_test.place_stored_obstacle(obstacle_instance_id, Vector2i(3, 7)) and obstacle_test.combat_gold == 150)
+	assert(obstacle_test.store_obstacle(int(obstacle_test.obstacles[1].id)))
+	obstacle_test.phase = "combat"
+	assert(not obstacle_test.move_obstacle(obstacle_instance_id, Vector2i(3, 7)))
+	assert(not obstacle_test.store_obstacle(int(obstacle_test.obstacles[1].id)))
+	assert(obstacle_test.install_obstacle("obstacle.barricade", Vector2i(6, 8)) and obstacle_test.combat_gold == 130)
+	assert(not obstacle_test.install_obstacle("obstacle.barricade", Vector2i(7, 8)))
+	obstacle_test.phase = "preparation"
+	var obstacle_snapshot := obstacle_test.to_dict()
+	var obstacle_restore := BattleModel.new("stage.m2.crossroads")
+	assert(obstacle_restore.restore(obstacle_snapshot) and obstacle_restore.obstacles.size() == 3)
+	assert(obstacle_restore.obstacles[0].cell == Vector2i(3, 7) and obstacle_restore.obstacles[0].placed and not obstacle_restore.obstacles[1].placed and obstacle_restore.combat_gold == 130)
+	var obstacle_route_test := BattleModel.new("stage.m2.crossroads")
+	obstacle_route_test.blocked_cells.clear()
+	for x in BattleModel.COLUMNS:
+		if x != 3:
+			obstacle_route_test.blocked_cells[Vector2i(x, 5)] = true
+	var route_gold_before := obstacle_route_test.combat_gold
+	assert(not obstacle_route_test.install_obstacle("obstacle.barricade", Vector2i(3, 5)))
+	assert(obstacle_route_test.combat_gold == route_gold_before and obstacle_route_test.obstacles.is_empty())
 	var support_heal_test := BattleModel.new()
 	support_heal_test.combat_gold = 205
 	assert(support_heal_test.deploy("swordsman", Vector2i(1, 8)) and support_heal_test.deploy("archer", Vector2i(2, 8)))
