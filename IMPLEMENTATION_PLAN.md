@@ -50,3 +50,5 @@
 - 2026-11-12: M1/M4 battle HUD gained the story-gated 1×/2× control from R-GAME-005, with headless UI-state regression. The pause/read-only requirement was subsequently completed and verified (see progress record).
 
 - 2026-11-12: R-UI-003 일시정지/조회 전용 동작 구현 완료. UI 회귀 테스트에서 전투 및 재정비 타이머 보존, 명령 차단과 정보 조회를 확인했으며 전체 회귀 및 콘텐츠 검증 통과. 실제 Android 터치 레이아웃 확인은 M6 기기 검증 잔여 항목.
+
+- 2026-11-12: R-UI-002 유닛 강화/수동 스킬 플로팅 패널과 시설 정보/이동 힌트를 구현하고 화면 경계 자동 검사를 추가. 시설 강화·수리 및 실제 기기 화면 확인은 잔여 항목으로 유지.

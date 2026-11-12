@@ -38,6 +38,9 @@ var upgrade_buttons: Array[Button] = []
 var upgrade_controls_unit := -1
 var skill_buttons: Array[Button] = []
 var skill_controls_unit := -1
+var context_panel: PanelContainer
+var context_box: VBoxContainer
+var context_info: Label
 var status_override := ""
 var result_reward := -1
 var progress_available := false
@@ -78,6 +81,15 @@ func _ready() -> void:
 	layout.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	layout.add_theme_constant_override("separation", 4)
 	add_child(layout)
+	context_panel = PanelContainer.new()
+	context_panel.visible = false
+	context_panel.z_index = 5
+	context_box = VBoxContainer.new()
+	context_panel.add_child(context_box)
+	add_child(context_panel)
+	context_info = Label.new()
+	context_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	context_box.add_child(context_info)
 	hud = Label.new()
 	hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	layout.add_child(hud)
@@ -120,11 +132,11 @@ func _ready() -> void:
 	upgrade_controls = GridContainer.new()
 	upgrade_controls.columns = 2
 	upgrade_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	layout.add_child(upgrade_controls)
+	context_box.add_child(upgrade_controls)
 	var skill_controls := GridContainer.new()
 	skill_controls.columns = 2
 	skill_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	layout.add_child(skill_controls)
+	context_box.add_child(skill_controls)
 	set_meta("skill_controls", skill_controls)
 	var facility_controls := HBoxContainer.new()
 	facility_controls.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -420,6 +432,7 @@ func _refresh() -> void:
 	_refresh_upgrade_controls()
 	_refresh_skill_controls()
 	_refresh_obstacle_controls()
+	_refresh_context_panel()
 	if paused:
 		for command in get_tree().get_nodes_in_group("battle_commands"):
 			command.disabled = true
@@ -493,17 +506,39 @@ func _toggle_pause() -> void:
 
 func _inspect_paused_cell(cell: Vector2i) -> String:
 	var unit := _unit_at(cell)
-	if not unit.is_empty(): return "%s · HP %.0f/%.0f" % [_unit_name(unit.kind), unit.hp, unit.max_hp]
+	if not unit.is_empty(): return "%s · HP %.0f/%.0f" % [_unit_name(unit.kind), unit.hp, battle.balance_seed[unit.kind].hp]
 	var facility := _facility_at(cell)
-	if not facility.is_empty(): return "아군 시설 · HP %.0f/%.0f" % [facility.hp, facility.max_hp]
+	if not facility.is_empty(): return "아군 시설 · HP %.0f/%.0f" % [facility.hp, battle.facility_definitions[facility.facility_id].hp]
 	for enemy in battle.enemies + battle.preview_enemies:
-		if enemy.alive and enemy.cell == cell: return "적 유닛 · HP %.0f/%.0f" % [enemy.hp, enemy.max_hp]
+		if enemy.alive and enemy.cell == cell: return "적 유닛 · HP %.0f/%.0f" % [enemy.hp, battle.balance_seed[enemy.kind].hp]
 	for enemy_facility in battle.enemy_facilities:
-		if enemy_facility.alive and enemy_facility.cell == cell: return "적 시설 · HP %.0f/%.0f" % [enemy_facility.hp, enemy_facility.max_hp]
+		if enemy_facility.alive and enemy_facility.cell == cell: return "적 시설 · HP %.0f/%.0f" % [enemy_facility.hp, battle.facility_definitions[enemy_facility.facility_id].hp]
 	if cell == battle.core_cell: return "핵심 · HP %.0f" % battle.core_hp
 	if battle._wall_at(cell) >= 0: return "방어벽"
 	if battle._obstacle_at(cell) >= 0: return "장애물"
 	return "빈 타일"
+
+func _refresh_context_panel() -> void:
+	var unit := battle._unit_by_id(selected_unit)
+	var facility := battle._facility_by_id(selected_facility_instance)
+	context_panel.visible = not unit.is_empty() or not facility.is_empty()
+	if not context_panel.visible:
+		return
+	if not unit.is_empty():
+		context_info.text = "%s · HP %.0f/%.0f" % [_unit_name(unit.kind), unit.hp, battle.balance_seed[unit.kind].hp]
+	else:
+		context_info.text = "시설 · HP %.0f/%.0f\n다른 타일을 눌러 이동" % [facility.hp, battle.facility_definitions[facility.facility_id].hp]
+	var cell: Vector2i = unit.cell if not unit.is_empty() else facility.cell
+	var tile_rect := tiles[cell.y * BattleModel.COLUMNS + cell.x].get_global_rect()
+	var menu_size := context_panel.get_combined_minimum_size()
+	var viewport_size := get_viewport_rect().size
+	var x := tile_rect.end.x + 4.0
+	if x + menu_size.x > viewport_size.x:
+		x = tile_rect.position.x - menu_size.x - 4.0
+	var y := tile_rect.position.y
+	if y + menu_size.y > viewport_size.y:
+		y = tile_rect.end.y - menu_size.y
+	context_panel.global_position = Vector2(clampf(x, 0.0, maxf(0.0, viewport_size.x - menu_size.x)), clampf(y, 0.0, maxf(0.0, viewport_size.y - menu_size.y)))
 
 func _refresh_obstacle_controls() -> void:
 	if obstacle_controls == null:

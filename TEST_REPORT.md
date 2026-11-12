@@ -316,3 +316,12 @@
 - R-UI-003 포함 Debug APK 재생성: `build/holo-debug.apk`, 249,875,578 bytes (2026-11-12 16:51 KST); `aapt` min API 29/target API 36, `apksigner` v2=true 확인. 실기기 실행과 FPS는 미검증.
 
 - R-UI-003 반영 AAB 재검증 (2026-11-12 16:55 KST): `build/holo-test.aab`, 86,284,601 bytes. bundletool 1.18.3 `validate` 성공; `BundleConfig.pb`, `base/manifest/AndroidManifest.xml`, `base/dex/classes.dex` 존재; base manifest minSdk 29/targetSdk 36 확인. `jarsigner`는 unsigned로 보고함. release 서명/Play 업로드 검증은 아님.
+
+## 2026-11-12 R-UI-002 컨텍스트 패널
+
+- 강화/수동 스킬을 화면 하단 공통 행에서 선택 아군 옆 플로팅 컨텍스트 패널로 재배치했다. 화면 가장자리에서 좌우/상하 위치를 반전·제한한다. 선택 시설은 주변 패널에 HP 및 이동 안내를 표시한다.
+- `tests/results_view.gd`: 유닛/시설 컨텍스트 표시, 강화 컨트롤 소속, 메뉴 bounds, 일시정지 시설 조회 검사 통과.
+- Godot 4.7.2 editor import, 결과/UI 테스트, 전체 모델 테스트, editor preview 격리, 8-stage seeded playability, 콘텐츠 validator 및 `git diff --check` 통과.
+- 한계: 실제 화면 비율/터치 상호작용 미검증. 시설 수리·강화 UI는 해당 기능 및 수리 정책이 구현되지 않아 미포함이므로 R-UI-002는 부분 충족 상태다.
+
+- R-UI-002 반영 Android artifacts (2026-11-12): Debug APK `build/holo-debug.apk`, 249,877,422 bytes; `aapt` min API 29/target API 36, `apksigner` v2 signature true. Test AAB `build/holo-test.aab`, 86,286,445 bytes; bundletool 1.18.3 validation pass and manifest min API 29/target API 36. AAB is unsigned. Both artifacts are local/ignored; neither proves physical device rendering or performance.

@@ -71,3 +71,5 @@
 - GitHub remote/Actions 권한이 확인되지 않아 새 Android AAB CI job의 hosted run 결과는 미검증이다. workflow lint 및 동일 로컬 export 경로는 확인했다.
 
 - Resolved 2026-11-12: R-UI-003 pause/read-only inspection was implemented and covered by `tests/results_view.gd`. Remaining platform verification is listed under environment limits: physical Android touch/layout and FPS are unverified.
+
+- R-UI-002는 부분 구현: 유닛 컨텍스트 강화/수동 스킬 및 시설 정보/이동 안내가 있으나 시설 강화·수리 버튼과 실기기 가장자리 배치/터치 검증은 남았다. 수리 타이밍/비용 등 미결정 규칙은 코드에서 확정하지 않았다.

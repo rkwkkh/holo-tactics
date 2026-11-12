@@ -101,3 +101,7 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12: 일시정지 변경을 포함해 Android Debug APK를 다시 내보냈다 (`build/holo-debug.apk`, 249,875,578 bytes). manifest min API 29/target API 36 및 APK v2 서명 확인 통과. Debug 빌드이며 실기기 실행·FPS 검증은 미완료다.
 
 - 2026-11-12: R-UI-003 반영 소스의 Android Debug AAB를 다시 생성했다 (`build/holo-test.aab`, 86,284,601 bytes). bundletool 1.18.3 검증과 필수 bundle/dex/manifest 항목, manifest min API 29·target API 36을 확인했다. 테스트 번들은 unsigned이며 Play 업로드용 배포본이 아니다.
+
+- 2026-11-12 R-UI-002 진행: 선택 아군 유닛의 강화·수동 스킬을 타일 주변 플로팅 패널로 표시하고 화면 경계 안으로 위치를 보정한다. 선택 시설은 HP와 재배치 안내를 표시한다. headless UI 검사에서 표시 대상·부모 관계·화면 경계와 일시정지 조회를 확인했다. 시설 강화/수리 조작은 별도 정책/기능 미완료라 R-UI-002 전체 완료로 보지 않는다.
+
+- 2026-11-12: R-UI-002 플로팅 패널까지 포함해 Android Debug APK/AAB를 갱신했다. APK `build/holo-debug.apk` 249,877,422 bytes (min API 29/target API 36, v2 signature true); AAB `build/holo-test.aab` 86,286,445 bytes (bundletool 1.18.3 validation pass, same API levels, unsigned). 실기기/성능 및 Play 서명 미검증.
