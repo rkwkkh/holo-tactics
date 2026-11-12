@@ -183,3 +183,9 @@ Verified with Godot 4.7.2 headless core, editor startup, results view, seeded 8-
 - 2026-11-12 M6 device follow-up: ADB server recovery brought API29/API37 AVDs online. Latest APK smoke: API37 campaign/M1 screen displays, API29 black screen with Vulkan present error 5. This improves the previous stale-device state but leaves Android 10 rendering unresolved; see ANDROID_TESTING.md/ISSUES.md.
 
 - M6 renderer follow-up: repeated API29 test in host-GPU and software-GPU modes; both black-screen with Vulkan present error 5. API37 SwiftShader renders. Recorded as unresolved emulator/device-path risk; no project renderer change made without real-device evidence.
+
+## Temporary battle pixel sprites (2026-11-12)
+
+Replaced battle-cell text glyphs for units, facilities, core, walls, and obstacles with a nearest-filtered 16px SVG pixel-art atlas. Mapped all 11 unit kinds and campaign facility IDs; unknown IDs continue to fall back to cell text. Selected friendly entities are tinted. The atlas is explicitly temporary and requires final art replacement before release.
+
+Verified every atlas region and every catalog unit/facility mapping in `tests/run.gd`. Godot 4.7.2 editor import, core/results/campaign/editor-preview/content tests and main/battle/village headless scene starts pass. Refreshed APK/AAB validate; API37 AVD rendered the M1 board and a placed swordsman sprite. APK SHA-256 `95DDFF7E99F5E30946B9626DC96A25B5E5F9B605E40EA55D5F8AFFF271A1EBA3`; AAB SHA-256 `90FE8D18CAB772A69E6E01305E053228D3471EFB19793CF746DC9E640FD11856`.

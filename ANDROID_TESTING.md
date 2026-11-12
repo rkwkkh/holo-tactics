@@ -93,3 +93,6 @@ On API 37 AVD, manual taps entered M1, placed two swordsmen (resource 160→60),
 - This is emulator-only and does not establish physical Android 10 compatibility, playthrough correctness for this APK, or FPS targets. API 29 Vulkan rendering is an active release risk requiring a physical Android 10 device or a validated renderer fallback.
 
 - API 29 renderer isolation follow-up: restarted `MaDang_API29` without wiping AVD data, first with its original host GPU mode and again with `-gpu swiftshader_indirect`. Both runs installed/launched the latest APK but captured black frames and logged Vulkan queue present `VkResult error 5`. API 37 SwiftShader still renders. The issue is specific to this API29 emulator image/driver path until checked on physical Android 10 hardware; no Android 10 compatibility claim is made.
+
+- 2026-11-12: Current API37 AVD with the latest sprite-atlas build shows M1 battle and deployed swordsman sprite. API29 smoke remains black with Vulkan present error 5. The asset is a temporary atlas; FPS/physical device remain unverified.
+- Latest build hashes: APK `95DDFF7E99F5E30946B9626DC96A25B5E5F9B605E40EA55D5F8AFFF271A1EBA3`; AAB `90FE8D18CAB772A69E6E01305E053228D3471EFB19793CF746DC9E640FD11856`.

@@ -2,12 +2,21 @@ extends Control
 
 const TILE_SIZE := Vector2(40, 39)
 const BATTLE_TICK_SECONDS := 0.2
+const BATTLE_SPRITE_CELLS := {
+	"swordsman": Vector2i(0, 0), "archer": Vector2i(1, 0), "spearman": Vector2i(2, 0), "support": Vector2i(3, 0), "mage": Vector2i(4, 0),
+	"goblin": Vector2i(5, 0), "goblin_archer": Vector2i(6, 0), "orc_warrior": Vector2i(7, 0), "orc_charger": Vector2i(8, 0), "enemy_mage": Vector2i(9, 0), "enemy_support": Vector2i(10, 0),
+	"arrow_tower": Vector2i(0, 1), "magic_tower": Vector2i(1, 1), "support_outpost": Vector2i(2, 1), "defense_wall": Vector2i(3, 1),
+	"facility.enemy_watchtower": Vector2i(4, 1), "facility.enemy_mage_tower": Vector2i(5, 1), "core": Vector2i(6, 1), "wall": Vector2i(7, 1), "obstacle": Vector2i(8, 1)
+}
 
 var battle: BattleModel
 var store: CheckpointStore
 var progress: ProgressStore
 var stage_title := ""
 var tiles: Array[Button] = []
+var tile_sprites: Array[TextureRect] = []
+var battle_sprite_cache: Dictionary = {}
+var battle_sprite_atlas: Texture2D
 var status: Label
 var hud: Label
 var selected_kind := "swordsman"
@@ -58,6 +67,7 @@ var result_reward_label: Label
 var result_button: Button
 
 func _ready() -> void:
+	battle_sprite_atlas = load("res://assets/battle_sprites.svg")
 	var selected_stage_id: String = get_tree().get_meta("selected_stage_id", BattleModel.STAGE_ID)
 	editor_preview = bool(get_tree().get_meta("editor_preview", false))
 	battle = BattleModel.new(selected_stage_id)
@@ -125,9 +135,23 @@ func _ready() -> void:
 			var hover_style := tile_style.duplicate()
 			hover_style.bg_color = tile_color.lightened(0.12)
 			tile.add_theme_stylebox_override("hover", hover_style)
+			var sprite := TextureRect.new()
+			sprite.name = "PixelSprite"
+			sprite.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			sprite.offset_left = 5
+			sprite.offset_top = 4
+			sprite.offset_right = -5
+			sprite.offset_bottom = -4
+			sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			sprite.visible = false
+			tile.add_child(sprite)
 			tile.pressed.connect(_on_tile_pressed.bind(cell))
 			grid.add_child(tile)
 			tiles.append(tile)
+			tile_sprites.append(sprite)
 	controls_scroll = ScrollContainer.new()
 	controls_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	controls_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -481,25 +505,30 @@ func _refresh() -> void:
 			var cell := Vector2i(x, y)
 			var index := y * BattleModel.COLUMNS + x
 			var tile := tiles[index]
+			var tile_sprite := tile_sprites[index]
+			tile.modulate = Color.WHITE
+			var sprite_id := "core" if cell == battle.core_cell else "obstacle" if battle._obstacle_at(cell) >= 0 else "wall" if battle._wall_at(cell) >= 0 else ""
 			tile.text = "◆" if cell == battle.core_cell else "▧" if battle.blocked_cells.has(cell) else "▤" if battle._wall_at(cell) >= 0 else ""
 			if battle._obstacle_at(cell) >= 0:
 				tile.text = "▨"
 			for unit in battle.units:
 				if unit.alive and unit.cell == cell:
-					tile.text = {"swordsman": "검", "archer": "궁", "spearman": "창", "support": "지", "mage": "법"}.get(unit.kind, "유")
-					if unit.id == selected_unit:
-						tile.text = "[" + tile.text + "]"
+					sprite_id = unit.kind
+					_set_tile_selected(tile, unit.id == selected_unit)
 			for facility in battle.facilities:
 				if facility.alive and facility.cell == cell:
-					tile.text = "화" if facility.kind == "arrow_tower" else "마" if facility.kind == "magic_tower" else "지" if facility.kind == "support_outpost" else "방"
-					if facility.id == selected_facility_instance:
-						tile.text = "[" + tile.text + "]"
+					sprite_id = facility.kind
+					_set_tile_selected(tile, facility.id == selected_facility_instance)
 			for enemy in battle.enemies + battle.preview_enemies:
 				if enemy.alive and enemy.cell == cell:
-					tile.text = "적"
+					sprite_id = enemy.kind
 			for facility in battle.enemy_facilities:
 				if facility.alive and facility.cell == cell:
-					tile.text = "적탑"
+					sprite_id = facility.facility_id
+			tile_sprite.texture = _battle_sprite(sprite_id)
+			tile_sprite.visible = tile_sprite.texture != null
+			if tile_sprite.visible:
+				tile.text = ""
 	if paused:
 		status.text = "일시정지 · 전장 정보를 확인할 수 있습니다" if status_override.is_empty() else status_override
 	elif not status_override.is_empty():
@@ -518,6 +547,20 @@ func _refresh_speed_control() -> void:
 	var unlocked: bool = not editor_preview and progress_available and progress.data.completed_stages.has(battle.stage_id)
 	speed_button.disabled = paused or not unlocked or battle.phase == "finished"
 	speed_button.text = "속도 %d×" % simulation_speed
+
+func _battle_sprite(sprite_id: String) -> Texture2D:
+	if not BATTLE_SPRITE_CELLS.has(sprite_id):
+		return null
+	if not battle_sprite_cache.has(sprite_id):
+		var cell: Vector2i = BATTLE_SPRITE_CELLS[sprite_id]
+		var atlas := AtlasTexture.new()
+		atlas.atlas = battle_sprite_atlas
+		atlas.region = Rect2(cell * 32, Vector2i(32, 32))
+		battle_sprite_cache[sprite_id] = atlas
+	return battle_sprite_cache[sprite_id]
+
+func _set_tile_selected(tile: Button, selected: bool) -> void:
+	tile.modulate = Color("#ffe7a0") if selected else Color.WHITE
 
 func _toggle_speed() -> void:
 	if paused or speed_button.disabled:

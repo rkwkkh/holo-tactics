@@ -113,3 +113,7 @@ Status-effect changes are now included in fresh APK/AAB exports; manifest and pa
 - M6 update: ADB reconnect enabled fresh APK smoke on API 37 and API 29 AVDs. API 37 renders menu/M1; API 29 remains black due Vulkan present error 5. Investigate Android 10 renderer support while seeking physical-device validation; don't treat AVD as performance evidence.
 
 - M6 next action: keep the API29 Vulkan present failure open after both host and SwiftShader AVD paths failed; validate on actual Android 10 hardware before choosing any renderer/configuration change.
+
+## Pixel sprite atlas implementation (2026-11-12)
+
+M1 battle view now shows temporary nearest-filtered pixel sprites for the roster, facilities, core, walls and obstacles. Tests enforce atlas-region size and catalog coverage. Refreshed APK/AAB pass package checks; API37 emulator visually confirms battle-board and deployed unit sprites. Next replace placeholder art with production assets and continue M5 GUI + M6 physical-device/performance/signing validation. Android 10 AVD currently fails Vulkan presentation.

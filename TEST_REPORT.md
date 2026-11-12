@@ -501,3 +501,11 @@
 - Android 10 emulator rendering is still a release risk; no physical device or FPS target is verified. Details and local screenshot path are recorded in ANDROID_TESTING.md.
 
 - 2026-11-12: API29 AVD renderer isolation tried both host GPU and SwiftShader software GPU; both fail Vulkan presentation. API37 SwiftShader passes UI rendering. Android 10 acceptance remains pending physical hardware or a validated API29 emulator configuration.
+
+## Battle sprite atlas test results (2026-11-12)
+
+- Passed `tests/run.gd`: all temporary atlas regions are 32x32 and every catalog unit/facility is mapped.
+- Passed `tests/results_view.gd`, `tests/campaign_playability.gd` (8/8), `tests/editor_preview.gd`, `scripts/validate_content.gd` (0 content errors), headless import, and main/battle/village scene starts.
+- Fresh Android debug APK: API29 minimum/API36 target, one debug signer verified. Fresh test AAB: bundletool 1.18.3 validation passed; unsigned.
+- API37 AVD: latest APK rendered M1 board and placed swordsman using pixel sprite atlas. API29 remains black with Vulkan present error 5 under host and SwiftShader GPU modes. No physical-device or FPS validation.
+- Visual asset is temporary placeholder art; final production art pass remains open.

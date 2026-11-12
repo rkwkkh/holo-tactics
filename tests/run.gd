@@ -19,6 +19,18 @@ func _initialize() -> void:
 	catalog_backup.store_string("{\"recovered\":true}")
 	catalog_backup.close()
 	var content_editor_script: Script = load("res://addons/content_editor/content_editor.gd")
+	var battle_view_script: Script = load("res://scripts/battle_view.gd")
+	var sprite_probe: Variant = battle_view_script.new()
+	sprite_probe.battle_sprite_atlas = load("res://assets/battle_sprites.svg")
+	for sprite_id in battle_view_script.BATTLE_SPRITE_CELLS:
+		var sprite: Texture2D = sprite_probe._battle_sprite(sprite_id)
+		assert(sprite != null and sprite.get_width() == 32 and sprite.get_height() == 32)
+	var sprite_catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/catalog.json"))
+	for unit in sprite_catalog.categories.units:
+		assert(battle_view_script.BATTLE_SPRITE_CELLS.has(unit.kind))
+	for facility in sprite_catalog.categories.facilities:
+		assert(battle_view_script.BATTLE_SPRITE_CELLS.has(facility.kind) if facility.team == "ally" else battle_view_script.BATTLE_SPRITE_CELLS.has(facility.id))
+	sprite_probe.free()
 	var recovered_catalog: Variant = content_editor_script.read_catalog(catalog_recovery_path)
 	assert(recovered_catalog is Dictionary and recovered_catalog.get("recovered", false))
 	assert(FileAccess.file_exists(catalog_recovery_path) and not FileAccess.file_exists(catalog_recovery_path + ".bak"))

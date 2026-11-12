@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="352" height="64" viewBox="0 0 352 64" shape-rendering="crispEdges">
+  <!-- Temporary 16px pixel-art battle glyph atlas. Replace with final production sprites. -->
+  <defs>
+    <g id="human">
+      <rect x="5" y="1" width="6" height="5" fill="#222b36"/><rect x="6" y="2" width="4" height="3" fill="#efbd83"/>
+      <rect x="4" y="6" width="8" height="6" fill="#263747"/><rect x="5" y="7" width="6" height="4" fill="#49758b"/>
+      <rect x="2" y="7" width="3" height="5" fill="#222b36"/><rect x="11" y="7" width="3" height="5" fill="#222b36"/>
+      <rect x="5" y="12" width="3" height="4" fill="#283244"/><rect x="9" y="12" width="3" height="4" fill="#283244"/>
+    </g>
+    <g id="enemy">
+      <rect x="4" y="2" width="8" height="4" fill="#382426"/><rect x="5" y="3" width="6" height="2" fill="#bf7250"/>
+      <rect x="3" y="6" width="10" height="6" fill="#6b342d"/><rect x="4" y="7" width="8" height="4" fill="#a64836"/>
+      <rect x="1" y="7" width="3" height="5" fill="#382426"/><rect x="12" y="7" width="3" height="5" fill="#382426"/>
+      <rect x="4" y="12" width="3" height="4" fill="#382426"/><rect x="9" y="12" width="3" height="4" fill="#382426"/>
+      <rect x="6" y="4" width="1" height="1" fill="#ffe08a"/><rect x="9" y="4" width="1" height="1" fill="#ffe08a"/>
+    </g>
+  </defs>
+  <!-- Allies: swordsman, archer, spearman, support, mage. -->
+  <g transform="translate(8 8)"><use href="#human"/><rect x="13" y="3" width="1" height="12" fill="#d8e0dc"/><rect x="12" y="3" width="3" height="1" fill="#f1d38c"/></g>
+  <g transform="translate(40 8)"><use href="#human"/><rect x="12" y="7" width="3" height="5" fill="none" stroke="#dfbc79" stroke-width="1"/><rect x="14" y="5" width="1" height="3" fill="#dfbc79"/></g>
+  <g transform="translate(72 8)"><use href="#human"/><rect x="13" y="0" width="1" height="16" fill="#d7c49b"/><rect x="11" y="3" width="5" height="1" fill="#eee0bd"/></g>
+  <g transform="translate(104 8)"><use href="#human"/><rect x="4" y="6" width="8" height="2" fill="#9dba88"/><rect x="7" y="1" width="2" height="2" fill="#f2e3bf"/></g>
+  <g transform="translate(136 8)"><use href="#human"/><rect x="13" y="3" width="2" height="2" fill="#81d9e8"/><rect x="12" y="1" width="4" height="1" fill="#d3f6ff"/><rect x="14" y="5" width="1" height="2" fill="#81d9e8"/></g>
+  <!-- Enemies: goblin, goblin archer, orc, charger, mage, support. -->
+  <g transform="translate(168 8)"><use href="#enemy"/><rect x="2" y="1" width="3" height="2" fill="#78a95b"/><rect x="11" y="1" width="3" height="2" fill="#78a95b"/></g>
+  <g transform="translate(200 8)"><use href="#enemy"/><rect x="13" y="6" width="3" height="5" fill="none" stroke="#d8bb83" stroke-width="1"/></g>
+  <g transform="translate(232 8)"><use href="#enemy"/><rect x="3" y="1" width="10" height="2" fill="#777f83"/><rect x="5" y="0" width="2" height="2" fill="#f0d08a"/><rect x="9" y="0" width="2" height="2" fill="#f0d08a"/></g>
+  <g transform="translate(264 8)"><use href="#enemy"/><rect x="2" y="5" width="4" height="2" fill="#dcb367"/><rect x="10" y="5" width="4" height="2" fill="#dcb367"/><rect x="13" y="8" width="2" height="6" fill="#66452e"/></g>
+  <g transform="translate(296 8)"><use href="#enemy"/><rect x="5" y="1" width="6" height="2" fill="#72648d"/><rect x="13" y="3" width="2" height="3" fill="#9bd7ea"/></g>
+  <g transform="translate(328 8)"><use href="#enemy"/><rect x="5" y="1" width="6" height="2" fill="#8d9d70"/><rect x="13" y="3" width="1" height="12" fill="#b3c18d"/><rect x="12" y="2" width="3" height="2" fill="#d9e6a9"/></g>
+  <!-- Facilities, enemy towers, core, wall, obstacle. -->
+  <g transform="translate(8 40)"><rect x="2" y="5" width="12" height="10" fill="#40352b"/><rect x="4" y="3" width="8" height="4" fill="#bd7843"/><rect x="7" y="9" width="3" height="6" fill="#d4c08d"/><rect x="1" y="14" width="14" height="2" fill="#262e37"/></g>
+  <g transform="translate(40 40)"><rect x="3" y="4" width="10" height="11" fill="#443453"/><rect x="5" y="2" width="6" height="4" fill="#8064a1"/><rect x="7" y="7" width="3" height="3" fill="#86d6e7"/><rect x="1" y="14" width="14" height="2" fill="#282733"/></g>
+  <g transform="translate(72 40)"><rect x="3" y="7" width="10" height="8" fill="#395448"/><rect x="5" y="3" width="6" height="5" fill="#72916a"/><rect x="7" y="9" width="2" height="4" fill="#dce6bf"/><rect x="1" y="14" width="14" height="2" fill="#283438"/></g>
+  <g transform="translate(104 40)"><rect x="1" y="6" width="14" height="10" fill="#695944"/><rect x="2" y="8" width="12" height="2" fill="#c5ad7a"/><rect x="2" y="12" width="12" height="2" fill="#c5ad7a"/><rect x="0" y="15" width="16" height="1" fill="#302d31"/></g>
+  <g transform="translate(136 40)"><rect x="2" y="5" width="12" height="10" fill="#513637"/><rect x="4" y="3" width="8" height="4" fill="#a94d3d"/><rect x="7" y="9" width="3" height="6" fill="#e6c38d"/><rect x="1" y="14" width="14" height="2" fill="#292c35"/></g>
+  <g transform="translate(168 40)"><rect x="3" y="4" width="10" height="11" fill="#493651"/><rect x="5" y="2" width="6" height="4" fill="#855878"/><rect x="7" y="7" width="3" height="3" fill="#eb8f70"/><rect x="1" y="14" width="14" height="2" fill="#292c35"/></g>
+  <g transform="translate(200 40)"><rect x="4" y="2" width="8" height="12" fill="#5c4d75"/><rect x="6" y="0" width="4" height="4" fill="#c8a9ec"/><rect x="7" y="5" width="2" height="5" fill="#fff1ad"/><rect x="2" y="14" width="12" height="2" fill="#30303c"/></g>
+  <g transform="translate(232 40)"><rect x="1" y="6" width="14" height="9" fill="#725b43"/><rect x="3" y="3" width="10" height="5" fill="#ad8a5c"/><rect x="5" y="9" width="6" height="4" fill="#dfc38b"/><rect x="0" y="15" width="16" height="1" fill="#302d31"/></g>
+  <g transform="translate(264 40)"><rect x="1" y="5" width="14" height="10" fill="#524a45"/><rect x="3" y="3" width="10" height="3" fill="#898078"/><rect x="4" y="7" width="8" height="2" fill="#b2a99a"/><rect x="3" y="12" width="10" height="2" fill="#35353a"/></g>
+  <g transform="translate(296 40)"><rect x="1" y="9" width="14" height="6" fill="#665340"/><rect x="3" y="6" width="10" height="4" fill="#958067"/><rect x="2" y="4" width="12" height="3" fill="#423d39"/><rect x="0" y="15" width="16" height="1" fill="#292e34"/></g>
+</svg>

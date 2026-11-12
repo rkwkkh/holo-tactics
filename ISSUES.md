@@ -124,3 +124,5 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 - 2026-11-12 emulator rerun after status-effect export: API 37 AVD displays campaign menu and M1 defense screen; API 29 AVD installs/launches but stays black with Vulkan present error 5. Physical Android 10 compatibility and representative-device FPS remain unverified; investigate renderer fallback or verify on real hardware before release.
 
 - Renderer isolation on API29 AVD: both original `-gpu host` and clean `-gpu swiftshader_indirect` runs reproduce black output plus Vulkan present error 5. This narrows the emulator issue but does not prove a device-wide Godot/API29 defect. Obtain physical Android 10 validation or a known-good API29 Vulkan emulator before release.
+
+- Asset gap: the M1 battle board now uses temporary pixel-art sprites for all catalog unit/facility kinds plus core/walls/obstacles. Replace the hand-authored atlas with approved final art before release; current icons are functional placeholders, not production art.
