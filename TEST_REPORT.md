@@ -362,3 +362,10 @@
 - Godot 4.7.2 headless editor에서 콘텐츠 플러그인 초기화 오류 없음. main/battle/village/village_research/editor_preview 씬 smoke 통과.
 - Android APK 249,881,626 bytes: min API 29, target API 36, APK v2 서명 통과.
 - Android AAB 86,290,543 bytes: bundletool 1.18.3 validate 통과, manifest API 29/36, unsigned임을 확인.
+
+
+## 2026-11-12 재검증: 콘텐츠 Warning 정책
+
+- 기본 26웨이브 시드는 Error/Warning 없음. 유효한 27웨이브 변형은 validate() Error 0건 및 조정 목표 초과 Warning 1건을 낸다. 6+2 스테이지 수 누락은 Error로 유지됨을 회귀 테스트로 확인.
+- tests/run.gd, results_view.gd, editor_preview.gd, campaign_playability.gd, validate_content.gd, editor plugin headless load 모두 통과. 주요 씬 smoke/diff check 포함.
+- 최신 APK 249,882,822 bytes(API29/36, v2 통과), AAB 86,291,741 bytes(bundletool validate, manifest API29/36 통과, unsigned).

@@ -1,6 +1,28 @@
 class_name ContentValidator
 extends RefCounted
 
+const CAMPAIGN_WAVE_TARGET := 26
+
+static func warnings(catalog: Dictionary) -> Array[String]:
+	var result: Array[String] = []
+	var categories: Variant = catalog.get("categories", {})
+	if not categories is Dictionary:
+		return result
+	var wave_ids: Dictionary = {}
+	for wave in _as_array(categories.get("waves", [])):
+		if wave is Dictionary and wave.get("id", "") is String:
+			wave_ids[wave.id] = true
+	var count := 0
+	for stage in _as_array(categories.get("stages", [])):
+		if not stage is Dictionary or stage.get("campaign_kind", "") not in ["main", "optional"] or not stage.get("references", []) is Array:
+			continue
+		for wave_id in stage.references:
+			if wave_id is String and wave_ids.has(wave_id):
+				count += 1
+	if count != CAMPAIGN_WAVE_TARGET:
+		result.append("campaign contains %d waves; production target is %d" % [count, CAMPAIGN_WAVE_TARGET])
+	return result
+
 static func validate(catalog: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
 	for version_key in ["content_version", "schema_version"]:
@@ -403,7 +425,6 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	if not campaign_stages.is_empty():
 		var main_stages: Array = campaign_stages.filter(func(stage): return stage.campaign_kind == "main")
 		var optional_stages: Array = campaign_stages.filter(func(stage): return stage.campaign_kind == "optional")
-		var campaign_wave_count := 0
 		var campaign_orders: Dictionary = {}
 		for stage in campaign_stages:
 			if not _is_positive_integer(stage.get("campaign_order")):
@@ -412,11 +433,8 @@ static func validate(catalog: Dictionary) -> Array[String]:
 			if campaign_orders.has(order_key):
 				errors.append("%s duplicates campaign order" % stage.get("id", "<missing-id>"))
 			campaign_orders[order_key] = true
-			for reference in stage.get("references", []):
-				if wave_items.any(func(wave): return wave is Dictionary and wave.get("id") == reference):
-					campaign_wave_count += 1
-		if main_stages.size() != 6 or optional_stages.size() != 2 or campaign_wave_count != 26:
-			errors.append("campaign must contain six main stages, two optional stages, and 26 waves")
+		if main_stages.size() != 6 or optional_stages.size() != 2:
+			errors.append("campaign must contain six main stages and two optional stages")
 	var cycle_nodes := _find_dependency_cycles(categories)
 	for id in cycle_nodes:
 		errors.append("cyclic dependency involving: %s" % id)

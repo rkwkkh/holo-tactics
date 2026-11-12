@@ -14,6 +14,8 @@ func _initialize() -> void:
 	var errors := ContentValidator.validate(parsed)
 	for error in errors:
 		push_error(error)
+	for warning in ContentValidator.warnings(parsed):
+		push_warning(warning)
 	if errors.is_empty():
 		print("Content validation passed")
 	quit(1 if not errors.is_empty() else 0)

@@ -31,7 +31,7 @@ func _build_panel(key: String) -> void:
 	feedback.custom_minimum_size.y = 60
 	page.add_child(feedback)
 	var errors_label := Label.new()
-	errors_label.text = "검증 오류 · 클릭하면 해당 레코드 열기"
+	errors_label.text = "검증 오류 / 경고 · 오류 항목은 클릭해 레코드 열기"
 	page.add_child(errors_label)
 	var error_list := ItemList.new()
 	error_list.custom_minimum_size.y = 84
@@ -177,26 +177,30 @@ func _save_record(key: String) -> void:
 		panel.feedback.text = "Error: 선택 항목이 카탈로그에서 사라졌습니다. 새로 고침 후 다시 시도하세요."
 		return
 	var errors := ContentValidator.validate(catalog)
+	var warnings := ContentValidator.warnings(catalog)
 	if not errors.is_empty():
 		panel.feedback.text = "Error · 저장 차단\n" + "\n".join(errors.slice(0, 5))
-		_show_validation_errors(key, errors, catalog)
+		_show_validation_errors(key, errors, catalog, warnings)
 		return
 	if not _write_catalog(JSON.stringify(catalog, "\t")):
 		panel.feedback.text = "Error: 원자적 저장에 실패했습니다. 원본을 보존했습니다."
 		return
-	panel.feedback.text = "검증 통과 · 저장했습니다."
-	panel.errors.clear()
+	panel.feedback.text = "검증 통과 · 저장했습니다." if warnings.is_empty() else "저장했습니다. 경고: " + "\n".join(warnings)
+	_show_validation_errors(key, [], catalog, warnings)
 	panel.drafts.erase(item_meta.id)
 	panel.active_id = ""
 	EditorInterface.get_resource_filesystem().scan()
 	_refresh_records(key, item_meta.id)
 
-func _show_validation_errors(key: String, errors: Array[String], catalog: Dictionary) -> void:
+func _show_validation_errors(key: String, errors: Array[String], catalog: Dictionary, warnings: Array[String] = []) -> void:
 	var panel: Dictionary = panels[key]
 	panel.errors.clear()
 	for error in errors:
-		panel.errors.add_item(error)
+		panel.errors.add_item("Error · " + error)
 		panel.errors.set_item_metadata(panel.errors.item_count - 1, ContentValidator.content_id_from_error(error, catalog))
+	for warning in warnings:
+		panel.errors.add_item("Warning · " + warning)
+		panel.errors.set_item_metadata(panel.errors.item_count - 1, "")
 
 func _open_error_record(index: int, source_key: String) -> void:
 	var source: Dictionary = panels[source_key]

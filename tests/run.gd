@@ -187,6 +187,11 @@ func _initialize() -> void:
 	assert(GridPathfinder.find_path(Vector2i(0, 0), Vector2i(2, 0), 3, 1, {Vector2i(1, 0): true}).is_empty())
 	var seeded_catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/catalog.json"))
 	assert(ContentValidator.validate(seeded_catalog).is_empty())
+	assert(ContentValidator.warnings(seeded_catalog).is_empty())
+	var off_target_campaign: Dictionary = seeded_catalog.duplicate(true)
+	off_target_campaign.categories.stages[0].references.append("wave.s2.supply.3")
+	assert(ContentValidator.validate(off_target_campaign).is_empty())
+	assert(ContentValidator.warnings(off_target_campaign).size() == 1 and ContentValidator.warnings(off_target_campaign)[0].contains("27 waves"))
 	assert(seeded_catalog.categories.evolutions.size() == 6)
 	for evolution in seeded_catalog.categories.evolutions:
 		assert(evolution.references.has("unit.%s" % evolution.unit_kind))
@@ -260,7 +265,7 @@ func _initialize() -> void:
 	assert(seeded_catalog.categories.skills.size() == 10)
 	var incomplete_campaign: Dictionary = seeded_catalog.duplicate(true)
 	incomplete_campaign.categories.stages.erase(incomplete_campaign.categories.stages.filter(func(stage): return stage.get("id") == "stage.s2.supply")[0])
-	assert(ContentValidator.validate(incomplete_campaign).any(func(error): return error.contains("six main stages, two optional stages, and 26 waves")))
+	assert(ContentValidator.validate(incomplete_campaign).any(func(error): return error.contains("six main stages and two optional stages")))
 	var campaign_stages: Array = seeded_catalog.categories.stages.filter(func(stage): return stage.get("campaign_kind", "") in ["main", "optional"])
 	assert(campaign_stages.size() == 8)
 	for campaign_stage in campaign_stages:
