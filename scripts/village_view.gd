@@ -20,6 +20,11 @@ func _ready() -> void:
 	status.text = "건물을 선택한 뒤 빈 칸을 누르세요." if model.available else "저장 데이터를 읽지 못해 마을 변경을 잠갔습니다."
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	layout.add_child(status)
+	var research_button := Button.new()
+	research_button.text = "영구 연구"
+	research_button.disabled = not model.available
+	research_button.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/village_research.tscn"))
+	layout.add_child(research_button)
 	for kind in ["training_hall", "workshop", "arcane_lab"]:
 		var definition: Dictionary = model.definitions[kind]
 		var button := Button.new()

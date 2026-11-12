@@ -42,6 +42,26 @@ func _initialize() -> void:
 	village_unlock_test.progress.data.completed_stages.append("stage.m2.crossroads")
 	assert(village_unlock_test.progress.save_progress() and village_unlock_test.place_building("workshop", Vector2i(0, 0)))
 	assert(village_unlock_test.has_building("workshop") and village_unlock_test.progress.data.permanent_currency == 0)
+	var research_path := "user://village_research_test.json"
+	var research_village := VillageModel.new(research_path)
+	research_village.progress.data.completed_stages.append("stage.m1.frontier")
+	research_village.progress.data.permanent_currency = 200
+	assert(research_village.progress.save_progress())
+	assert(not research_village.can_purchase_research("research.swordsman.damage"))
+	assert(research_village.place_building("training_hall", Vector2i(0, 0)))
+	assert(research_village.can_purchase_research("research.swordsman.damage"))
+	assert(research_village.purchase_research("research.swordsman.damage"))
+	assert(not research_village.purchase_research("research.swordsman.damage"))
+	assert(research_village.store_building("training_hall"))
+	assert(not research_village.can_purchase_research("research.archer.damage"))
+	var researched_battle := BattleModel.new()
+	assert(researched_battle.set_permanent_research(["research.swordsman.damage"]))
+	assert(not researched_battle.set_permanent_research(["research.missing"]))
+	assert(researched_battle.deploy("swordsman", Vector2i(3, 6)))
+	assert(researched_battle.units[0].damage == researched_battle.balance_seed.swordsman.damage)
+	var researched_restore := BattleModel.new()
+	assert(researched_restore.restore(researched_battle.to_dict()))
+	assert(researched_restore.permanent_research == ["research.swordsman.damage"])
 	var legacy_path := "user://legacy_progress_test.json"
 	var legacy := village_unlock_test.progress.data.duplicate(true)
 	legacy.erase("buildings")
@@ -57,7 +77,7 @@ func _initialize() -> void:
 	var protected_village := VillageModel.new(corrupt_path)
 	assert(not protected_village.available and not protected_village.place_building("training_hall", Vector2i(0, 0)))
 	assert(FileAccess.get_file_as_string(corrupt_path) == "{}")
-	for path in [village_test_path, village_unlock_path]:
+	for path in [village_test_path, village_unlock_path, research_path]:
 		for suffix in ["", ".tmp", ".bak"]:
 			var cleanup_path: String = path + suffix
 			if FileAccess.file_exists(cleanup_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(cleanup_path))
@@ -80,6 +100,9 @@ func _initialize() -> void:
 	assert(GridPathfinder.find_path(Vector2i(0, 0), Vector2i(2, 0), 3, 1, {Vector2i(1, 0): true}).is_empty())
 	var seeded_catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/catalog.json"))
 	assert(ContentValidator.validate(seeded_catalog).is_empty())
+	var invalid_research_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_research_catalog.categories.research[0].amount = 0
+	assert(ContentValidator.validate(invalid_research_catalog).any(func(error): return error.contains("invalid permanent research data")))
 	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "ally").size() == 5)
 	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "enemy").size() == 6)
 	var roster_deploy_test := BattleModel.new()

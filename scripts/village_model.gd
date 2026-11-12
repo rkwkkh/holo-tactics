@@ -5,6 +5,7 @@ const COLUMNS := 6
 const ROWS := 6
 var progress: ProgressStore
 var definitions: Dictionary = {}
+var research_definitions: Dictionary = {}
 var available := false
 
 func _init(save_path: String = ProgressStore.PATH) -> void:
@@ -22,6 +23,8 @@ func _init(save_path: String = ProgressStore.PATH) -> void:
 		return
 	for definition in catalog.categories.get("town_buildings", []):
 		definitions[definition.kind] = definition
+	for research in catalog.categories.get("research", []):
+		research_definitions[research.id] = research
 
 func building_at(cell: Vector2i) -> Dictionary:
 	for building in progress.data.get("buildings", []):
@@ -43,6 +46,25 @@ func can_build(kind: String) -> bool:
 
 func is_stored(kind: String) -> bool:
 	return bool(_building_by_kind(kind).get("stored", false))
+
+func can_purchase_research(research_id: String) -> bool:
+	if not available or not research_definitions.has(research_id) or progress.data.unlocked_research.has(research_id):
+		return false
+	var research: Dictionary = research_definitions[research_id]
+	if not has_building(research.building_kind) or int(research.cost) > progress.data.permanent_currency:
+		return false
+	if not _is_unlocked(research) or research.dependencies.any(func(id): return not progress.data.completed_stages.has(id) and not progress.data.unlocked_research.has(id)):
+		return false
+	return true
+
+func purchase_research(research_id: String) -> bool:
+	if not can_purchase_research(research_id):
+		return false
+	var before := progress.data.duplicate(true)
+	var research: Dictionary = research_definitions[research_id]
+	progress.data.permanent_currency -= int(research.cost)
+	progress.data.unlocked_research.append(research_id)
+	return _save_or_restore(before)
 
 func place_building(kind: String, cell: Vector2i) -> bool:
 	if not can_build(kind) or not _is_valid_cell(cell) or not building_at(cell).is_empty():

@@ -27,3 +27,4 @@ jobs:
           godot --headless --path . res://scenes/main.tscn --quit-after 2
           godot --headless --path . res://scenes/battle.tscn --quit-after 2
           godot --headless --path . res://scenes/village.tscn --quit-after 2
+          godot --headless --path . res://scenes/village_research.tscn --quit-after 2

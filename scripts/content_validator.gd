@@ -106,6 +106,14 @@ static func validate(catalog: Dictionary) -> Array[String]:
 			errors.append("%s has invalid facility splash data" % facility.get("id", "<missing-id>"))
 		elif facility.heal > 0 and (facility.range < 1 or facility.attack_time <= 0 or facility.team != "ally"):
 			errors.append("%s has invalid facility healing data" % facility.get("id", "<missing-id>"))
+	var town_buildings := _as_array(categories.get("town_buildings", []))
+	for research in _as_array(categories.get("research", [])):
+		if not research is Dictionary:
+			continue
+		var research_units: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == research.get("unit_kind") and unit.get("team") == "ally")
+		var research_buildings: Array = town_buildings.filter(func(building): return building is Dictionary and building.get("kind") == research.get("building_kind"))
+		if research_units.size() != 1 or research_buildings.size() != 1 or research.get("stat") != "damage" or not _is_positive_number(research.get("amount")) or not _is_nonnegative_integer(research.get("cost")) or not ids.has(research.get("requires_stage", "")):
+			errors.append("%s has invalid permanent research data" % research.get("id", "<missing-id>"))
 	for profile in _as_array(categories.get("ai_profiles", [])):
 		var weights: Variant = profile.get("weights") if profile is Dictionary else null
 		if not weights is Dictionary or weights.is_empty():

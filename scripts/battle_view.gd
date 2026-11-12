@@ -37,6 +37,8 @@ func _ready() -> void:
 	progress_available = progress.load_progress()
 	if not progress_available:
 		status_override = "영구 진행 저장을 읽지 못했습니다. 원본 데이터를 보존하고 보상 정산을 중단했습니다."
+	else:
+		battle.set_permanent_research(progress.data.unlocked_research)
 	stage_title = "수성" if battle.stage.get("mode") == "defense" else "공성"
 	var saved := store.load_checkpoint()
 	var resume := FileAccess.file_exists(store.path)

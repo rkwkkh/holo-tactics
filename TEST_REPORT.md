@@ -9,6 +9,13 @@
 - 시작 재화와 가격은 SEED. 터치 화면 레이아웃, Android 실기기 및 FPS는 이번 변경에서 검증하지 않았다.
 - 최신 마을 UI·저장 보호 포함 Android Debug APK 재생성: `build/holo-debug.apk`, 86,326,570 bytes (2026-11-12 12:49 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 기기 실행과 실제 성능은 미검증.
 
+## 영구 연구 연결 (2026-11-12)
+
+- 영구 연구 데이터 5건의 유닛·건물·스테이지 참조 및 가격/효과 검증, 활성 훈련 건물 필요, 스토리 해금, 재화 차감, 중복 구매 차단을 검사한다.
+- 구매한 연구의 공격력 증가가 새 전투 유닛에 적용되고, 같은 연구 ID와 효과가 체크포인트 복원 후에도 유지되는 단위 테스트 통과.
+- `tests/run.gd`, 콘텐츠 validator, battle/village/research 씬 headless 기동 및 `git diff --check` 통과. 연구 수치는 SEED다.
+- 영구 연구 포함 Android Debug APK 재생성: `build/holo-debug.apk`, 86,335,165 bytes (2026-11-12 13:01 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 실기기 UI/FPS는 미검증.
+
 ## M0
 
 - 실행 환경: Windows, Godot 4.7.2 stable, Java 17; Android SDK 경로는 `%LOCALAPPDATA%/Android/Sdk`.

@@ -106,7 +106,13 @@
       {"id":"building.arcane_lab","kind":"arcane_lab","label":"마법 연구소","cost":100,"requires_stage":"stage.m3.fortress","references":["stage.m3.fortress"],"dependencies":["stage.m3.fortress"]},
       {"id":"building.workshop","kind":"workshop","label":"공방","cost":100,"requires_stage":"stage.m2.crossroads","references":["stage.m2.crossroads"],"dependencies":["stage.m2.crossroads"]}
     ],
-    "research": [],
+    "research": [
+      {"id":"research.swordsman.damage","label":"검사 공격 훈련","unit_kind":"swordsman","building_kind":"training_hall","stat":"damage","amount":2,"cost":50,"requires_stage":"stage.m1.frontier","references":["unit.swordsman","building.training_hall","stage.m1.frontier"],"dependencies":["stage.m1.frontier"]},
+      {"id":"research.archer.damage","label":"궁수 조준 훈련","unit_kind":"archer","building_kind":"training_hall","stat":"damage","amount":2,"cost":50,"requires_stage":"stage.m1.frontier","references":["unit.archer","building.training_hall","stage.m1.frontier"],"dependencies":["stage.m1.frontier"]},
+      {"id":"research.spearman.damage","label":"창병 공격 훈련","unit_kind":"spearman","building_kind":"training_hall","stat":"damage","amount":2,"cost":50,"requires_stage":"stage.m2.crossroads","references":["unit.spearman","building.training_hall","stage.m2.crossroads"],"dependencies":["stage.m2.crossroads"]},
+      {"id":"research.support.damage","label":"지원병 공격 훈련","unit_kind":"support","building_kind":"arcane_lab","stat":"damage","amount":2,"cost":50,"requires_stage":"stage.m3.fortress","references":["unit.support","building.arcane_lab","stage.m3.fortress"],"dependencies":["stage.m3.fortress"]},
+      {"id":"research.mage.damage","label":"마법사 공격 훈련","unit_kind":"mage","building_kind":"arcane_lab","stat":"damage","amount":2,"cost":50,"requires_stage":"stage.m4.forest","references":["unit.mage","building.arcane_lab","stage.m4.forest"],"dependencies":["stage.m4.forest"]}
+    ],
     "ai_profiles": [
       {"id": "ai.goblin.warrior", "weights": {"attack": 1.2, "objective": 1.0}, "references": [], "dependencies": []},
       {"id": "ai.goblin.archer", "weights": {"attack": 1.3, "objective": 0.7}, "references": [], "dependencies": []},
