@@ -413,3 +413,10 @@
 - `tests/results_view.gd`의 SubViewport 시나리오: 320×568, 360×640, 412×915. 각 해상도에서 문맥 메뉴와 고정 pause 버튼이 화면 안에 있고 컨트롤 스크롤 영역이 보이는지 확인.
 - tests/run.gd, results_view.gd, editor_preview.gd, campaign_playability.gd, validate_content.gd 모두 통과. `git diff --check` 통과.
 - 화면 비율 headless 검사는 기기 픽셀 밀도, 시스템 안전 영역, 실제 터치 반응을 대신하지 않는다.
+
+
+## 2026-11-12 Main campaign layout
+
+- `tests/run.gd`: 320/360/412px viewport에서 캠페인 버튼 2개의 총 최소 폭이 viewport를 넘지 않는지 검사. `scenes/main.tscn` smoke 통과.
+- 전체 필수 테스트(run/results_view/editor_preview/campaign_playability/content validator) 통과.
+- APK 249,824,757 bytes: min API29/target36, v2 검증 통과. AAB 86,232,522 bytes: bundletool 1.18.3 validate, manifest API29/36 통과, unsigned.

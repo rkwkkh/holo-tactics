@@ -6,6 +6,9 @@ func _initialize() -> void:
 	assert(inspector_record._get("label") == "Before")
 	assert(inspector_record._set("cost", 50) and inspector_record.values.cost == 50)
 	assert(not inspector_record._set("unknown", 1))
+	var main_script: Script = load("res://scripts/main.gd")
+	for viewport_width in [320.0, 360.0, 412.0]:
+		assert(main_script.campaign_stage_button_width(viewport_width) * 2.0 <= viewport_width)
 	var catalog_recovery_path := "user://catalog_recovery_test.json"
 	for suffix in ["", ".bak"]:
 		var stale_path: String = catalog_recovery_path + suffix

@@ -1,5 +1,8 @@
 extends Control
 
+static func campaign_stage_button_width(viewport_width: float) -> float:
+	return clampf((viewport_width - 24.0) / 2.0, 120.0, 168.0)
+
 func _ready() -> void:
 	var progress := ProgressStore.new()
 	var progress_ok := progress.load_progress()
@@ -38,7 +41,7 @@ func _ready() -> void:
 		var button := Button.new()
 		var unlocked: bool = stage.get("dependencies", []).all(func(dependency): return cleared.has(dependency))
 		button.text = "%s\n%s" % [stage.get("name", stage.id), "입장 가능" if unlocked and progress_ok else "잠김"]
-		button.custom_minimum_size = Vector2(168, 58)
+		button.custom_minimum_size = Vector2(campaign_stage_button_width(get_viewport_rect().size.x), 58)
 		button.disabled = not unlocked or not progress_ok
 		button.pressed.connect(_start_stage.bind(stage.id))
 		campaign.add_child(button)

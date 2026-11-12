@@ -67,3 +67,6 @@ Record scenario, device, room temperature/power mode, run duration, average and 
 ## Current verification state
 
 Local Gradle Android debug APK export, API 29 manifest, and v2 signature verification pass. The latest test AAB was validated with bundletool 1.18.3 and its API 29/36 manifest, but it is unsigned. On the API 37 SwiftShader AVD, the latest APK installed and its process remained foreground, but the captured screen was black with GLES3 shader-link errors (`GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)`). This is a failed emulator render check, not proof of a physical-device failure or pass. Physical Android 10+ startup, touch/UI behavior, frame-rate targets, publisher-key release AAB, and Play Console private-test distribution remain pending.
+
+
+Latest local exports (2026-11-12): Debug APK 249,824,757 bytes; unsigned test AAB 86,232,522 bytes. Both use min API 29 / target API 36. APK v2 signature and AAB bundletool validation pass. The Android app was not rechecked on a physical device after this export.
