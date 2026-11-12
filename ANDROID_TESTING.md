@@ -2,8 +2,8 @@
 
 ## Current artifact
 
-- Debug APK: `build/holo-debug.apk` (generated locally; ignored by Git; latest local build includes read-only pause and contextual panels; scrollable battle controls and fixed pause footer included).
-- Test AAB: `build/holo-test.aab` (unsigned packaging artifact only; latest local build includes read-only pause and contextual panels; scrollable battle controls and fixed pause footer included; unsigned and not uploadable to Play).
+- Debug APK: `build/holo-debug.apk` (249,823,557 bytes; generated locally; ignored by Git; debug-signed).
+- Test AAB: `build/holo-test.aab` (86,231,323 bytes; generated locally; ignored by Git; unsigned packaging artifact, not uploadable to Play).
 - Package ID: `com.example.holotactics` (placeholder; replace with the publisher's permanent ID before release).
 - Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
 - The APK is debug-signed. It is for device smoke tests, not Google Play upload.
@@ -66,4 +66,4 @@ Record scenario, device, room temperature/power mode, run duration, average and 
 
 ## Current verification state
 
-Local Gradle Android debug APK export, API 29 manifest, and v2 signature verification pass. The latest test AAB was validated with bundletool 1.18.3, its API 29/36 manifest and required bundle entries were checked, but it is unsigned. Physical Android 10+ startup, touch/UI behavior, frame-rate targets, publisher-key release AAB, and Play Console private-test distribution remain pending device/account access.
+Local Gradle Android debug APK export, API 29 manifest, and v2 signature verification pass. The latest test AAB was validated with bundletool 1.18.3 and its API 29/36 manifest, but it is unsigned. On the API 37 SwiftShader AVD, the latest APK installed and its process remained foreground, but the captured screen was black with GLES3 shader-link errors (`GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)`). This is a failed emulator render check, not proof of a physical-device failure or pass. Physical Android 10+ startup, touch/UI behavior, frame-rate targets, publisher-key release AAB, and Play Console private-test distribution remain pending.

@@ -25,12 +25,11 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
   & $godot --headless --path . --install-android-build-template --export-debug "Android Debug APK" build/holo-debug.apk
   ```
 
+- Android exports exclude automated tests, the editor plugin, and the editor-only preview runner. These remain available in the Godot project and CI.
+
 - For a signed Play-format AAB, set `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD` in the process environment, then run `scripts/export_android_aab.ps1`. Keep the keystore and passwords outside Git. The checked-in package ID is still a placeholder.
 - `assets/icon.svg` is temporary project art; replace it before store publication. No release keystore or store credentials belong in this repository.
 
 ## Data boundaries
 
-`data/catalog.json` contains bundled content definitions. Runtime battle state, permanent player progress, and editor preview data will be kept separate as their owning systems are added. Content, schema, and save versions are independent constants in `scripts/project_versions.gd`. No numeric balance seed is a locked game rule.
-
-
-진화 형태 6종은 마을 연구로 영구 해금되며 연구 결과는 체크포인트에 저장된다. 연구 비용은 임시 초기값이다. 실제 전투 변신은 분기·재진화 정책 결정 후 연결한다.
+`data/catalog.json` contains bundled content definitions. Runtime battle state/checkpoints, permanent campaign progress, and one-shot editor preview requests use separate files and systems. Content, schema, and save versions are independent constants in `scripts/project_versions.gd`. No numeric balance seed is a locked game rule.
