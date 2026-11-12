@@ -641,3 +641,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - API 37 x86_64 emulator: installed the released debug APK with `adb install -r` (`Success`), launched `com.example.holotactics`, observed the game process and `GodotAppLauncher` as the resumed foreground activity. Screenshot shows the campaign menu and existing progress.
 - No app fatal exception was present for the launched process. Mesa logged missing rendernode messages from the emulator software renderer; this is emulator-specific and does not establish physical-device performance.
 - The user’s Galaxy S25 Ultra is not connected to this workstation, so its installation result remains unverified.
+
+## Rebuilt APK and release refresh (2026-11-13)
+
+- Re-exported the current `master` project with Godot 4.7.2. APK size 249,837,983 bytes; SHA-256 `6823CA453156ED7AB8B157C2C4AE65FBE6C98C6C89E3C29F9BC132356A4A5CB2` (byte-identical to prior reproducible build).
+- APK v2 signature and 16 KB ZIP alignment checks passed. API 37 x86_64 AVD install returned `Success`; app launched as foreground activity with a live process.
+- Replaced `holo-debug.apk` on GitHub release `v0.1.0-preview.1`; GitHub asset size and SHA-256 match the local build.
+- Physical Galaxy S25 Ultra installation remains unverified.
