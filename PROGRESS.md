@@ -237,3 +237,7 @@ Reinstalled the current local Debug APK on `MaDangStage6_API37` with Emulator 37
 ## API37 M1 touch gameplay smoke (2026-11-12)
 
 Corrected ADB coordinates entered M1 on `MaDangStage6_API37`/Emulator 37.2.13. The board and controls rendered; deploying a swordsman charged 50 (resource 160→110), and wave 1 combat reduced core HP 300→280 after an enemy hit. This confirms a short deploy/start/attack path on the emulator only. Full campaign, Android 10 physical device, and FPS acceptance remain separate. Screenshot: ignored `build/mvp-followup-api37-wave.png`.
+
+## Godot build-output scan exclusion (2026-11-12)
+
+Added tracked `build/.gdignore`. Godot 4.7.2 headless editor initialization now skips the ignored output directory, including generated emulator PNGs and Android packages; the import log no longer scans those artifacts. The editor-panel script still passes, but its standalone editor shutdown continues to print renderer/ObjectDB cleanup diagnostics (exit code 0), so that existing test-harness warning remains open.

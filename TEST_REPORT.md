@@ -586,3 +586,9 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 - 2026-11-12: fresh API37 install smoke showed the current APK campaign menu with Vulkan/SwiftShader and no captured runtime error. ADB touch did not enter M1. Count only as launch/menu evidence; no combat, Android 10 hardware, or FPS acceptance.
 
 - API37 emulator smoke (2026-11-12): touch entered M1; unit deployment charged the expected 50 resources (160→110), and wave 1 enemy attack reduced core HP (300→280). This strengthens launch-only evidence to a short interactive combat path; it is not a full-stage or physical-device/FPS pass.
+
+## Build directory editor scan regression
+
+- Added empty `build/.gdignore` (force-tracked because `/build/` is Git-ignored) so Godot's editor filesystem scanner ignores generated Android APK/AAB and local screenshots.
+- `Godot_v4.7.2 --headless --editor --path . --quit`: passed; filesystem scan/import output did not enumerate generated files under `build/`.
+- `tests/editor_panels.gd`: passed after the change. Existing renderer/ObjectDB teardown diagnostics persist on exit; do not count them as a clean shutdown.
