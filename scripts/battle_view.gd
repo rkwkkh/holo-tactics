@@ -17,6 +17,9 @@ var rest_timer: Timer
 var rest_seconds := 0
 var wave_button: Button
 var deploy_buttons: Array[Button] = []
+var upgrade_controls: GridContainer
+var upgrade_buttons: Array[Button] = []
+var upgrade_controls_unit := -1
 var status_override := ""
 
 func _ready() -> void:
@@ -73,6 +76,10 @@ func _ready() -> void:
 		deploy_button.pressed.connect(_select_unit_kind.bind(kind))
 		unit_controls.add_child(deploy_button)
 		deploy_buttons.append(deploy_button)
+	upgrade_controls = GridContainer.new()
+	upgrade_controls.columns = 2
+	upgrade_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	layout.add_child(upgrade_controls)
 	var facility_controls := HBoxContainer.new()
 	facility_controls.alignment = BoxContainer.ALIGNMENT_CENTER
 	layout.add_child(facility_controls)
@@ -167,6 +174,10 @@ func _start_wave() -> void:
 		status_override = ""
 	_refresh()
 
+func _purchase_upgrade(unit_id: int, upgrade_id: String) -> void:
+	status_override = "" if battle.purchase_upgrade(unit_id, upgrade_id) else "강화에 필요한 전투 자원이 부족하거나 구매할 수 없습니다"
+	_refresh()
+
 func _tick() -> void:
 	var previous_phase := battle.phase
 	battle.tick(timer.wait_time)
@@ -207,6 +218,7 @@ func _refresh() -> void:
 	wave_button.disabled = battle.phase != "preparation"
 	for button in deploy_buttons:
 		button.disabled = battle.phase != "preparation"
+	_refresh_upgrade_controls()
 	for y in BattleModel.ROWS:
 		for x in BattleModel.COLUMNS:
 			var cell := Vector2i(x, y)
@@ -229,14 +241,42 @@ func _refresh() -> void:
 			for facility in battle.enemy_facilities:
 				if facility.alive and facility.cell == cell:
 					tile.text = "적탑"
-		if not status_override.is_empty():
-			status.text = status_override
-		elif battle.phase == "finished":
-			match battle.battle_result:
-				"victory": status.text = "전투에서 승리했습니다!"
-				"safe_abort": status.text = "증원 출현 실패로 전투를 안전 종료했습니다. 마지막 체크포인트에서 다시 시작할 수 있습니다."
-				_: status.text = "전투에서 패배했습니다"
-		elif battle.phase == "combat":
-			status.text = "전투 중 · 선택 유닛을 누른 뒤 이동할 칸을 선택하세요"
-		else:
-			status.text = "배치 단계 · 검사/궁수를 선택한 뒤 아군 구역을 누르세요"
+	if not status_override.is_empty():
+		status.text = status_override
+	elif battle.phase == "finished":
+		match battle.battle_result:
+			"victory": status.text = "전투에서 승리했습니다!"
+			"safe_abort": status.text = "증원 출현 실패로 전투를 안전 종료했습니다. 마지막 체크포인트에서 다시 시작할 수 있습니다."
+			_: status.text = "전투에서 패배했습니다"
+	elif battle.phase == "combat":
+		status.text = "전투 중 · 선택 유닛을 누른 뒤 이동할 칸을 선택하세요"
+	else:
+		status.text = "배치 단계 · 검사/궁수를 선택한 뒤 아군 구역을 누르세요"
+
+func _refresh_upgrade_controls() -> void:
+	var unit := battle._unit_by_id(selected_unit)
+	if unit.is_empty():
+		for button in upgrade_buttons:
+			button.queue_free()
+		upgrade_buttons.clear()
+		upgrade_controls_unit = -1
+		return
+	var definitions: Array = battle.content.categories.upgrades.filter(func(item): return item.unit_kind == unit.kind)
+	if upgrade_controls_unit != unit.id:
+		for button in upgrade_buttons:
+			button.queue_free()
+		upgrade_buttons.clear()
+		upgrade_controls_unit = unit.id
+		for upgrade in definitions:
+			var button := Button.new()
+			button.custom_minimum_size = Vector2(120, 36)
+			button.pressed.connect(_purchase_upgrade.bind(unit.id, upgrade.id))
+			upgrade_controls.add_child(button)
+			upgrade_buttons.append(button)
+	for index in upgrade_buttons.size():
+		var upgrade: Dictionary = definitions[index]
+		var level := int(unit.upgrades.get(upgrade.id, 0))
+		var cost := int(upgrade.costs[level]) if level < 3 else 0
+		var button := upgrade_buttons[index]
+		button.text = "%s %d/3 · %d" % [upgrade.label, level, cost] if level < 3 else "%s 최대" % upgrade.label
+		button.disabled = battle.phase not in ["preparation", "combat"] or level >= 3 or battle.combat_gold < cost

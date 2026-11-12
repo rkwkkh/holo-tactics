@@ -66,6 +66,20 @@ static func validate(catalog: Dictionary) -> Array[String]:
 				var references: Variant = unit.get("references", [])
 				if not profile_ids.has(profile_id) or not references is Array or not references.has(profile_id):
 					errors.append("%s must reference an AI profile" % unit.get("id", "<missing-id>"))
+	var upgrade_counts: Dictionary = {}
+	for upgrade in _as_array(categories.get("upgrades", [])):
+		if not upgrade is Dictionary:
+			continue
+		var levels: Variant = upgrade.get("values", [])
+		var costs: Variant = upgrade.get("costs", [])
+		var matches: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == upgrade.get("unit_kind") and unit.get("team") == "ally")
+		var effect: Variant = upgrade.get("effect", null)
+		if matches.size() != 1 or not levels is Array or levels.size() != 3 or not costs is Array or costs.size() != 3 or levels.any(func(value): return not _is_positive_number(value)) or costs.any(func(value): return not _is_positive_integer(value)) or not effect is String or effect not in ["combo", "bleed", "splash", "charge", "pierce", "multishot", "freeze", "pushback", "counter", "taunt", "defense", "heal_area", "shield", "attack_buff", "cleanse", "chain", "burn", "mana_burst"]:
+			errors.append("%s has invalid combat upgrade data" % upgrade.get("id", "<missing-id>"))
+		upgrade_counts[upgrade.get("unit_kind", "")] = int(upgrade_counts.get(upgrade.get("unit_kind", ""), 0)) + 1
+	for unit in unit_items:
+		if categories.has("upgrades") and unit is Dictionary and unit.get("team") == "ally" and upgrade_counts.get(unit.get("kind", ""), 0) != 4:
+			errors.append("%s must have exactly four combat upgrades" % unit.get("id", "<missing-id>"))
 	for facility in _as_array(categories.get("facilities", [])):
 		if not facility is Dictionary:
 			continue

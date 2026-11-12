@@ -1,4 +1,4 @@
-extends SceneTree
+﻿extends SceneTree
 
 func _initialize() -> void:
 	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "team": "ally", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash"], "dependencies": []}], "skills": [{"id": "skill.slash", "references": [], "dependencies": []}]}}
@@ -26,10 +26,135 @@ func _initialize() -> void:
 	roster_deploy_test.combat_gold = 1000
 	var ally_kinds := ["swordsman", "archer", "spearman", "support", "mage"]
 	assert(not roster_deploy_test.deploy("spearman", Vector2i(0, 8)))
+	var locked_unit_snapshot_test := BattleModel.new()
+	locked_unit_snapshot_test.stage.available_units = ["swordsman", "archer", "spearman"]
+	locked_unit_snapshot_test.combat_gold = 500
+	assert(locked_unit_snapshot_test.deploy("spearman", Vector2i(1, 8)))
+	var locked_snapshot := locked_unit_snapshot_test.to_dict()
+	assert(not BattleModel.new().restore(locked_snapshot))
 	roster_deploy_test.stage.available_units = ally_kinds
 	for index in ally_kinds.size():
 		assert(roster_deploy_test.deploy(ally_kinds[index], Vector2i(index, 8)))
 	assert(roster_deploy_test.units.size() == 5 and roster_deploy_test.combat_gold == 660)
+	assert(seeded_catalog.categories.upgrades.size() == 20)
+	var upgrade_test := BattleModel.new()
+	upgrade_test.combat_gold = 1000
+	assert(upgrade_test.deploy("swordsman", Vector2i(1, 8)))
+	assert(not upgrade_test.purchase_upgrade(upgrade_test.units[0].id, "upgrade.archer.pierce"))
+	assert(upgrade_test.purchase_upgrade(upgrade_test.units[0].id, "upgrade.swordsman.charge"))
+	assert(upgrade_test.units[0].damage == 25.0 and upgrade_test.combat_gold == 920)
+	assert(upgrade_test.purchase_upgrade(upgrade_test.units[0].id, "upgrade.swordsman.charge"))
+	var upgraded_snapshot := upgrade_test.to_dict()
+	var upgraded_restore := BattleModel.new()
+	assert(upgraded_restore.restore(upgraded_snapshot))
+	assert(upgraded_restore.units[0].upgrades["upgrade.swordsman.charge"] == 2 and upgraded_restore.units[0].damage == 28.0)
+	assert(upgraded_restore.purchase_upgrade(upgraded_restore.units[0].id, "upgrade.swordsman.charge"))
+	assert(not upgraded_restore.purchase_upgrade(upgraded_restore.units[0].id, "upgrade.swordsman.charge"))
+	var combo_bleed_test := BattleModel.new()
+	combo_bleed_test.combat_gold = 500
+	assert(combo_bleed_test.deploy("swordsman", Vector2i(2, 8)))
+	assert(combo_bleed_test.purchase_upgrade(combo_bleed_test.units[0].id, "upgrade.swordsman.combo"))
+	assert(combo_bleed_test.purchase_upgrade(combo_bleed_test.units[0].id, "upgrade.swordsman.bleed"))
+	combo_bleed_test.enemies.append({"id": 90, "kind": "goblin", "team": "enemy", "cell": Vector2i(2, 7), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 10.0, "alive": true, "active": true, "statuses": {}})
+	combo_bleed_test._strike(combo_bleed_test.units[0], combo_bleed_test.enemies[0])
+	assert(combo_bleed_test.enemies[0].hp == 60.0 and combo_bleed_test.enemies[0].statuses.has("bleed"))
+	assert(combo_bleed_test.enemies[0].statuses.bleed.stacks.size() == 2)
+	combo_bleed_test._tick_statuses(combo_bleed_test.enemies[0], 0.5)
+	assert(combo_bleed_test.enemies[0].hp == 58.0)
+	combo_bleed_test.units[0].cooldown = 0.0
+	combo_bleed_test._strike(combo_bleed_test.units[0], combo_bleed_test.enemies[0])
+	assert(combo_bleed_test.enemies[0].statuses.bleed.stacks.size() == 3)
+	var freeze_test := BattleModel.new()
+	freeze_test.combat_gold = 500
+	assert(freeze_test.deploy("archer", Vector2i(2, 8)))
+	assert(freeze_test.purchase_upgrade(freeze_test.units[0].id, "upgrade.archer.freeze"))
+	freeze_test.enemies.append({"id": 91, "kind": "goblin", "team": "enemy", "cell": Vector2i(2, 7), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 10.0, "alive": true, "active": true, "statuses": {}})
+	freeze_test._strike(freeze_test.units[0], freeze_test.enemies[0])
+	assert(freeze_test.enemies[0].statuses.freeze.remaining == 0.5)
+	freeze_test._add_status(freeze_test.enemies[0], "freeze", 0.2, 0.0)
+	assert(freeze_test.enemies[0].statuses.freeze.remaining == 0.2)
+	var defense_test := BattleModel.new()
+	defense_test.combat_gold = 500
+	defense_test.stage.available_units = ["swordsman", "archer", "spearman"]
+	assert(defense_test.deploy("spearman", Vector2i(1, 8)))
+	assert(defense_test.purchase_upgrade(defense_test.units[0].id, "upgrade.spearman.shield"))
+	defense_test._apply_damage({"kind": "goblin", "damage": 20.0}, defense_test.units[0])
+	assert(defense_test.units[0].hp == 163.0)
+	var support_upgrade_test := BattleModel.new()
+	support_upgrade_test.combat_gold = 1000
+	support_upgrade_test.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
+	assert(support_upgrade_test.deploy("swordsman", Vector2i(1, 8)) and support_upgrade_test.deploy("archer", Vector2i(1, 7)) and support_upgrade_test.deploy("support", Vector2i(2, 8)))
+	assert(support_upgrade_test.purchase_upgrade(support_upgrade_test.units[2].id, "upgrade.support.heal_area"))
+	assert(support_upgrade_test.purchase_upgrade(support_upgrade_test.units[2].id, "upgrade.support.shield"))
+	assert(support_upgrade_test.purchase_upgrade(support_upgrade_test.units[2].id, "upgrade.support.attack"))
+	assert(support_upgrade_test.purchase_upgrade(support_upgrade_test.units[2].id, "upgrade.support.cleanse"))
+	support_upgrade_test.units[0].hp = 60.0
+	support_upgrade_test.units[1].hp = 40.0
+	support_upgrade_test.units[1].statuses.freeze = {"remaining": 1.0, "damage": 0.0}
+	support_upgrade_test.enemies.append({"id": 92, "kind": "goblin", "team": "enemy", "cell": Vector2i(7, 0), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 100.0, "alive": true, "active": false, "statuses": {}})
+	support_upgrade_test.phase = "combat"
+	support_upgrade_test.tick(0.2)
+	assert(support_upgrade_test.units[0].hp == 68.0 and support_upgrade_test.units[1].hp == 48.0)
+	assert(support_upgrade_test.units[0].shield == 10.0 and support_upgrade_test.units[1].shield == 10.0 and not support_upgrade_test.units[1].statuses.has("freeze"))
+	assert(support_upgrade_test.units[1].statuses.attack_buff.value == 0.1)
+	for upgrade in seeded_catalog.categories.upgrades:
+		var every_upgrade_test := BattleModel.new()
+		every_upgrade_test.stage.available_units = [upgrade.unit_kind]
+		every_upgrade_test.combat_gold = 10000
+		assert(every_upgrade_test.deploy(upgrade.unit_kind, Vector2i(1, 8)))
+		for level in 3:
+			assert(every_upgrade_test.purchase_upgrade(every_upgrade_test.units[0].id, upgrade.id))
+		assert(every_upgrade_test.units[0].upgrades[upgrade.id] == 3 and not every_upgrade_test.purchase_upgrade(every_upgrade_test.units[0].id, upgrade.id))
+	var pierce_test := BattleModel.new()
+	pierce_test.combat_gold = 500
+	assert(pierce_test.deploy("archer", Vector2i(1, 8)))
+	assert(pierce_test.purchase_upgrade(pierce_test.units[0].id, "upgrade.archer.pierce"))
+	pierce_test.enemies.append({"id": 93, "kind": "goblin", "team": "enemy", "cell": Vector2i(1, 6), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 10.0, "alive": true, "active": true, "statuses": {}})
+	pierce_test.enemies.append({"id": 94, "kind": "goblin", "team": "enemy", "cell": Vector2i(1, 4), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 10.0, "alive": true, "active": true, "statuses": {}})
+	pierce_test._strike(pierce_test.units[0], pierce_test.enemies[0])
+	assert(pierce_test.enemies[0].hp == 85.0 and pierce_test.enemies[1].hp == 85.0)
+	var spear_control_test := BattleModel.new()
+	spear_control_test.combat_gold = 500
+	spear_control_test.stage.available_units = ["swordsman", "archer", "spearman"]
+	assert(spear_control_test.deploy("spearman", Vector2i(1, 8)))
+	assert(spear_control_test.purchase_upgrade(spear_control_test.units[0].id, "upgrade.spearman.pushback"))
+	assert(spear_control_test.purchase_upgrade(spear_control_test.units[0].id, "upgrade.spearman.counter"))
+	spear_control_test.enemies.append({"id": 95, "kind": "goblin", "team": "enemy", "cell": Vector2i(1, 7), "hp": 100.0, "damage": 20.0, "range": 1, "cooldown": 10.0, "alive": true, "active": true, "statuses": {}})
+	spear_control_test._strike(spear_control_test.units[0], spear_control_test.enemies[0])
+	assert(spear_control_test.enemies[0].cell == Vector2i(1, 6))
+	spear_control_test._apply_damage(spear_control_test.enemies[0], spear_control_test.units[0])
+	assert(spear_control_test.enemies[0].hp == 81.0)
+	var taunt_test := BattleModel.new("stage.m2.siege")
+	taunt_test.stage.available_units = ["swordsman", "archer", "spearman"]
+	taunt_test.combat_gold = 1000
+	assert(taunt_test.deploy("spearman", Vector2i(1, 8)) and taunt_test.deploy("swordsman", Vector2i(3, 8)))
+	for _rank in 3:
+		assert(taunt_test.purchase_upgrade(taunt_test.units[0].id, "upgrade.spearman.taunt"))
+	var taunt_enemy := {"id": 96, "kind": "goblin", "team": "enemy", "cell": Vector2i(3, 7), "hp": 100.0, "damage": 5.0, "range": 3, "cooldown": 0.0, "alive": true, "active": true, "ai_weights": {"attack": 1.2, "objective": 1.0}}
+	assert(taunt_test._choose_enemy_action(taunt_enemy).target_index == 0)
+	var mage_upgrade_test := BattleModel.new()
+	mage_upgrade_test.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
+	mage_upgrade_test.combat_gold = 1000
+	assert(mage_upgrade_test.deploy("mage", Vector2i(3, 8)))
+	assert(mage_upgrade_test.purchase_upgrade(mage_upgrade_test.units[0].id, "upgrade.mage.area"))
+	assert(mage_upgrade_test.purchase_upgrade(mage_upgrade_test.units[0].id, "upgrade.mage.area"))
+	assert(mage_upgrade_test.purchase_upgrade(mage_upgrade_test.units[0].id, "upgrade.mage.burst"))
+	assert(mage_upgrade_test.units[0].splash_radius == 2)
+	mage_upgrade_test.units[0].attack_count = 2
+	mage_upgrade_test.enemies.append({"id": 97, "kind": "goblin", "team": "enemy", "cell": Vector2i(3, 7), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 10.0, "alive": true, "active": true, "statuses": {}})
+	mage_upgrade_test._strike(mage_upgrade_test.units[0], mage_upgrade_test.enemies[0])
+	assert(mage_upgrade_test.enemies[0].hp == 70.0)
+	assert(mage_upgrade_test.purchase_upgrade(mage_upgrade_test.units[0].id, "upgrade.mage.chain"))
+	mage_upgrade_test.enemies.append({"id": 98, "kind": "goblin", "team": "enemy", "cell": Vector2i(3, 4), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 10.0, "alive": true, "active": true, "statuses": {}})
+	mage_upgrade_test.units[0].cooldown = 0.0
+	mage_upgrade_test._strike_area(mage_upgrade_test.units[0], mage_upgrade_test.enemies, mage_upgrade_test.enemies[0].cell, mage_upgrade_test.units[0].splash_radius)
+	assert(mage_upgrade_test.enemies[0].hp == 45.0 and mage_upgrade_test.enemies[1].hp == 75.0)
+	var invalid_upgrade_checkpoint: Dictionary = upgraded_snapshot.duplicate(true)
+	invalid_upgrade_checkpoint.units[0].upgrades["upgrade.swordsman.charge"] = 4
+	assert(not BattleModel.new().restore(invalid_upgrade_checkpoint))
+	var invalid_upgrade: Dictionary = seeded_catalog.duplicate(true)
+	invalid_upgrade.categories.upgrades.pop_back()
+	assert(ContentValidator.validate(invalid_upgrade).any(func(error): return error.contains("exactly four combat upgrades")))
 	var invalid_support_unit: Dictionary = seeded_catalog.duplicate(true)
 	invalid_support_unit.categories.units[3].heal_range = 0
 	assert(ContentValidator.validate(invalid_support_unit).any(func(error): return error.contains("invalid unit healing data")))
@@ -222,6 +347,7 @@ func _initialize() -> void:
 	assert(support_unit_test.units[0].hp == 68.0 and support_unit_test.units[1].cooldown == 1.5)
 	support_unit_test.phase = "preparation"
 	var support_unit_restore := BattleModel.new()
+	support_unit_restore.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
 	assert(support_unit_restore.restore(support_unit_test.to_dict()) and support_unit_restore.units[1].heal == 8 and support_unit_restore.units[1].heal_range == 3)
 	var mage_unit_test := BattleModel.new()
 	mage_unit_test.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
@@ -234,6 +360,7 @@ func _initialize() -> void:
 	assert(mage_unit_test.enemies[0].hp == 40.0 and mage_unit_test.enemies[1].hp == 40.0 and mage_unit_test.enemies[2].hp == 65.0)
 	mage_unit_test.phase = "preparation"
 	var mage_unit_restore := BattleModel.new()
+	mage_unit_restore.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
 	assert(mage_unit_restore.restore(mage_unit_test.to_dict()) and mage_unit_restore.units[0].splash_radius == 1)
 	var enemy_support_test := BattleModel.new()
 	enemy_support_test.phase = "combat"

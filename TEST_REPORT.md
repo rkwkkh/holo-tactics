@@ -89,7 +89,22 @@
 - 최신 `build/holo-debug.apk`: 86,280,823 bytes, 2026-11-12 09:51 KST. APK Signature v2/v3 검증 통과.
 - ADB: `emulator-5554`, `emulator-5556` 모두 offline. APK 설치·실행은 불가했고 실기기/Android 10 기기는 미검증이다. 이전 GLES2/GLES3 AVD 한계도 해결 증거가 없다.
 
+## M3 개체별 전투 강화 (2026-11-12)
+
+- 카탈로그의 다섯 기본 아군별 4개 강화(20개), 단계별 비용/효과 및 최대 3단계를 정의했다. 선택 유닛 UI에서 재정비·전투 중 구매할 수 있고, 개체 ID 기준 레벨이 유지된다. 강화는 공격 횟수/대상·범위·피해, 상태이상, 밀치기·반격·도발·감소, 치유 대상 범위·보호막·공격 버프·해제에 연결했다.
+- 체크포인트에 강화 레벨과 마력 폭발 카운터를 저장한다. 복원 시 카탈로그에 정의된 유닛 전용 강화인지, 레벨이 1~3인지, 저장 스탯이 강화 레벨에서 재구성되는 값인지 검사한다. 체크포인트 밖의 상태이상/보호막은 복원 시 초기화하고 웨이브 사이 상태이상을 해제한다.
+- 통과: 20개 강화 각각 3단계 구매/최대 제한, 전투 자원 차감, 다른 유닛 항목 거부, 피해 보너스/콤보/관통/빙결/3중첩 출혈과 지속시간, 방어/반격/밀치기/도발, 광역 치유·보호막·버프·해제, 마력 폭발, 강화 저장·복원과 변조된 레벨 거부 테스트.
+- Godot 4.7.2 editor import, `tests/run.gd` sentinel, content validator, battle scene headless 실행을 통과했다. 수치·가격 및 스택 상한 초과 처리는 임시 SEED이며 `ISSUES.md`에 기록했다.
+
 ## 해금 목록 validator 경계 검사 (2026-11-12)
 
 - 잘못된 스테이지 해금 목록이 유닛 누락·중복 또는 잘못된 `references` 형태를 가져도 validator가 충돌하지 않고 Error를 반환하는 회귀 검사를 추가했다.
 - 통과: Godot 4.7.2 headless editor import, 전체 테스트 성공 sentinel, 콘텐츠 검사, `git diff --check`.
+
+## 강화 기능 최종 재검증 및 Android export (2026-11-12)
+
+- 통과: Godot 4.7.2 headless editor import, 전체 `tests/run.gd` 성공 sentinel, 카탈로그 validator, `scenes/battle.tscn` headless 실행, `git diff --check`.
+- 최신 소스 APK: `build/holo-debug.apk`, 86,297,207 bytes, 2026-11-12 10:24 KST. `apksigner verify`에서 APK Signature v2/v3 통과.
+- `aapt dump badging`: package `com.example.holotactics`, min API 24, target API 36. Android 10(API29)+에 설치 가능한 설정이나 API29 실행은 GLES2 전용 AVD 문제로 미검증이다.
+- 현재 ADB 재확인: `emulator-5554`, `emulator-5556` 모두 offline. 새 강화 UI 포함 APK를 설치·터치 확인하지 못했다. API29/37 GLES 한계와 실제 Android 10·실기기 FPS 미검증은 그대로다.
+- 실패/수정 이력: 새 UI 함수 삽입 위치가 `_refresh()` 내부 루프를 끊어 battle scene 파싱이 실패해 함수를 올바른 최상위 위치로 옮겼다. 비용 검증 테스트가 소환 비용을 포함하지 않아 기대 재화를 고쳤고, 빈 적 fixture가 웨이브 완료/회복을 유발해 비활성 생존 적을 추가했다. 최종 전 항목은 성공 sentinel로 재확인했다.

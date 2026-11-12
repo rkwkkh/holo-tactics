@@ -9,6 +9,7 @@ var stage_id := STAGE_ID
 var content: Dictionary = {}
 var stage: Dictionary = {}
 var balance_seed: Dictionary = {}
+var upgrade_definitions: Dictionary = {}
 var facility_definitions: Dictionary = {}
 var ai_profiles: Dictionary = {}
 var waves: Array = []
@@ -43,6 +44,8 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 	content = parsed
 	for unit in content.categories.units:
 		balance_seed[unit.kind] = unit
+	for upgrade in content.categories.upgrades:
+		upgrade_definitions[upgrade.id] = upgrade
 	for facility in content.categories.facilities:
 		facility_definitions[facility.id] = facility
 	for profile in content.categories.ai_profiles:
@@ -75,9 +78,66 @@ func deploy(kind: String, cell: Vector2i) -> bool:
 		return false
 	combat_gold -= cost
 	var stats: Dictionary = balance_seed[kind]
-	units.append({"id": next_id, "kind": kind, "cell": cell, "hp": stats.hp, "damage": stats.damage, "range": stats.range, "heal": stats.get("heal", 0), "heal_range": stats.get("heal_range", 0), "splash_radius": stats.get("splash_radius", 0), "cooldown": 0.0, "alive": true})
+	units.append({"id": next_id, "kind": kind, "cell": cell, "hp": stats.hp, "damage": stats.damage, "range": stats.range, "heal": stats.get("heal", 0), "heal_range": stats.get("heal_range", 0), "splash_radius": stats.get("splash_radius", 0), "attack_count": 0, "upgrades": {}, "statuses": {}, "cooldown": 0.0, "alive": true})
 	next_id += 1
 	return true
+
+func purchase_upgrade(unit_id: int, upgrade_id: String) -> bool:
+	var unit := _unit_by_id(unit_id)
+	if unit.is_empty() or phase not in ["preparation", "combat"] or not upgrade_definitions.has(upgrade_id):
+		return false
+	var definition: Dictionary = upgrade_definitions[upgrade_id]
+	if definition.unit_kind != unit.kind:
+		return false
+	var level := int(unit.get("upgrades", {}).get(upgrade_id, 0))
+	if level >= 3:
+		return false
+	var cost := int(definition.costs[level])
+	if combat_gold < cost:
+		return false
+	combat_gold -= cost
+	unit.upgrades[upgrade_id] = level + 1
+	_apply_unit_upgrades(unit)
+	return true
+
+func _upgrade_level(unit: Dictionary, effect: String) -> int:
+	var level := 0
+	for upgrade_id in unit.get("upgrades", {}):
+		var definition: Dictionary = upgrade_definitions.get(upgrade_id, {})
+		if definition.get("effect", "") == effect:
+			level += int(unit.upgrades[upgrade_id])
+	return level
+
+func _upgrade_value(unit: Dictionary, effect: String) -> float:
+	var value := 0.0
+	for upgrade_id in unit.get("upgrades", {}):
+		var definition: Dictionary = upgrade_definitions.get(upgrade_id, {})
+		if definition.get("effect", "") == effect:
+			value += float(definition.values[int(unit.upgrades[upgrade_id]) - 1])
+	return value
+
+func _apply_unit_upgrades(unit: Dictionary) -> void:
+	var stats: Dictionary = balance_seed[unit.kind]
+	unit.damage = float(stats.damage)
+	unit.range = int(stats.range)
+	unit.heal = float(stats.get("heal", 0))
+	unit.heal_range = int(stats.get("heal_range", 0))
+	unit.splash_radius = int(stats.get("splash_radius", 0))
+	unit.erase("taunt_range")
+	unit.erase("damage_reduction")
+	for upgrade_id in unit.upgrades:
+		var definition: Dictionary = upgrade_definitions[upgrade_id]
+		var level := int(unit.upgrades[upgrade_id])
+		var value: float = float(definition.values[level - 1])
+		match definition.effect:
+			"charge": unit.damage += value
+			"splash": unit.splash_radius = maxi(unit.splash_radius, int(value))
+			"area": unit.splash_radius = maxi(unit.splash_radius, int(value))
+			"taunt": unit.taunt_range = int(value)
+			"defense": unit.damage_reduction = value
+
+func _distance(a: Vector2i, b: Vector2i) -> int:
+	return absi(a.x - b.x) + absi(a.y - b.y)
 
 func move_unit(unit_id: int, destination: Vector2i) -> bool:
 	var unit := _unit_by_id(unit_id)
@@ -138,6 +198,9 @@ func tick(delta: float) -> void:
 	for unit in units:
 		if not unit.alive:
 			continue
+		_tick_statuses(unit, delta)
+		if not unit.alive:
+			continue
 		unit.cooldown = maxf(0.0, unit.cooldown - delta)
 		if unit.has("destination"):
 			if unit.cell == unit.destination:
@@ -152,7 +215,12 @@ func tick(delta: float) -> void:
 		if unit.get("heal", 0) > 0 and unit.cooldown <= 0.0:
 			var ally_index := _lowest_hp_ally(unit.cell, unit.get("heal_range", 0), unit.id)
 			if ally_index >= 0:
-				units[ally_index].hp = minf(float(balance_seed[units[ally_index].kind].hp), units[ally_index].hp + unit.heal)
+				var primary: Dictionary = units[ally_index]
+				for ally in units:
+					var area := _upgrade_value(unit, "heal_area")
+					if not ally.alive or _distance(unit.cell, ally.cell) > unit.heal_range or (ally.id != primary.id and (area <= 0.0 or _distance(primary.cell, ally.cell) > area)) or float(ally.hp) >= float(balance_seed[ally.kind].hp):
+						continue
+					_apply_support_effects(unit, ally)
 				unit.cooldown = balance_seed[unit.kind].attack_time
 				continue
 		var unit_targets: Array[Dictionary] = enemies + enemy_facilities
@@ -198,6 +266,9 @@ func tick(delta: float) -> void:
 			_strike(facility, (units + facilities)[target_index])
 	for enemy in enemies:
 		if not enemy.alive or not enemy.get("active", true):
+			continue
+		_tick_statuses(enemy, delta)
+		if not enemy.alive or enemy.get("statuses", {}).has("freeze"):
 			continue
 		enemy.cooldown = maxf(0.0, enemy.cooldown - delta)
 		if enemy.get("heal", 0) > 0 and enemy.cooldown <= 0.0:
@@ -253,6 +324,11 @@ func tick(delta: float) -> void:
 			for unit in units:
 				if unit.alive:
 					unit.hp = balance_seed[unit.kind].hp
+					if unit.has("statuses"):
+						unit.statuses.clear()
+					else:
+						unit.statuses = {}
+					unit.shield = 0.0
 					unit.cooldown = 0.0
 			enemies.clear()
 			_prepare_wave_preview()
@@ -293,13 +369,22 @@ func restore(snapshot: Dictionary) -> bool:
 	var occupied: Dictionary = {}
 	var max_id := 0
 	for saved_unit in snapshot.units:
-		if not saved_unit is Dictionary or not _is_integer_value(saved_unit.get("id")) or not _is_valid_cell(saved_unit.get("cell")) or not balance_seed.has(saved_unit.get("kind")) or balance_seed[saved_unit.kind].team != "ally" or not saved_unit.get("alive") is bool:
+		if not saved_unit is Dictionary or not _is_integer_value(saved_unit.get("id")) or not _is_valid_cell(saved_unit.get("cell")) or not balance_seed.has(saved_unit.get("kind")) or balance_seed[saved_unit.kind].team != "ally" or not stage.get("available_units", []).has(saved_unit.get("kind")) or not saved_unit.get("alive") is bool:
 			return false
 		var unit: Dictionary = saved_unit.duplicate(true)
 		var id := int(saved_unit.id)
 		var cell := Vector2i(int(saved_unit.cell[0]), int(saved_unit.cell[1]))
 		var stats: Dictionary = balance_seed[saved_unit.kind]
-		if ids.has(id) or cell.y < 5 or occupied.has(cell) or not _is_finite_nonnegative(saved_unit.get("hp")) or float(saved_unit.hp) > stats.hp or not _version_matches(saved_unit.get("damage"), int(stats.damage)) or not _version_matches(saved_unit.get("range"), int(stats.range)) or not _version_matches(saved_unit.get("heal", stats.get("heal", 0)), int(stats.get("heal", 0))) or not _version_matches(saved_unit.get("heal_range", stats.get("heal_range", 0)), int(stats.get("heal_range", 0))) or not _version_matches(saved_unit.get("splash_radius", stats.get("splash_radius", 0)), int(stats.get("splash_radius", 0))) or not _is_finite_nonnegative(saved_unit.get("cooldown")):
+		if not _valid_saved_upgrades(saved_unit.get("upgrades", {}), saved_unit.kind):
+			return false
+		if not _is_integer_value(saved_unit.get("attack_count", 0)) or int(saved_unit.get("attack_count", 0)) < 0:
+			return false
+		unit.upgrades = saved_unit.get("upgrades", {}).duplicate(true)
+		unit.statuses = {}
+		unit.shield = 0.0
+		unit.attack_count = int(saved_unit.get("attack_count", 0))
+		_apply_unit_upgrades(unit)
+		if ids.has(id) or cell.y < 5 or occupied.has(cell) or not _is_finite_nonnegative(saved_unit.get("hp")) or float(saved_unit.hp) > stats.hp or not _version_matches(saved_unit.get("damage"), int(unit.damage)) or not _version_matches(saved_unit.get("range"), int(unit.range)) or not _version_matches(saved_unit.get("heal", stats.get("heal", 0)), int(unit.heal)) or not _version_matches(saved_unit.get("heal_range", stats.get("heal_range", 0)), int(unit.heal_range)) or not _version_matches(saved_unit.get("splash_radius", stats.get("splash_radius", 0)), int(unit.splash_radius)) or not _is_finite_nonnegative(saved_unit.get("cooldown")):
 			return false
 		if unit.has("destination") and not _is_valid_cell(unit.destination):
 			return false
@@ -310,9 +395,6 @@ func restore(snapshot: Dictionary) -> bool:
 		if unit.alive and unit.hp <= 0.0 or not unit.alive and unit.hp > 0.0:
 			return false
 		unit.cell = cell
-		unit.heal = stats.get("heal", 0)
-		unit.heal_range = stats.get("heal_range", 0)
-		unit.splash_radius = stats.get("splash_radius", 0)
 		ids[id] = true
 		if unit.alive:
 			occupied[cell] = true
@@ -372,6 +454,16 @@ func restore(snapshot: Dictionary) -> bool:
 func _version_matches(value: Variant, expected: int) -> bool:
 	return (value is int or value is float) and float(value) == float(expected)
 
+func _valid_saved_upgrades(saved_upgrades: Variant, unit_kind: String) -> bool:
+	if not saved_upgrades is Dictionary:
+		return false
+	for upgrade_id in saved_upgrades:
+		var definition: Dictionary = upgrade_definitions.get(upgrade_id, {})
+		var level: Variant = saved_upgrades[upgrade_id]
+		if definition.get("unit_kind", "") != unit_kind or not _is_integer_value(level) or int(level) < 1 or int(level) > 3:
+			return false
+	return true
+
 func _is_integer_value(value: Variant) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and floor(float(value)) == float(value)
 
@@ -424,28 +516,159 @@ func _lowest_hp_enemy(cell: Vector2i, heal_range: int, exclude_id: int) -> int:
 			lowest_ratio = ratio
 	return best
 
+func _apply_support_effects(support: Dictionary, ally: Dictionary) -> void:
+	ally.hp = minf(float(balance_seed[ally.kind].hp), ally.hp + support.heal)
+	if not ally.has("statuses"):
+		ally.statuses = {}
+	var shield := _upgrade_value(support, "shield")
+	if shield > float(ally.get("shield", 0.0)):
+		ally.shield = shield
+	var cleanse_radius := int(_upgrade_value(support, "cleanse"))
+	if cleanse_radius > 0:
+		for nearby_ally in units:
+			if _distance(ally.cell, nearby_ally.cell) <= cleanse_radius and nearby_ally.has("statuses"):
+				nearby_ally.statuses.clear()
+	var buff := _upgrade_value(support, "attack_buff")
+	if buff > 0.0:
+		_add_status(ally, "attack_buff", 3.0, 0.0)
+		ally.statuses.attack_buff.value = maxf(float(ally.statuses.attack_buff.get("value", 0.0)), buff)
+
 func _strike(attacker: Dictionary, target: Dictionary) -> void:
 	if attacker.cooldown > 0.0:
 		return
-	_apply_damage(attacker, target)
+	attacker.attack_count = int(attacker.get("attack_count", 0)) + 1
+	var hits := 1 + _upgrade_level(attacker, "combo")
+	for _hit in hits:
+		_apply_damage(attacker, target)
+	var multi_count := _upgrade_level(attacker, "multishot") + _upgrade_level(attacker, "pierce") + _upgrade_level(attacker, "chain")
+	if multi_count > 0 and attacker in units:
+		var candidates := enemies + enemy_facilities
+		candidates.sort_custom(func(a: Dictionary, b: Dictionary): return _distance(attacker.cell, a.cell) < _distance(attacker.cell, b.cell))
+		var extra := 0
+		for candidate in candidates:
+			if not candidate.alive or not candidate.get("active", true) or candidate == target or _distance(attacker.cell, candidate.cell) > attacker.range:
+				continue
+			if _upgrade_level(attacker, "pierce") > 0:
+				var first_ray: Vector2i = target.cell - attacker.cell
+				var next_ray: Vector2i = candidate.cell - attacker.cell
+				if first_ray.x * next_ray.y != first_ray.y * next_ray.x or first_ray.x * next_ray.x + first_ray.y * next_ray.y <= first_ray.length_squared():
+					continue
+			if _upgrade_level(attacker, "chain") > 0 and _distance(candidate.cell, target.cell) > 2:
+				continue
+			_apply_damage(attacker, candidate)
+			extra += 1
+			if extra >= multi_count:
+				break
 	attacker.cooldown = float(attacker.attack_time) if attacker.has("attack_time") else float(balance_seed[attacker.kind].attack_time)
 
 func _strike_area(attacker: Dictionary, targets: Array[Dictionary], center: Vector2i, radius: int) -> void:
 	if attacker.cooldown > 0.0:
 		return
+	attacker.attack_count = int(attacker.get("attack_count", 0)) + 1
+	var hit_ids: Dictionary = {}
 	for target in targets:
 		var distance := absi(center.x - target.cell.x) + absi(center.y - target.cell.y)
 		if target.alive and target.get("active", true) and distance <= radius:
+			for _hit in 1 + _upgrade_level(attacker, "combo"):
+				_apply_damage(attacker, target)
+			hit_ids[target.id] = true
+	var chain_count := _upgrade_level(attacker, "chain") if attacker in units else 0
+	if chain_count > 0:
+		var candidates := enemies + enemy_facilities
+		candidates.sort_custom(func(a: Dictionary, b: Dictionary): return _distance(center, a.cell) < _distance(center, b.cell))
+		var chained := 0
+		for target in candidates:
+			if not target.alive or not target.get("active", true) or hit_ids.has(target.id) or _distance(center, target.cell) <= radius or _distance(center, target.cell) > radius + 2:
+				continue
 			_apply_damage(attacker, target)
+			chained += 1
+			if chained >= chain_count:
+				break
 	attacker.cooldown = float(attacker.attack_time) if attacker.has("attack_time") else float(balance_seed[attacker.kind].attack_time)
 
 func _apply_damage(attacker: Dictionary, target: Dictionary) -> void:
-	target.hp -= attacker.damage
+	var damage := float(attacker.damage)
+	if attacker.has("upgrades"):
+		damage += _upgrade_value(attacker, "charge")
+		if _upgrade_level(attacker, "mana_burst") > 0 and int(attacker.get("attack_count", 0)) % 3 == 0:
+			damage *= _upgrade_value(attacker, "mana_burst")
+	var buff: Dictionary = attacker.get("statuses", {}).get("attack_buff", {})
+	if not buff.is_empty():
+		damage *= 1.0 + float(buff.get("value", 0.0))
+	var reduction := float(target.get("damage_reduction", 0.0))
+	if target.has("upgrades"):
+		reduction = maxf(reduction, _upgrade_value(target, "defense"))
+	damage *= 1.0 - clampf(reduction, 0.0, 0.8)
+	var shield := float(target.get("shield", 0.0))
+	if shield > 0.0:
+		var absorbed := minf(shield, damage)
+		target.shield = shield - absorbed
+		damage -= absorbed
+	_deal_damage(target, damage)
+	if not target.alive:
+		return
+	if attacker.has("upgrades"):
+		if _upgrade_level(attacker, "bleed") > 0:
+			_add_status(target, "bleed", 3.0, _upgrade_value(attacker, "bleed"))
+		if _upgrade_level(attacker, "burn") > 0:
+			_add_status(target, "burn", 3.0, _upgrade_value(attacker, "burn"))
+		if _upgrade_level(attacker, "freeze") > 0:
+			_add_status(target, "freeze", _upgrade_value(attacker, "freeze"), 0.0)
+		if _upgrade_level(attacker, "pushback") > 0 and target in enemies:
+			_pushback(target, attacker.cell, int(_upgrade_value(attacker, "pushback")))
+	if target.has("upgrades") and _upgrade_level(target, "counter") > 0:
+		_deal_damage(attacker, damage * _upgrade_value(target, "counter"))
+
+func _deal_damage(target: Dictionary, damage: float) -> void:
+	if not target.alive:
+		return
+	target.hp = maxf(0.0, float(target.hp) - maxf(0.0, damage))
 	if target.hp <= 0.0:
-		target.hp = 0.0
 		target.alive = false
 		if target.get("team", "") == "enemy" or target.kind == "goblin":
-				combat_gold += stage.kill_reward
+			combat_gold += stage.kill_reward
+
+func _add_status(target: Dictionary, id: String, duration: float, damage: float) -> void:
+	if not target.has("statuses"):
+		target.statuses = {}
+	if id in ["bleed", "burn"]:
+		var status: Dictionary = target.statuses.get(id, {"stacks": []})
+		var stacks: Array = status.get("stacks", [])
+		if stacks.size() < 3:
+			stacks.append({"remaining": duration, "damage": damage})
+		status.stacks = stacks
+		target.statuses[id] = status
+		return
+	var status: Dictionary = target.statuses.get(id, {"remaining": 0.0, "damage": 0.0})
+	status.remaining = duration
+	status.damage = damage
+	target.statuses[id] = status
+
+func _tick_statuses(target: Dictionary, delta: float) -> void:
+	for id in target.get("statuses", {}).keys():
+		var status: Dictionary = target.statuses[id]
+		if id in ["bleed", "burn"]:
+			var active_stacks: Array = []
+			for stack in status.get("stacks", []):
+				_deal_damage(target, float(stack.damage) * delta)
+				stack.remaining -= delta
+				if stack.remaining > 0.0:
+					active_stacks.append(stack)
+			status.stacks = active_stacks
+			if active_stacks.is_empty():
+				target.statuses.erase(id)
+		elif status.get("remaining", 0.0) > 0.0:
+			status.remaining -= delta
+			if status.remaining <= 0.0:
+				target.statuses.erase(id)
+
+func _pushback(target: Dictionary, from_cell: Vector2i, distance: int) -> void:
+	var direction := Vector2i(signi(target.cell.x - from_cell.x), signi(target.cell.y - from_cell.y))
+	for _step in distance:
+		var destination: Vector2i = target.cell + direction
+		if not _is_inside(destination) or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or _occupied(destination):
+			break
+		target.cell = destination
 
 func _unit_by_id(unit_id: int) -> Dictionary:
 	for unit in units:
@@ -561,11 +784,14 @@ func _choose_enemy_action(enemy: Dictionary) -> Dictionary:
 	var weights: Dictionary = enemy.get("ai_weights", {"attack": 1.2, "objective": 1.0})
 	var targets: Array[Dictionary] = units.duplicate()
 	targets.append_array(facilities)
-	var target_index := _closest_target(enemy.cell, targets, enemy.range)
+	var taunt_targets: Array[Dictionary] = units.filter(func(unit): return unit.alive and unit.get("taunt_range", 0) > 0 and _distance(enemy.cell, unit.cell) <= unit.taunt_range and _distance(enemy.cell, unit.cell) <= enemy.range)
+	var target_index := targets.find(taunt_targets[0]) if not taunt_targets.is_empty() else _closest_target(enemy.cell, targets, enemy.range)
 	if target_index >= 0:
 		var target: Dictionary = targets[target_index]
 		var distance := absi(enemy.cell.x - target.cell.x) + absi(enemy.cell.y - target.cell.y)
 		var attack_score: float = weights.get("attack", 1.2) * (1.0 + 0.5 * (1.0 - float(distance) / float(enemy.range + 1)))
+		if target.has("taunt_range") and distance <= target.taunt_range:
+			attack_score += 10.0
 		options.append({"kind": "attack_facility" if target.has("facility_id") else "attack_unit", "target_index": target_index - units.size() if target.has("facility_id") else target_index, "score": attack_score})
 	if stage.mode == "siege":
 		if options.is_empty():
