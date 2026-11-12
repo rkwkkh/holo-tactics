@@ -155,3 +155,5 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 ## M5 GUI access retry (2026-11-12)
 
 Computer Use state query returned no apps; native pipe and browser host are unavailable (Windows OS error 2). Headless editor-panel structure and content validation pass, but visible dock/Inspector interaction remains open. Retried this turn; no UI interaction occurred.
+
+- M6 environment recheck (2026-11-12): ADB currently lists no devices. Release keystore path, alias, and password environment variables are all unset; current package ID is the placeholder `com.example.holotactics`. The unsigned test AAB is not uploadable to Play. These require publisher/device inputs; no credentials were created or stored.

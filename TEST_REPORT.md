@@ -610,3 +610,9 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 - Correct CI invocation for the M5 editor structure check: Godot 4.7.2 `--headless --editor --path . --script res://tests/editor_panels.gd`; passed with stages/waves, 6 evolutions, and 20 upgrades. Engine prints renderer/ObjectDB leak diagnostics during standalone editor-script shutdown despite exit success; no clean GUI session was available.
 - `scripts/validate_content.gd --quit-after 2`: passed (0 content Errors).
 - Computer Use inventory still returns no apps because its native Windows pipe and browser host are unavailable. M5 visual dock/Inspector interaction remains unverified.
+
+## Full local revalidation and release-gate check (2026-11-12)
+
+- Godot 4.7.2: editor import, 	ests/run.gd, editor preview isolation, M5 editor-panel construction, battle results, seeded 8-stage campaign simulation (all 8 wins), content validation (0 Errors), and headless starts for main/battle/village/village_research/editor_preview all passed. git diff --check passed.
+- Current local artifacts: APK SHA-256 $apkHash; test AAB SHA-256 $aabHash. undletool validate was previously successful; current jarsigner -verify confirms the test AAB is unsigned, as expected, and not a Play-upload artifact.
+- Rechecked external prerequisites: ADB reports no connected devices; all three GODOT_ANDROID_KEYSTORE_RELEASE_* environment variables are absent. The package ID remains com.example.holotactics. Thus release AAB signing, physical-device Android/FPS acceptance, and Play private-test upload cannot be completed in this environment.

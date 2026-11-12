@@ -256,3 +256,5 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - M5 panel construction/content checks pass in editor-headless mode. Visible dock/Inspector interaction remains unverified because the local computer-use host exposes no apps.
 - M6 debug APK/test AAB and local validations pass; API37 emulator victory is observed. Physical Android 10/FPS, release signing/package identity, and Play private-test upload remain pending.
 - See the current acceptance snapshot in `IMPLEMENTATION_PLAN.md`; immutable source-spec conflicts are resolved by the user-policy addenda in `ISSUES.md`.
+
+- 2026-11-12 full local Godot revalidation repeated: core, preview isolation, editor panels, results, 8-stage playability, content validator, and five scene starts pass. Current ADB has no attached device; release signing environment remains unset, so M6 external gates are still open.
