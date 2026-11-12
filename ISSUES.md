@@ -133,6 +133,6 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 
 - M6 perf sample on API37 SwiftShader AVD is below target (25.4–25.9 FPS, p95 41–42ms). Emulator software GPU makes this a diagnostic result only; physical device/frame-profiler measurement is still required before acceptance. Debug sampler is excluded from release builds.
 
-- 2026-11-12 M5 GUI retry: both Computer Use state checks failed because the native app pipe and browser host were unavailable. No UI action occurred; plugin/editor GUI interaction remains unverified, while headless plugin initialization and model tests pass.
+- 2026-11-12 M5 GUI retry: Computer Use still reports the native app pipe missing and browser host unavailable after a fresh runtime reset. No UI action occurred; plugin/editor GUI interaction remains unverified, while headless plugin initialization and model tests pass.
 
 - Renderer fallback probe (2026-11-12): API29 AVD fails both configured Mobile/Vulkan presentation and a temporary Compatibility/OpenGL APK (EGL GL-thread startup failure). Production setting is unchanged. Physical Android 10 behavior is still unknown; do not claim API29 acceptance from AVD results.
