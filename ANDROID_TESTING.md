@@ -112,3 +112,4 @@ A temporary APK exported with Godot Compatibility/OpenGL was installed on the AP
 ## Current export revalidation (2026-11-12)
 
 Re-exported with the restored Mobile/Vulkan Android renderer after the temporary API29 Compatibility probe. APK v2 signature verification and AAB ZIP structure (`BundleConfig.pb`, base manifest, dex) pass. API29/API37 AVDs were offline at this check, so there is no fresh installation/render smoke result for these exact artifact hashes.
+- Fresh API37 smoke for the current official APK hash `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC` (2026-11-12): after ADB server restart and cold-start delay, campaign menu and M1 defense board rendered; tapped M1 and confirmed the board, unit sprites, core HUD, and controls. No script, Vulkan-present, or fatal exception was logged during the short smoke. This is emulator-only.

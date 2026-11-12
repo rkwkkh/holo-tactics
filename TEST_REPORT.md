@@ -537,3 +537,5 @@
 ## Full CI-equivalent revalidation (2026-11-12)
 
 Passed Godot 4.7.2 headless editor import, `tests/run.gd`, `tests/editor_preview.gd`, `tests/results_view.gd`, `tests/campaign_playability.gd` (8/8 seeded wins), content validator (0 errors), and headless starts for main, battle, village, village_research, and editor_preview scenes. Re-exported official Mobile/Vulkan APK and test AAB; APK v2 signature and required AAB entries verified. Both AVDs reported offline after the API29 renderer experiment, so this export was not freshly installed. Physical Android 10+ performance, Play signing/upload, and M5 GUI remain pending.
+
+- Follow-up smoke after ADB recovered: installed the exact official APK hash above on API37; cold-start campaign menu and tapped M1 board rendered with sprite atlas/HUD. No script, Vulkan-present, or fatal exception in the short log sample. API29 and physical Android remain unverified.
