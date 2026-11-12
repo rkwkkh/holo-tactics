@@ -126,3 +126,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12: 영구 진행 저장의 원자 교체 중 앱 종료로 메인 파일이 없고 .bak만 남는 경우, load_progress()가 백업을 복구하도록 수정했다. 회귀 테스트에서 기존 재화·진행 복원과 파일 이동을 확인. EditorPlugin headless 초기화 및 주요 5개 씬 smoke도 통과.
 
 - 2026-11-12: 콘텐츠 검증을 Error/Warning으로 분리. 필수 6 메인+2 선택 스테이지는 Error 유지, 26웨이브는 조정 가능한 제작 목표로 Warning 처리한다. EditorPlugin은 경고만 있어도 저장하고 CI 검증기는 Warning 출력 후 성공 종료하도록 연결. 27웨이브 변형 테스트에서 Error 0/Warning 1 확인.
+
+- 2026-11-12: Android APK/AAB export에서 테스트, EditorPlugin, editor-preview 씬/런처를 제외하도록 설정. 생성된 APK sparse PCK를 검사해 해당 경로 부재와 런타임 ContentValidator 포함을 확인. APK v2/API29/36 및 AAB bundletool/manifest 검증 통과.
