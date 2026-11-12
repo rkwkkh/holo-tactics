@@ -544,3 +544,7 @@ Passed Godot 4.7.2 headless editor import, `tests/run.gd`, `tests/editor_preview
 
 - Ran `scripts/export_android_aab.ps1` with release signing environment variables absent. It stopped at the required keystore-path check before export and created no release artifact.
 - A separate attempt to generate and use a throwaway local signing key was rejected by the automatic approval review (`blocked by policy`); no key was created and no alternate credential path was used. Publisher-signed AAB remains pending the publisher's permanent application ID and signing setup.
+
+## M0–M4 milestone evidence reconciliation (2026-11-12)
+
+Marked M0–M4 complete in `PROGRESS.md`: M1 has API37 manual defense evidence plus headless combat/checkpoint/reward tests; M2/M3 have outcome, AI/path, growth/evolution/status tests; M4 has campaign lock/reward persistence checks and a seeded 8/8 stage win simulation across all 26 waves. The seeded simulation is not a full manual UI campaign run; that remains additional QA. M5 GUI interaction and M6 physical-device/FPS/release-signing gates remain incomplete.
