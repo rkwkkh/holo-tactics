@@ -58,6 +58,8 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		var unit_id: String = unit.get("id", "<missing-id>")
 		if unit.get("team") not in ["ally", "enemy"]:
 			_append_field_error(errors, unit_id, "team", "invalid combat or cost data")
+		if unit.get("movement_type") != "ground":
+			_append_field_error(errors, unit_id, "movement_type", "unsupported movement type")
 		for field in ["hp", "damage", "range", "attack_time", "cost", "heal", "heal_range", "splash_radius"]:
 			var value: Variant = unit.get(field, 0 if field in ["heal", "heal_range", "splash_radius"] else null)
 			var valid := _is_nonnegative_integer(value) if field in ["cost", "heal_range", "splash_radius"] else _is_nonnegative_number(value) if field == "heal" else _is_positive_integer(value) if field == "range" else _is_positive_number(value)
@@ -169,6 +171,9 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		var obstacle_id: String = obstacle.get("id", "<missing-id>")
 		if not obstacle.get("kind") is String or obstacle.get("kind", "").is_empty():
 			_append_field_error(errors, obstacle_id, "kind", "invalid obstacle data")
+		var blocked_movement_types: Variant = obstacle.get("blocked_movement_types")
+		if not blocked_movement_types is Array or blocked_movement_types.is_empty() or blocked_movement_types.any(func(movement_type): return movement_type != "ground"):
+			_append_field_error(errors, obstacle_id, "blocked_movement_types", "invalid obstacle movement types")
 		if not _is_nonnegative_integer(obstacle.get("cost")):
 			_append_field_error(errors, obstacle_id, "cost", "invalid obstacle data")
 	var town_buildings := _as_array(categories.get("town_buildings", []))
@@ -386,7 +391,7 @@ static func _field_for_error(message: String) -> String:
 		["invalid permanent research", "unit_kind|building_kind|stat|amount|cost|requires_stage"], ["AI weights", "weights"], ["AI weight", "weights.*"],
 		["enemy and have a positive integer count", "enemy_id|count|references"], ["AI weight overrides", "ai_weight_overrides"], ["invalid reinforcement", "reinforcements[]"],
 		["enemy_facilities must", "enemy_facilities"], ["invalid enemy facility placement", "enemy_facilities[].facility_id|cell"], ["enemy facility must be referenced", "references"], ["conflicting enemy facility cell", "enemy_facilities[].cell"], ["conflicts with initial spawn", "enemy_facilities[].cell"], ["conflicts with reinforcement spawn", "enemy_facilities[].cell"],
-		["invalid obstacle data", "kind|cost"], ["invalid obstacle limits", "obstacle_max_owned|obstacle_max_placed|references"], ["invalid available unit", "available_units"], ["must list available units", "available_units"], ["invalid board dimensions or core cell", "columns|rows|core_cell"], ["unknown battle mode", "mode"], ["invalid enemy spawn row", "enemy_spawn_row"], ["blocked_cells must", "blocked_cells"], ["invalid blocked cell", "blocked_cells[]"], ["duplicate blocked cell", "blocked_cells[]"], ["blocks its core cell", "blocked_cells[]|core_cell"], ["walls must", "walls"], ["invalid wall data", "walls[].cell|hp"], ["conflicting wall cell", "walls[].cell"], ["blocks a required wave route", "blocked_cells|walls|core_cell|waves"], ["blocks a reinforcement route", "blocked_cells|walls|core_cell|reinforcements"], ["must reference at least one wave", "references"], ["invalid core or resource values", "core_hp|start_resource|kill_reward|wave_reward|permanent_first_bonus|permanent_repeat_reward|permanent_partial_per_wave|intermission_seconds"], ["invalid campaign order", "campaign_order"], ["duplicates campaign order", "campaign_order"], ["campaign must contain", "stages|waves"], ["cyclic dependency", "dependencies"]
+		["unsupported movement type", "movement_type"], ["invalid obstacle movement types", "blocked_movement_types"], ["invalid obstacle data", "kind|cost"], ["invalid obstacle limits", "obstacle_max_owned|obstacle_max_placed|references"], ["invalid available unit", "available_units"], ["must list available units", "available_units"], ["invalid board dimensions or core cell", "columns|rows|core_cell"], ["unknown battle mode", "mode"], ["invalid enemy spawn row", "enemy_spawn_row"], ["blocked_cells must", "blocked_cells"], ["invalid blocked cell", "blocked_cells[]"], ["duplicate blocked cell", "blocked_cells[]"], ["blocks its core cell", "blocked_cells[]|core_cell"], ["walls must", "walls"], ["invalid wall data", "walls[].cell|hp"], ["conflicting wall cell", "walls[].cell"], ["blocks a required wave route", "blocked_cells|walls|core_cell|waves"], ["blocks a reinforcement route", "blocked_cells|walls|core_cell|reinforcements"], ["must reference at least one wave", "references"], ["invalid core or resource values", "core_hp|start_resource|kill_reward|wave_reward|permanent_first_bonus|permanent_repeat_reward|permanent_partial_per_wave|intermission_seconds"], ["invalid campaign order", "campaign_order"], ["duplicates campaign order", "campaign_order"], ["campaign must contain", "stages|waves"], ["cyclic dependency", "dependencies"]
 	]
 	for hint in hints:
 		if message.contains(hint[0]):

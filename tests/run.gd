@@ -6,7 +6,7 @@ func _initialize() -> void:
 	assert(inspector_record._get("label") == "Before")
 	assert(inspector_record._set("cost", 50) and inspector_record.values.cost == 50)
 	assert(not inspector_record._set("unknown", 1))
-	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash", "skill.guard"], "dependencies": []}], "skills": [{"id": "skill.slash", "unit_kind": "swordsman", "mode": "automatic", "effect": "strike", "cooldown": 5.0, "cost": 0, "value": 10, "radius": 0, "label": "Strike", "references": [], "dependencies": []}, {"id": "skill.guard", "unit_kind": "swordsman", "mode": "manual", "effect": "shield", "cooldown": 5.0, "cost": 1, "value": 10, "radius": 1, "label": "Guard", "references": [], "dependencies": []}]}}
+	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "movement_type": "ground", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash", "skill.guard"], "dependencies": []}], "skills": [{"id": "skill.slash", "unit_kind": "swordsman", "mode": "automatic", "effect": "strike", "cooldown": 5.0, "cost": 0, "value": 10, "radius": 0, "label": "Strike", "references": [], "dependencies": []}, {"id": "skill.guard", "unit_kind": "swordsman", "mode": "manual", "effect": "shield", "cooldown": 5.0, "cost": 1, "value": 10, "radius": 1, "label": "Guard", "references": [], "dependencies": []}]}}
 	assert(ContentValidator.validate(valid).is_empty())
 	var progress_test_path := "user://progress_store_test.json"
 	for suffix in ["", ".tmp", ".bak"]:
@@ -156,6 +156,12 @@ func _initialize() -> void:
 	var invalid_obstacle_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_obstacle_catalog.categories.obstacles[0].cost = "20"
 	assert(ContentValidator.validate(invalid_obstacle_catalog).any(func(error): return error == "obstacle.barricade.cost: invalid obstacle data"))
+	var invalid_movement_type_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_movement_type_catalog.categories.units[0].movement_type = "air"
+	assert(ContentValidator.validate(invalid_movement_type_catalog).any(func(error): return error == "unit.swordsman.movement_type: unsupported movement type"))
+	var invalid_obstacle_movement_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_obstacle_movement_catalog.categories.obstacles[0].blocked_movement_types = ["air"]
+	assert(ContentValidator.validate(invalid_obstacle_movement_catalog).any(func(error): return error == "obstacle.barricade.blocked_movement_types: invalid obstacle movement types"))
 	var invalid_obstacle_limits: Dictionary = seeded_catalog.duplicate(true)
 	invalid_obstacle_limits.categories.stages.filter(func(stage): return stage.id == "stage.m2.crossroads")[0].obstacle_max_owned = "3"
 	assert(ContentValidator.validate(invalid_obstacle_limits).any(func(error): return error.begins_with("stage.m2.crossroads.obstacle_max_owned|obstacle_max_placed|references:")))

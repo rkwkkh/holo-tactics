@@ -245,3 +245,9 @@
 - `tests/results_view.gd`: M2 battle view에 장애물 도구가 생성되고 설치→회수→저장 개체 선택→재설치가 동작하는 상태 검사.
 - 통과: 전체 headless 모델·미리보기·화면 테스트, 콘텐츠 검증, main/battle/village/village_research/editor_preview 씬 smoke, diff 검사.
 - Android Debug APK 갱신 통과: `build/holo-debug.apk`, 86,364,950 bytes (2026-11-12 15:03 KST), apksigner v2/v3 검증. Debug 서명이라 Play 업로드용은 아니다. AVD offline 및 실기기/FPS 미검증 상태 유지.
+
+## 2026-11-12 이동 유형 데이터 계약
+
+- UnitData 11종에 `movement_type: ground`, obstacle 정의에 `blocked_movement_types: [ground]`를 명시했다. Validator가 누락/미지원 이동 유형을 거부하고, 경로 검사와 A*에서 장애물 유형을 반영한다. 세이브 복원 시 기존 스냅샷은 기본 ground로 이어지고, 저장된 유형이 카탈로그와 다르면 거부한다.
+- 통과: editor import, validator parse, 전체 모델·에디터 미리보기·전투 UI 테스트, 콘텐츠 검사, 5개 씬 smoke, `git diff --check`.
+- APK 갱신: 86,369,046 bytes (2026-11-12 15:14 KST), apksigner v2/v3 서명 검증 통과. Debug 서명, 실기기/FPS 및 Play 업로드 미검증.

@@ -127,7 +127,7 @@ func deploy(kind: String, cell: Vector2i) -> bool:
 		return false
 	combat_gold -= cost
 	var stats: Dictionary = balance_seed[kind]
-	units.append({"id": next_id, "kind": kind, "cell": cell, "hp": stats.hp, "damage": stats.damage, "range": stats.range, "heal": stats.get("heal", 0), "heal_range": stats.get("heal_range", 0), "splash_radius": stats.get("splash_radius", 0), "attack_count": 0, "upgrades": {}, "skill_cooldowns": {}, "statuses": {}, "cooldown": 0.0, "alive": true})
+	units.append({"id": next_id, "kind": kind, "movement_type": stats.movement_type, "cell": cell, "hp": stats.hp, "damage": stats.damage, "range": stats.range, "heal": stats.get("heal", 0), "heal_range": stats.get("heal_range", 0), "splash_radius": stats.get("splash_radius", 0), "attack_count": 0, "upgrades": {}, "skill_cooldowns": {}, "statuses": {}, "cooldown": 0.0, "alive": true})
 	next_id += 1
 	return true
 
@@ -261,7 +261,7 @@ func install_obstacle(obstacle_id: String, cell: Vector2i) -> bool:
 	if phase not in ["preparation", "combat"] or not obstacle_definitions.has(obstacle_id) or obstacles.size() >= int(stage.get("obstacle_max_owned", 0)) or _placed_obstacle_count() >= int(stage.get("obstacle_max_placed", 0)):
 		return false
 	var definition: Dictionary = obstacle_definitions[obstacle_id]
-	if combat_gold < int(definition.cost) or not _valid_obstacle_cell(cell, -1):
+	if combat_gold < int(definition.cost) or not _valid_obstacle_cell(cell, -1, obstacle_id):
 		return false
 	combat_gold -= int(definition.cost)
 	obstacles.append({"id": next_id, "obstacle_id": obstacle_id, "cell": cell, "placed": true})
@@ -520,6 +520,9 @@ func restore(snapshot: Dictionary) -> bool:
 		var id := int(saved_unit.id)
 		var cell := Vector2i(int(saved_unit.cell[0]), int(saved_unit.cell[1]))
 		var stats: Dictionary = balance_seed[saved_unit.kind]
+		if saved_unit.has("movement_type") and saved_unit.movement_type != stats.movement_type:
+			return false
+		unit.movement_type = stats.movement_type
 		if not _valid_saved_upgrades(saved_unit.get("upgrades", {}), saved_unit.kind) or not _valid_saved_skill_cooldowns(saved_unit.get("skill_cooldowns", {}), saved_unit.kind):
 			return false
 		if not _is_integer_value(saved_unit.get("attack_count", 0)) or int(saved_unit.get("attack_count", 0)) < 0:
@@ -889,7 +892,7 @@ func _spawn_enemy(content_id: String, cell: Vector2i, wave_definition: Dictionar
 	for action in wave_definition.get("ai_weight_overrides", {}):
 		ai_weights[action] = wave_definition.ai_weight_overrides[action]
 	var destination := enemies if active else preview_enemies
-	destination.append({"id": -1000 - destination.size(), "kind": enemy_definition.kind, "team": "enemy", "cell": spawn, "hp": enemy_definition.hp, "damage": enemy_definition.damage, "range": enemy_definition.range, "heal": enemy_definition.get("heal", 0), "heal_range": enemy_definition.get("heal_range", 0), "splash_radius": enemy_definition.get("splash_radius", 0), "ai_profile_id": enemy_definition.ai_profile_id, "ai_weights": ai_weights, "cooldown": 0.0, "alive": true, "active": active})
+	destination.append({"id": -1000 - destination.size(), "kind": enemy_definition.kind, "team": "enemy", "movement_type": enemy_definition.movement_type, "cell": spawn, "hp": enemy_definition.hp, "damage": enemy_definition.damage, "range": enemy_definition.range, "heal": enemy_definition.get("heal", 0), "heal_range": enemy_definition.get("heal_range", 0), "splash_radius": enemy_definition.get("splash_radius", 0), "ai_profile_id": enemy_definition.ai_profile_id, "ai_weights": ai_weights, "cooldown": 0.0, "alive": true, "active": active})
 	return true
 
 func _prepare_wave_preview() -> bool:
@@ -947,10 +950,17 @@ func _obstacle_at(cell: Vector2i, ignored_id: int = -1) -> int:
 			return index
 	return -1
 
+func _obstacle_blocks_movement(cell: Vector2i, movement_type: String) -> bool:
+	var index := _obstacle_at(cell)
+	if index < 0:
+		return false
+	var definition: Dictionary = obstacle_definitions.get(obstacles[index].obstacle_id, {})
+	return definition.get("blocked_movement_types", []).has(movement_type)
+
 func _placed_obstacle_count() -> int:
 	return obstacles.filter(func(obstacle: Dictionary): return obstacle.placed).size()
 
-func _valid_obstacle_cell(cell: Vector2i, ignored_id: int) -> bool:
+func _valid_obstacle_cell(cell: Vector2i, ignored_id: int, new_obstacle_id: String = "") -> bool:
 	if not _is_inside(cell) or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied_without_obstacles(cell) or _obstacle_at(cell, ignored_id) >= 0:
 		return false
 	var proposed: Array[Dictionary] = []
@@ -965,7 +975,7 @@ func _valid_obstacle_cell(cell: Vector2i, ignored_id: int) -> bool:
 		proposed[index].placed = true
 		proposed[index].cell = cell
 	else:
-		proposed.append({"id": -1, "obstacle_id": "", "cell": cell, "placed": true})
+		proposed.append({"id": -1, "obstacle_id": new_obstacle_id, "cell": cell, "placed": true})
 	return _obstacle_layout_preserves_paths(proposed)
 
 func _occupied_without_obstacles(cell: Vector2i) -> bool:
@@ -975,20 +985,32 @@ func _occupied_without_obstacles(cell: Vector2i) -> bool:
 	return false
 
 func _obstacle_layout_preserves_paths(layout: Array[Dictionary]) -> bool:
-	var blocked := blocked_cells.duplicate()
-	for obstacle in layout:
-		if obstacle.placed:
-			blocked[obstacle.cell] = true
 	for wave_definition in waves:
+		var movement_type := _movement_type_for_unit(wave_definition.enemy_id)
+		var blocked := _blocked_for_obstacle_layout(layout, movement_type)
 		for index in int(wave_definition.get("count", 0)):
 			if not _route_exists_from_nearest(Vector2i(2 + index * 2, int(stage.get("enemy_spawn_row", 0))), blocked):
 				return false
 		for reinforcement in wave_definition.get("reinforcements", []):
 			if reinforcement is Dictionary and reinforcement.get("spawn") is Array and reinforcement.spawn.size() == 2:
 				var spawn := Vector2i(int(reinforcement.spawn[0]), int(reinforcement.spawn[1]))
-				if not _route_exists_from_nearest(spawn, blocked):
+				var reinforcement_type := _movement_type_for_unit(reinforcement.get("enemy_id", ""))
+				if not _route_exists_from_nearest(spawn, _blocked_for_obstacle_layout(layout, reinforcement_type)):
 					return false
 	return true
+
+func _blocked_for_obstacle_layout(layout: Array[Dictionary], movement_type: String) -> Dictionary:
+	var blocked := blocked_cells.duplicate()
+	for obstacle in layout:
+		if not obstacle.placed:
+			continue
+		var definition: Dictionary = obstacle_definitions.get(obstacle.obstacle_id, {})
+		if definition.get("blocked_movement_types", []).has(movement_type):
+			blocked[obstacle.cell] = true
+	return blocked
+
+func _movement_type_for_unit(unit_id: String) -> String:
+	return str(_unit_by_content_id(unit_id).get("movement_type", "ground"))
 
 func _route_exists_from_nearest(requested: Vector2i, blocked: Dictionary) -> bool:
 	var start := Vector2i(-1, -1)
@@ -1091,10 +1113,12 @@ func _choose_enemy_action(enemy: Dictionary) -> Dictionary:
 
 func _find_path(mover: Dictionary, goal: Vector2i) -> Array[Vector2i]:
 	var blocked := blocked_cells.duplicate()
+	var movement_type: String = mover.get("movement_type", "ground")
 	for wall in walls:
 		blocked[wall.cell] = true
 	for obstacle in obstacles:
-		if obstacle.placed:
+		var definition: Dictionary = obstacle_definitions.get(obstacle.obstacle_id, {})
+		if obstacle.placed and definition.get("blocked_movement_types", []).has(movement_type):
 			blocked[obstacle.cell] = true
 	for facility in facilities:
 		if facility.alive and facility.blocks_path:
@@ -1109,7 +1133,7 @@ func _path_to_wall(mover: Dictionary, wall_cell: Vector2i) -> Variant:
 	var target := Vector2i(-1, -1)
 	for direction in [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]:
 		var adjacent: Vector2i = wall_cell + direction
-		if not _is_inside(adjacent) or blocked_cells.has(adjacent) or _wall_at(adjacent) >= 0 or _obstacle_at(adjacent) >= 0:
+		if not _is_inside(adjacent) or blocked_cells.has(adjacent) or _wall_at(adjacent) >= 0 or _obstacle_blocks_movement(adjacent, mover.get("movement_type", "ground")):
 			continue
 		if adjacent == mover.cell:
 			return {"path": [], "target": adjacent}
@@ -1123,6 +1147,7 @@ func _path_to_wall(mover: Dictionary, wall_cell: Vector2i) -> Variant:
 
 func _path_to_core_after_wall(mover: Dictionary, start: Vector2i, removed_wall: int) -> Array[Vector2i]:
 	var blocked := blocked_cells.duplicate()
+	var movement_type: String = mover.get("movement_type", "ground")
 	for index in walls.size():
 		if index != removed_wall:
 			blocked[walls[index].cell] = true
@@ -1130,7 +1155,8 @@ func _path_to_core_after_wall(mover: Dictionary, start: Vector2i, removed_wall: 
 		if facility.alive and facility.blocks_path:
 			blocked[facility.cell] = true
 	for obstacle in obstacles:
-		if obstacle.placed:
+		var definition: Dictionary = obstacle_definitions.get(obstacle.obstacle_id, {})
+		if obstacle.placed and definition.get("blocked_movement_types", []).has(movement_type):
 			blocked[obstacle.cell] = true
 	for item in units + enemies:
 		if item.alive and item.id != mover.id and item.cell != start:
@@ -1139,13 +1165,15 @@ func _path_to_core_after_wall(mover: Dictionary, start: Vector2i, removed_wall: 
 
 func _path_to_core_after_facility(mover: Dictionary, start: Vector2i, removed_facility: int) -> Array[Vector2i]:
 	var blocked := blocked_cells.duplicate()
+	var movement_type: String = mover.get("movement_type", "ground")
 	for wall in walls:
 		blocked[wall.cell] = true
 	for index in facilities.size():
 		if index != removed_facility and facilities[index].alive and facilities[index].blocks_path:
 			blocked[facilities[index].cell] = true
 	for obstacle in obstacles:
-		if obstacle.placed:
+		var definition: Dictionary = obstacle_definitions.get(obstacle.obstacle_id, {})
+		if obstacle.placed and definition.get("blocked_movement_types", []).has(movement_type):
 			blocked[obstacle.cell] = true
 	for item in units + enemies:
 		if item.alive and item.id != mover.id and item.cell != start:

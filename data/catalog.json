@@ -3,17 +3,17 @@
   "schema_version": 1,
   "categories": {
     "units": [
-      {"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "hp": 120, "damage": 20, "range": 1, "attack_time": 1.0, "cost": 50, "references": []},
-      {"id": "unit.archer", "kind": "archer", "team": "ally", "hp": 80, "damage": 15, "range": 4, "attack_time": 1.2, "cost": 60, "references": []},
-      {"id": "unit.spearman", "kind": "spearman", "team": "ally", "hp": 180, "damage": 15, "range": 2, "attack_time": 1.4, "cost": 70, "references": []},
-      {"id": "unit.support", "kind": "support", "team": "ally", "hp": 90, "damage": 5, "range": 1, "attack_time": 1.5, "heal": 8, "heal_range": 3, "cost": 70, "references": []},
-      {"id": "unit.mage", "kind": "mage", "team": "ally", "hp": 75, "damage": 25, "range": 3, "attack_time": 1.8, "splash_radius": 1, "cost": 90, "references": []},
-      {"id": "enemy.goblin", "kind": "goblin", "team": "enemy", "hp": 65, "damage": 10, "range": 1, "attack_time": 1.4, "cost": 0, "ai_profile_id": "ai.goblin.warrior", "references": ["ai.goblin.warrior"]},
-      {"id": "enemy.goblin_archer", "kind": "goblin_archer", "team": "enemy", "hp": 45, "damage": 8, "range": 3, "attack_time": 1.6, "cost": 0, "ai_profile_id": "ai.goblin.archer", "references": ["ai.goblin.archer"]},
-      {"id": "enemy.orc_warrior", "kind": "orc_warrior", "team": "enemy", "hp": 150, "damage": 18, "range": 1, "attack_time": 1.8, "cost": 0, "ai_profile_id": "ai.orc.warrior", "references": ["ai.orc.warrior"]},
-      {"id": "enemy.orc_charger", "kind": "orc_charger", "team": "enemy", "hp": 110, "damage": 20, "range": 1, "attack_time": 1.3, "cost": 0, "ai_profile_id": "ai.orc.charger", "references": ["ai.orc.charger"]},
-      {"id": "enemy.mage", "kind": "enemy_mage", "team": "enemy", "hp": 70, "damage": 22, "range": 3, "attack_time": 2.0, "cost": 0, "splash_radius": 1, "ai_profile_id": "ai.enemy.mage", "references": ["ai.enemy.mage"]},
-      {"id": "enemy.support", "kind": "enemy_support", "team": "enemy", "hp": 90, "damage": 5, "range": 1, "attack_time": 1.5, "cost": 0, "heal": 10, "heal_range": 3, "ai_profile_id": "ai.enemy.support", "references": ["ai.enemy.support"]}
+      {"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "movement_type": "ground", "hp": 120, "damage": 20, "range": 1, "attack_time": 1.0, "cost": 50, "references": []},
+      {"id": "unit.archer", "kind": "archer", "team": "ally", "movement_type": "ground", "hp": 80, "damage": 15, "range": 4, "attack_time": 1.2, "cost": 60, "references": []},
+      {"id": "unit.spearman", "kind": "spearman", "team": "ally", "movement_type": "ground", "hp": 180, "damage": 15, "range": 2, "attack_time": 1.4, "cost": 70, "references": []},
+      {"id": "unit.support", "kind": "support", "team": "ally", "movement_type": "ground", "hp": 90, "damage": 5, "range": 1, "attack_time": 1.5, "heal": 8, "heal_range": 3, "cost": 70, "references": []},
+      {"id": "unit.mage", "kind": "mage", "team": "ally", "movement_type": "ground", "hp": 75, "damage": 25, "range": 3, "attack_time": 1.8, "splash_radius": 1, "cost": 90, "references": []},
+      {"id": "enemy.goblin", "kind": "goblin", "team": "enemy", "movement_type": "ground", "hp": 65, "damage": 10, "range": 1, "attack_time": 1.4, "cost": 0, "ai_profile_id": "ai.goblin.warrior", "references": ["ai.goblin.warrior"]},
+      {"id": "enemy.goblin_archer", "kind": "goblin_archer", "team": "enemy", "movement_type": "ground", "hp": 45, "damage": 8, "range": 3, "attack_time": 1.6, "cost": 0, "ai_profile_id": "ai.goblin.archer", "references": ["ai.goblin.archer"]},
+      {"id": "enemy.orc_warrior", "kind": "orc_warrior", "team": "enemy", "movement_type": "ground", "hp": 150, "damage": 18, "range": 1, "attack_time": 1.8, "cost": 0, "ai_profile_id": "ai.orc.warrior", "references": ["ai.orc.warrior"]},
+      {"id": "enemy.orc_charger", "kind": "orc_charger", "team": "enemy", "movement_type": "ground", "hp": 110, "damage": 20, "range": 1, "attack_time": 1.3, "cost": 0, "ai_profile_id": "ai.orc.charger", "references": ["ai.orc.charger"]},
+      {"id": "enemy.mage", "kind": "enemy_mage", "team": "enemy", "movement_type": "ground", "hp": 70, "damage": 22, "range": 3, "attack_time": 2.0, "cost": 0, "splash_radius": 1, "ai_profile_id": "ai.enemy.mage", "references": ["ai.enemy.mage"]},
+      {"id": "enemy.support", "kind": "enemy_support", "team": "enemy", "movement_type": "ground", "hp": 90, "damage": 5, "range": 1, "attack_time": 1.5, "cost": 0, "heal": 10, "heal_range": 3, "ai_profile_id": "ai.enemy.support", "references": ["ai.enemy.support"]}
     ],
     "skills": [
       {"id":"skill.swordsman.rend","unit_kind":"swordsman","mode":"automatic","effect":"strike","cooldown":8.0,"cost":0,"value":12,"radius":0,"label":"강타"},
@@ -59,7 +59,7 @@
       {"id": "facility.enemy_mage_tower", "kind": "mage_tower", "team": "enemy", "hp": 80, "damage": 18, "heal": 0, "splash_radius": 0, "range": 4, "attack_time": 2.0, "cost": 0, "blocks_path": false, "references": [], "dependencies": []}
     ],
     "obstacles": [
-      {"id": "obstacle.barricade", "kind": "barricade", "cost": 20, "references": [], "dependencies": []}
+      {"id": "obstacle.barricade", "kind": "barricade", "blocked_movement_types": ["ground"], "cost": 20, "references": [], "dependencies": []}
     ],
     "waves": [
       {"id": "wave.m1.1", "enemy_id": "enemy.goblin", "count": 2, "references": ["enemy.goblin"], "dependencies": []},
