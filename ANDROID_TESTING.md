@@ -2,7 +2,8 @@
 
 ## Current artifact
 
-- Debug APK: `build/holo-debug.apk` (generated locally; ignored by Git).
+- Debug APK: `build/holo-debug.apk` (generated locally; ignored by Git; latest local build includes read-only pause).
+- Test AAB: `build/holo-test.aab` (unsigned packaging artifact only; latest local build includes read-only pause and is not uploadable to Play).
 - Package ID: `com.example.holotactics` (placeholder; replace with the publisher's permanent ID before release).
 - Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
 - The APK is debug-signed. It is for device smoke tests, not Google Play upload.
@@ -30,6 +31,8 @@ Check each flow and record pass/fail plus a short note:
 1. Portrait startup, safe-area placement, campaign stage locks, and opening the village.
 2. Training-hall build, free move/store/redeploy, M1 research purchase, and currency persistence after relaunch.
 3. M1 unit placement, movement, attacks, both waves, intermission, victory settlement, and return to village.
+   - Before the stage's first clear, verify 2× is unavailable; clear it, re-enter, and verify 2× changes battle and intermission cadence together.
+   - Pause during preparation and combat: verify units, enemies, cooldowns, and countdown stop; tile taps show information without selecting, moving, building, spending, or queuing commands. Resume and confirm the remaining timer continues.
 4. Explicit abandon and defeat partial rewards; relaunch the same run to confirm rewards are not duplicated.
 5. Close/relaunch during preparation and combat; confirm checkpoint restoration is not treated as an abandon.
 6. M2 siege: issue an order into the enemy half, fight through all waves, and destroy the enemy core.
@@ -61,4 +64,4 @@ Record scenario, device, room temperature/power mode, run duration, average and 
 
 ## Current verification state
 
-Local Gradle Android debug APK export, API 29 manifest, and v2 signature verification pass. A test AAB was packaged and its bundle structure inspected, but it is unsigned. Physical Android 10+ startup, touch/UI behavior, frame-rate targets, publisher-key release AAB, and Play Console private-test distribution remain pending device/account access.
+Local Gradle Android debug APK export, API 29 manifest, and v2 signature verification pass. The latest test AAB was validated with bundletool 1.18.3, its API 29/36 manifest and required bundle entries were checked, but it is unsigned. Physical Android 10+ startup, touch/UI behavior, frame-rate targets, publisher-key release AAB, and Play Console private-test distribution remain pending device/account access.
