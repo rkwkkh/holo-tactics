@@ -81,3 +81,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12 재검증: 현재 커밋에서 headless editor import, 전체 모델 테스트, editor preview, results view, 8-stage 캠페인 플레이어빌리티, 콘텐츠 검증이 모두 통과했다. Android export 설정 검증 결과는 `TEST_REPORT.md` 참조.
 
 - 2026-11-12 M6 저장 복원 안전성 수정: 거부할 체크포인트가 영구 연구/밸런스를 미리 변경하지 않도록 검증 상태를 분리했다. 잘못된 schema와 유닛 스탯 회귀 테스트 통과.
+
+- 2026-11-12: 저장 복원 수정 소스를 포함한 Android Debug APK 재생성 완료. API 29/36 manifest와 v2 서명 확인 통과; v3 서명은 없다. 실기기/FPS와 release AAB는 여전히 검증 대기.

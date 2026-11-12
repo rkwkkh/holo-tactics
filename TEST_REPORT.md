@@ -284,3 +284,5 @@
 - `BattleModel.restore()` previously applied permanent research before validating checkpoint versions and contents. A rejected snapshot could therefore mutate research and unit balance on the live model.
 - Changed restore to build a temporary research/balance state, validate unit upgrades against that state, and commit research plus combat state only after all checks pass. Added regression coverage for both unsupported schema and malformed unit stats.
 - First test run exposed `_apply_unit_upgrades()` reading the live model balance; it now accepts the candidate balance for restore validation. Re-run passed: editor import, `tests/run.gd`, campaign playability, and content validator. `git diff --check` passed.
+
+- After the checkpoint restore fix, Android Debug APK was re-exported successfully from the updated source: `build/holo-debug.apk`, 249,871,658 bytes (2026-11-12 16:15 local). `aapt` confirmed min API 29/target API 36; `apksigner` confirmed v2=true and v3=false. This is a debug APK, not Play release evidence.
