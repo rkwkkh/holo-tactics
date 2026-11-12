@@ -62,6 +62,9 @@ func _initialize() -> void:
 	var researched_restore := BattleModel.new()
 	assert(researched_restore.restore(researched_battle.to_dict()))
 	assert(researched_restore.permanent_research == ["research.swordsman.damage"])
+	var direct_wave_preview := BattleModel.new("stage.m1.frontier")
+	assert(direct_wave_preview.select_preview_wave(direct_wave_preview.waves[1].id))
+	assert(direct_wave_preview.wave == 2 and direct_wave_preview.phase == "preparation" and direct_wave_preview.combat_gold == direct_wave_preview.stage.start_resource)
 	var legacy_path := "user://legacy_progress_test.json"
 	var legacy := village_unlock_test.progress.data.duplicate(true)
 	legacy.erase("buildings")

@@ -96,6 +96,24 @@ func set_permanent_research(research_ids: Array) -> bool:
 			balance_seed[unit_kind].damage += float(research.amount)
 	return true
 
+func select_preview_wave(wave_id: String) -> bool:
+	for index in waves.size():
+		if waves[index].id == wave_id:
+			wave = index + 1
+			phase = "preparation"
+			battle_result = ""
+			core_hp = stage.core_hp
+			combat_gold = stage.start_resource
+			next_id = 1
+			units.clear()
+			facilities.clear()
+			rewarded_waves.clear()
+			walls.clear()
+			for definition in stage.get("walls", []):
+				walls.append({"cell": Vector2i(definition.cell[0], definition.cell[1]), "hp": float(definition.hp), "max_hp": float(definition.hp)})
+			return _prepare_wave_preview()
+	return false
+
 func deploy(kind: String, cell: Vector2i) -> bool:
 	if not balance_seed.has(kind) or balance_seed[kind].team != "ally" or not stage.get("available_units", []).has(kind) or not _is_inside(cell) or cell.y < 6 or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied(cell):
 		return false

@@ -20,6 +20,14 @@
 
 - 전투 결과 상태에서 “마을로 돌아가기” 버튼의 목적지를 캠페인 메뉴에서 마을 화면으로 수정했다. headless 전투 씬 기동 및 전체 테스트/콘텐츠 검증 통과. 터치 기반 전환은 실기기 미검증.
 
+## M5 편집기 패널 기반 (2026-11-12)
+
+- Godot 4.7.2 `--headless --editor --quit`에서 활성화된 EditorPlugin 초기화 통과. 프로젝트 기본 import에 편집기 도구 스크립트 로드가 포함된다.
+- 세 탭의 선택 레코드 JSON 수정 및 공통 `ContentValidator` Error 차단, 안정 ID 변경 차단, 임시 파일·백업 기반 원자 저장 코드를 추가했다.
+- `tests/editor_preview.gd`: 격리 런처가 요청을 소비하고 지정된 2번째 웨이브를 전투 씬에 로드하며 전투 종료 처리에도 영구 진행 저장 파일을 변경하지 않는 것 통과. 미리보기 전용 체크포인트도 고유 ID 경로를 사용한다.
+- 편집기 GUI에서 패널 렌더링/저장 버튼 상호작용과 실시간 게임 실행은 직접 클릭하지 않아 미검증이다. Error 필드 클릭 탐색과 Inspector 통합은 미구현.
+- M5 preview 포함 Android Debug APK 재생성: `build/holo-debug.apk`, 86,348,202 bytes (2026-11-12 13:18 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 실기기 실행과 성능은 미검증.
+
 ## M0
 
 - 실행 환경: Windows, Godot 4.7.2 stable, Java 17; Android SDK 경로는 `%LOCALAPPDATA%/Android/Sdk`.

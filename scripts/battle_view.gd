@@ -27,12 +27,21 @@ var skill_controls_unit := -1
 var status_override := ""
 var result_reward := -1
 var progress_available := false
+var editor_preview := false
 
 func _ready() -> void:
 	var selected_stage_id: String = get_tree().get_meta("selected_stage_id", BattleModel.STAGE_ID)
+	editor_preview = bool(get_tree().get_meta("editor_preview", false))
 	battle = BattleModel.new(selected_stage_id)
-	var checkpoint_path := "user://battle_checkpoint.json" if selected_stage_id == BattleModel.STAGE_ID else "user://battle_checkpoint_%s.json" % selected_stage_id.replace(".", "_")
+	var preview_wave_id: String = get_tree().get_meta("preview_wave_id", "") if editor_preview else ""
+	if not preview_wave_id.is_empty() and not battle.select_preview_wave(preview_wave_id):
+		get_tree().change_scene_to_file("res://scenes/main.tscn")
+		return
+	var preview_id: String = get_tree().get_meta("editor_preview_id", "") if editor_preview else ""
+	var checkpoint_path := "user://editor_preview_checkpoint_%s.json" % preview_id if editor_preview else "user://battle_checkpoint.json" if selected_stage_id == BattleModel.STAGE_ID else "user://battle_checkpoint_%s.json" % selected_stage_id.replace(".", "_")
 	store = CheckpointStore.new(checkpoint_path)
+	if editor_preview:
+		store.clear_checkpoint()
 	progress = ProgressStore.new()
 	progress_available = progress.load_progress()
 	if not progress_available:
@@ -40,8 +49,8 @@ func _ready() -> void:
 	else:
 		battle.set_permanent_research(progress.data.unlocked_research)
 	stage_title = "수성" if battle.stage.get("mode") == "defense" else "공성"
-	var saved := store.load_checkpoint()
-	var resume := FileAccess.file_exists(store.path)
+	var saved := store.load_checkpoint() if not editor_preview else {}
+	var resume := FileAccess.file_exists(store.path) and not editor_preview
 	if resume and (saved.is_empty() or not battle.restore(saved)):
 		store.clear_checkpoint()
 		get_tree().change_scene_to_file("res://scenes/main.tscn")
@@ -125,7 +134,7 @@ func _ready() -> void:
 	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	layout.add_child(back_button)
 	var abandon_dialog := ConfirmationDialog.new()
-	abandon_dialog.dialog_text = "전투를 포기하고 돌아가시겠습니까? 완료한 웨이브 수만큼 부분 보상을 받습니다."
+	abandon_dialog.dialog_text = "테스트를 끝내고 돌아가시겠습니까? 전투 진행과 보상은 저장되지 않습니다." if editor_preview else "전투를 포기하고 돌아가시겠습니까? 완료한 웨이브 수만큼 부분 보상을 받습니다."
 	abandon_dialog.confirmed.connect(_abandon_battle)
 	add_child(abandon_dialog)
 	set_meta("abandon_dialog", abandon_dialog)
@@ -205,6 +214,10 @@ func _cast_skill(unit_id: int, skill_id: String) -> void:
 	_refresh()
 
 func _on_back_pressed() -> void:
+	if editor_preview:
+		store.clear_checkpoint()
+		get_tree().change_scene_to_file("res://scenes/main.tscn")
+		return
 	if battle.phase == "finished":
 		get_tree().change_scene_to_file("res://scenes/village.tscn")
 	else:
@@ -218,6 +231,11 @@ func _abandon_battle() -> void:
 		_refresh()
 
 func _process_result() -> void:
+	if editor_preview:
+		result_reward = 0
+		store.clear_checkpoint()
+		status_override = "편집기 테스트 종료 · 영구 진행과 보상은 변경되지 않았습니다."
+		return
 	if battle.battle_result == "safe_abort" or result_reward >= 0:
 		return
 	if not progress_available:
@@ -268,7 +286,7 @@ func _refresh() -> void:
 	hud.text = "%s · 웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [stage_title, battle.wave, battle.core_hp, battle.combat_gold]
 	wave_button.text = "웨이브 시작 (%d)" % rest_seconds if rest_seconds > 0 else "웨이브 시작"
 	wave_button.disabled = battle.phase != "preparation"
-	back_button.text = "마을로 돌아가기" if battle.phase == "finished" else "전투 포기"
+	back_button.text = "테스트 종료" if editor_preview else "마을로 돌아가기" if battle.phase == "finished" else "전투 포기"
 	for button in deploy_buttons:
 		button.disabled = battle.phase != "preparation"
 	_refresh_upgrade_controls()

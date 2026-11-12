@@ -20,6 +20,11 @@ jobs:
           output="$(godot --headless --path . --script res://tests/run.gd 2>&1)"
           echo "$output"
           grep -q "All headless project tests passed" <<< "$output"
+      - name: Verify editor preview isolation
+        run: |
+          output="$(godot --headless --path . --script res://tests/editor_preview.gd 2>&1)"
+          echo "$output"
+          grep -q "Editor preview isolation passed" <<< "$output"
       - name: Validate content (errors block CI)
         run: godot --headless --path . --script res://scripts/validate_content.gd
       - name: Smoke test game scenes
@@ -28,3 +33,4 @@ jobs:
           godot --headless --path . res://scenes/battle.tscn --quit-after 2
           godot --headless --path . res://scenes/village.tscn --quit-after 2
           godot --headless --path . res://scenes/village_research.tscn --quit-after 2
+          godot --headless --path . res://scenes/editor_preview.tscn --quit-after 2
