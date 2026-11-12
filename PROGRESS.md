@@ -109,3 +109,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12 정책 회귀: 최신 사용자 결정인 기본 5종 단계별 스토리 해금을 `tests/campaign_playability.gd`에서 직접 assert한다. M1 시작 검사/궁수, M2 이후 창병, M4 숲 지원병, M5 성채 마법사 시점을 확인하고 8-stage 승리 시뮬레이션도 통과했다. 원본 기획 문서는 수정하지 않았다.
 
 - R-UI-002 상태 안내 수정: 시설 컨텍스트 패널은 재정비 중 이동 안내, 전투 중 이동 불가 안내를 구분한다. headless UI 회귀 및 editor import 통과.
+
+- 2026-11-12: 상태별 시설 안내 포함 최신 커밋의 Android APK/AAB 재생성. Debug APK `build/holo-debug.apk` 249,877,946 bytes; manifest API 29/36, apksigner v2 pass. Test AAB `build/holo-test.aab` 86,286,970 bytes; bundletool 1.18.3 validate, 필수 bundle entries 및 API 29/36 manifest pass. AAB unsigned.
