@@ -11,6 +11,21 @@ func _run() -> void:
 	root.add_child(view)
 	await process_frame
 	assert(view.speed_button.disabled and view.timer.wait_time == 0.2)
+	var initial_phase: String = view.battle.phase
+	var initial_gold: int = view.battle.combat_gold
+	view._toggle_pause()
+	assert(view.paused and view.timer.time_left == 0.0 and view.wave_button.disabled and view.back_button.disabled)
+	view._start_wave()
+	view._on_tile_pressed(view.battle.core_cell)
+	assert(view.status.text.contains("핵심 · HP") and view.battle.phase == initial_phase and view.battle.combat_gold == initial_gold)
+	view._toggle_pause()
+	assert(not view.paused and view.timer.time_left > 0.0 and not view.wave_button.disabled and not view.back_button.disabled)
+	view.rest_seconds = 2
+	view.rest_timer.start(0.5)
+	view._toggle_pause()
+	assert(view.paused and view.rest_timer.time_left == 0.0)
+	view._toggle_pause()
+	assert(view.rest_timer.time_left > 0.0)
 	view.editor_preview = false
 	view._refresh()
 	assert(view.speed_button.disabled)

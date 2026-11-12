@@ -22,6 +22,11 @@ var rest_seconds := 0
 var wave_button: Button
 var speed_button: Button
 var simulation_speed := 1
+var pause_button: Button
+var paused := false
+var pause_timer_remaining := 0.0
+var pause_rest_timer_remaining := 0.0
+var pause_rest_timer_was_running := false
 var back_button: Button
 var deploy_buttons: Array[Button] = []
 var obstacle_controls: GridContainer
@@ -109,6 +114,7 @@ func _ready() -> void:
 		deploy_button.text = "%s %d" % [_unit_name(kind), battle.balance_seed[kind].cost]
 		deploy_button.custom_minimum_size = Vector2(88, 40)
 		deploy_button.pressed.connect(_select_unit_kind.bind(kind))
+		deploy_button.add_to_group("battle_commands")
 		unit_controls.add_child(deploy_button)
 		deploy_buttons.append(deploy_button)
 	upgrade_controls = GridContainer.new()
@@ -128,6 +134,7 @@ func _ready() -> void:
 		var facility_button := Button.new()
 		facility_button.text = "%s %d" % ["화살탑" if definition.kind == "arrow_tower" else "마법탑" if definition.kind == "magic_tower" else "지원" if definition.kind == "support_outpost" else "방벽", definition.cost]
 		facility_button.pressed.connect(_select_facility.bind(facility_id))
+		facility_button.add_to_group("battle_commands")
 		facility_controls.add_child(facility_button)
 	if int(battle.stage.get("obstacle_max_owned", 0)) > 0:
 		obstacle_controls = GridContainer.new()
@@ -139,26 +146,34 @@ func _ready() -> void:
 			var install_button := Button.new()
 			install_button.text = "장애물 설치 %d" % obstacle.cost
 			install_button.pressed.connect(_select_obstacle_definition.bind(obstacle_id))
+			install_button.add_to_group("battle_commands")
 			obstacle_controls.add_child(install_button)
 			obstacle_install_buttons.append(install_button)
 		obstacle_reuse_button = Button.new()
 		obstacle_reuse_button.text = "보관 장애물 재설치"
 		obstacle_reuse_button.pressed.connect(_select_stored_obstacle)
+		obstacle_reuse_button.add_to_group("battle_commands")
 		obstacle_controls.add_child(obstacle_reuse_button)
 		obstacle_store_button = Button.new()
 		obstacle_store_button.text = "선택 장애물 회수"
 		obstacle_store_button.pressed.connect(_store_selected_obstacle)
+		obstacle_store_button.add_to_group("battle_commands")
 		obstacle_controls.add_child(obstacle_store_button)
 	wave_button = Button.new()
 	wave_button.text = "웨이브 시작"
 	wave_button.pressed.connect(_start_wave)
+	wave_button.add_to_group("battle_commands")
 	var wave_controls := HBoxContainer.new()
 	wave_controls.alignment = BoxContainer.ALIGNMENT_CENTER
 	layout.add_child(wave_controls)
 	wave_controls.add_child(wave_button)
 	speed_button = Button.new()
 	speed_button.pressed.connect(_toggle_speed)
+	speed_button.add_to_group("battle_commands")
 	wave_controls.add_child(speed_button)
+	pause_button = Button.new()
+	pause_button.pressed.connect(_toggle_pause)
+	wave_controls.add_child(pause_button)
 	status = Label.new()
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -191,6 +206,10 @@ func _ready() -> void:
 	_refresh()
 
 func _on_tile_pressed(cell: Vector2i) -> void:
+	if paused:
+		status_override = _inspect_paused_cell(cell)
+		_refresh()
+		return
 	status_override = ""
 	var unit := _unit_at(cell)
 	if not unit.is_empty():
@@ -239,6 +258,7 @@ func _on_tile_pressed(cell: Vector2i) -> void:
 	_refresh()
 
 func _select_unit_kind(kind: String) -> void:
+	if paused: return
 	selected_kind = kind
 	selected_facility_id = ""
 	selected_facility_instance = -1
@@ -249,6 +269,7 @@ func _select_unit_kind(kind: String) -> void:
 	_refresh()
 
 func _select_facility(facility_id: String) -> void:
+	if paused: return
 	selected_facility_id = facility_id
 	selected_facility_instance = -1
 	selected_kind = ""
@@ -259,6 +280,7 @@ func _select_facility(facility_id: String) -> void:
 	_refresh()
 
 func _select_obstacle_definition(obstacle_id: String) -> void:
+	if paused: return
 	selected_obstacle_id = obstacle_id
 	selected_obstacle_instance = -1
 	selected_kind = ""
@@ -269,6 +291,7 @@ func _select_obstacle_definition(obstacle_id: String) -> void:
 	_refresh()
 
 func _select_stored_obstacle() -> void:
+	if paused: return
 	for obstacle in battle.obstacles:
 		if not obstacle.placed:
 			selected_obstacle_instance = int(obstacle.id)
@@ -282,6 +305,7 @@ func _select_stored_obstacle() -> void:
 			return
 
 func _store_selected_obstacle() -> void:
+	if paused: return
 	if selected_obstacle_instance < 0 or not battle.store_obstacle(selected_obstacle_instance):
 		status_override = "재정비 중 배치된 장애물을 선택하세요"
 	else:
@@ -290,6 +314,7 @@ func _store_selected_obstacle() -> void:
 	_refresh()
 
 func _start_wave() -> void:
+	if paused: return
 	rest_timer.stop()
 	rest_seconds = 0
 	if not battle.start_wave(store):
@@ -299,10 +324,12 @@ func _start_wave() -> void:
 	_refresh()
 
 func _purchase_upgrade(unit_id: int, upgrade_id: String) -> void:
+	if paused: return
 	status_override = "" if battle.purchase_upgrade(unit_id, upgrade_id) else "강화에 필요한 전투 자원이 부족하거나 구매할 수 없습니다"
 	_refresh()
 
 func _cast_skill(unit_id: int, skill_id: String) -> void:
+	if paused: return
 	status_override = "" if battle.cast_skill(unit_id, skill_id) else "스킬을 사용할 수 없습니다"
 	_refresh()
 
@@ -343,6 +370,7 @@ func _process_result() -> void:
 	status_override = "%s · 영구 재화 +%d · 보유 %d" % ["승리" if battle.battle_result == "victory" else "패배" if battle.battle_result == "defeat" else "포기", amount, progress.data.permanent_currency]
 
 func _tick() -> void:
+	if paused: return
 	var previous_phase := battle.phase
 	battle.tick(BATTLE_TICK_SECONDS)
 	if previous_phase == "combat" and battle.phase == "preparation":
@@ -354,6 +382,7 @@ func _tick() -> void:
 	_refresh()
 
 func _on_rest_tick() -> void:
+	if paused: return
 	rest_seconds -= 1
 	if rest_seconds <= 0:
 		_start_wave()
@@ -376,17 +405,26 @@ func _facility_at(cell: Vector2i) -> Dictionary:
 	return {}
 
 func _refresh() -> void:
+	if not paused:
+		for command in get_tree().get_nodes_in_group("battle_commands"):
+			command.disabled = false
 	_refresh_speed_control()
 	hud.text = "%s · 웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [stage_title, battle.wave, battle.core_hp, battle.combat_gold]
 	_refresh_result_panel()
 	wave_button.text = "웨이브 시작 (%d)" % rest_seconds if rest_seconds > 0 else "웨이브 시작"
 	wave_button.disabled = battle.phase != "preparation"
 	back_button.text = "테스트 종료" if editor_preview else "마을로 돌아가기" if battle.phase == "finished" else "전투 포기"
+	back_button.disabled = paused
 	for button in deploy_buttons:
 		button.disabled = battle.phase != "preparation"
 	_refresh_upgrade_controls()
 	_refresh_skill_controls()
 	_refresh_obstacle_controls()
+	if paused:
+		for command in get_tree().get_nodes_in_group("battle_commands"):
+			command.disabled = true
+	pause_button.text = "계속" if paused else "일시정지"
+	pause_button.disabled = battle.phase == "finished"
 	for y in BattleModel.ROWS:
 		for x in BattleModel.COLUMNS:
 			var cell := Vector2i(x, y)
@@ -411,7 +449,9 @@ func _refresh() -> void:
 			for facility in battle.enemy_facilities:
 				if facility.alive and facility.cell == cell:
 					tile.text = "적탑"
-	if not status_override.is_empty():
+	if paused:
+		status.text = "일시정지 · 전장 정보를 확인할 수 있습니다" if status_override.is_empty() else status_override
+	elif not status_override.is_empty():
 		status.text = status_override
 	elif battle.phase == "finished":
 		match battle.battle_result:
@@ -425,16 +465,45 @@ func _refresh() -> void:
 
 func _refresh_speed_control() -> void:
 	var unlocked: bool = not editor_preview and progress_available and progress.data.completed_stages.has(battle.stage_id)
-	speed_button.disabled = not unlocked or battle.phase == "finished"
+	speed_button.disabled = paused or not unlocked or battle.phase == "finished"
 	speed_button.text = "속도 %d×" % simulation_speed
 
 func _toggle_speed() -> void:
-	if speed_button.disabled:
+	if paused or speed_button.disabled:
 		return
 	simulation_speed = 1 if simulation_speed == 2 else 2
 	timer.wait_time = BATTLE_TICK_SECONDS / simulation_speed
 	rest_timer.wait_time = 1.0 / simulation_speed
 	speed_button.text = "속도 %d×" % simulation_speed
+
+func _toggle_pause() -> void:
+	if battle.phase == "finished": return
+	paused = not paused
+	if paused:
+		pause_timer_remaining = timer.time_left
+		pause_rest_timer_remaining = rest_timer.time_left
+		pause_rest_timer_was_running = rest_timer.time_left > 0.0
+		timer.stop()
+		rest_timer.stop()
+	else:
+		timer.start(maxf(pause_timer_remaining, 0.001))
+		if pause_rest_timer_was_running:
+			rest_timer.start(maxf(pause_rest_timer_remaining, 0.001))
+	_refresh()
+
+func _inspect_paused_cell(cell: Vector2i) -> String:
+	var unit := _unit_at(cell)
+	if not unit.is_empty(): return "%s · HP %.0f/%.0f" % [_unit_name(unit.kind), unit.hp, unit.max_hp]
+	var facility := _facility_at(cell)
+	if not facility.is_empty(): return "아군 시설 · HP %.0f/%.0f" % [facility.hp, facility.max_hp]
+	for enemy in battle.enemies + battle.preview_enemies:
+		if enemy.alive and enemy.cell == cell: return "적 유닛 · HP %.0f/%.0f" % [enemy.hp, enemy.max_hp]
+	for enemy_facility in battle.enemy_facilities:
+		if enemy_facility.alive and enemy_facility.cell == cell: return "적 시설 · HP %.0f/%.0f" % [enemy_facility.hp, enemy_facility.max_hp]
+	if cell == battle.core_cell: return "핵심 · HP %.0f" % battle.core_hp
+	if battle._wall_at(cell) >= 0: return "방어벽"
+	if battle._obstacle_at(cell) >= 0: return "장애물"
+	return "빈 타일"
 
 func _refresh_obstacle_controls() -> void:
 	if obstacle_controls == null:
@@ -523,6 +592,7 @@ func _refresh_upgrade_controls() -> void:
 			var button := Button.new()
 			button.custom_minimum_size = Vector2(120, 36)
 			button.pressed.connect(_purchase_upgrade.bind(unit.id, upgrade.id))
+			button.add_to_group("battle_commands")
 			upgrade_controls.add_child(button)
 			upgrade_buttons.append(button)
 	for index in upgrade_buttons.size():
@@ -550,6 +620,7 @@ func _refresh_skill_controls() -> void:
 			var button := Button.new()
 			button.custom_minimum_size = Vector2(120, 36)
 			button.pressed.connect(_cast_skill.bind(unit.id, skill.id))
+			button.add_to_group("battle_commands")
 			controls.add_child(button)
 			skill_buttons.append(button)
 	for index in skill_buttons.size():

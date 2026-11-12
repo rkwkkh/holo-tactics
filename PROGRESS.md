@@ -93,4 +93,7 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - M6 manifest 검증 추가: bundletool로 최신 Android Debug AAB 내부 manifest의 min API 29/target API 36을 직접 확인했다. AAB는 unsigned 테스트 산출물이다.
 
 - R-GAME-005 일부 구현: 전투 화면에 1×/2× 버튼을 추가했다. 현재 스테이지 최초 클리어 전과 테스트 미리보기에서는 2×가 잠기며, 완료 stage 재진입에서만 해제된다. 고정 전투 tick은 유지하고 호출 주기와 재정비 countdown을 함께 배속한다.
-- 남음: R-UI-003의 일시정지 중 조회 전용 규칙은 아직 미구현이다.
+- R-UI-003 조회 전용 일시정지는 아래 2026-11-12 기록에서 구현·검증 완료.
+
+- 2026-11-12 R-UI-003 조회 전용 일시정지 구현: 전투/재정비 타이머의 남은 시간을 보존해 정지·재개하며, 일시정지 중 전투 명령 버튼을 비활성화하고 핸들러에서도 실행을 차단한다. 타일을 누르면 유닛·시설·적·핵심·장애물 정보를 표시한다. `tests/results_view.gd`로 전투 상태 불변, 핵심 조회, 양 타이머 재개를 검사했다.
+- 재검증: Godot 4.7.2 headless editor import, `tests/results_view.gd`, `tests/run.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`, 콘텐츠 validator, `git diff --check` 통과.

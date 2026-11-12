@@ -304,4 +304,11 @@
 
 - Added a 1×/2× battle speed control. New stages and isolated editor previews remain locked to 1×. Previously completed stage IDs from `ProgressStore` unlock 2× on re-entry; battle ticks remain fixed at 0.2 s while timer cadence and intermission countdown scale.
 - First test run found a GDScript type inference parse error on the unlock boolean; explicitly typed it as `bool`. Re-run passed: editor import, `tests/results_view.gd`, `tests/run.gd`, campaign playability, and content validation; `git diff --check` passed.
-- R-UI-003 pause/read-only inspection remains unimplemented.
+- R-UI-003 pause/read-only inspection was completed and verified in the following entry.
+
+## 2026-11-12 R-UI-003 일시정지 재검증
+
+- 일시정지 UI는 타이머의 잔여 시간을 보존하며 전투 명령 버튼과 직접 호출 핸들러를 차단한다. 타일 조회는 선택/배치 상태를 변경하지 않고 대상 정보를 status에 출력한다.
+- 회귀: `tests/results_view.gd`에서 준비 단계 시작/명령 차단/핵심 정보 조회/전투 자원 불변/재개, 재정비 타이머 잔여시간 재개를 확인했다.
+- 통과: Godot 4.7.2 headless editor import, `tests/results_view.gd`, `tests/run.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`, `scripts/validate_content.gd`, `git diff --check`.
+- 제한: 실제 기기 터치/화면 배치 및 성능은 이전 Android 렌더러/기기 접근 차단 상태로 검증되지 않았다.
