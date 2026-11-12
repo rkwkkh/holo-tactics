@@ -312,3 +312,5 @@
 - 회귀: `tests/results_view.gd`에서 준비 단계 시작/명령 차단/핵심 정보 조회/전투 자원 불변/재개, 재정비 타이머 잔여시간 재개를 확인했다.
 - 통과: Godot 4.7.2 headless editor import, `tests/results_view.gd`, `tests/run.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`, `scripts/validate_content.gd`, `git diff --check`.
 - 제한: 실제 기기 터치/화면 배치 및 성능은 이전 Android 렌더러/기기 접근 차단 상태로 검증되지 않았다.
+
+- R-UI-003 포함 Debug APK 재생성: `build/holo-debug.apk`, 249,875,578 bytes (2026-11-12 16:51 KST); `aapt` min API 29/target API 36, `apksigner` v2=true 확인. 실기기 실행과 FPS는 미검증.

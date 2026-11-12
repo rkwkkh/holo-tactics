@@ -97,3 +97,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 
 - 2026-11-12 R-UI-003 조회 전용 일시정지 구현: 전투/재정비 타이머의 남은 시간을 보존해 정지·재개하며, 일시정지 중 전투 명령 버튼을 비활성화하고 핸들러에서도 실행을 차단한다. 타일을 누르면 유닛·시설·적·핵심·장애물 정보를 표시한다. `tests/results_view.gd`로 전투 상태 불변, 핵심 조회, 양 타이머 재개를 검사했다.
 - 재검증: Godot 4.7.2 headless editor import, `tests/results_view.gd`, `tests/run.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`, 콘텐츠 validator, `git diff --check` 통과.
+
+- 2026-11-12: 일시정지 변경을 포함해 Android Debug APK를 다시 내보냈다 (`build/holo-debug.apk`, 249,875,578 bytes). manifest min API 29/target API 36 및 APK v2 서명 확인 통과. Debug 빌드이며 실기기 실행·FPS 검증은 미완료다.
