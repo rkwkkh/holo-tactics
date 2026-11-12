@@ -115,3 +115,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12: 전투 화면 보드 아래의 공통 조작부를 세로 스크롤 영역에 넣고 시설 건설 버튼을 2열로 배치했다. 보드 자체는 고정 부모에 유지된다. headless UI 테스트에서 보드/스크롤 영역 분리와 실제 세로 overflow를 확인했다. 좁은 화면·노치 실기기 확인은 미검증.
 
 - 2026-11-12: 세로 스크롤 전투 레이아웃 포함 최신 Android Debug APK `build/holo-debug.apk` 249,879,210 bytes(API29/36 manifest, v2 서명 pass) 및 Debug AAB `build/holo-test.aab` 86,288,227 bytes(bundletool 1.18.3 검증, 필수 항목·API29/36 manifest pass) 생성. AAB는 unsigned.
+
+- 2026-11-12: 고정 pause 푸터를 스크롤 영역 밖에 분리해 작은 세로 화면에서 항상 접근 가능하게 했다. 360×640 회귀/전체 headless/validator 통과. 최신 APK 249,879,286 bytes(API29/36, v2), AAB 86,288,306 bytes(bundletool 검증, API29/36, unsigned) 재생성.

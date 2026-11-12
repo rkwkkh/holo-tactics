@@ -197,7 +197,6 @@ func _ready() -> void:
 	wave_controls.add_child(speed_button)
 	pause_button = Button.new()
 	pause_button.pressed.connect(_toggle_pause)
-	wave_controls.add_child(pause_button)
 	status = Label.new()
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -209,6 +208,8 @@ func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	controls_box.add_child(back_button)
+	pause_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	layout.add_child(pause_button)
 	_build_result_panel()
 	var abandon_dialog := ConfirmationDialog.new()
 	abandon_dialog.dialog_text = "테스트를 끝내고 돌아가시겠습니까? 전투 진행과 보상은 저장되지 않습니다." if editor_preview else "전투를 포기하고 돌아가시겠습니까? 완료한 웨이브 수만큼 부분 보상을 받습니다."

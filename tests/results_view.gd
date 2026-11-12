@@ -14,6 +14,7 @@ func _run() -> void:
 	await process_frame
 	assert(view.controls_scroll.get_parent() != null and view.controls_scroll.get_child_count() == 1)
 	assert(view.wave_button.get_parent().get_parent().get_parent() == view.controls_scroll)
+	assert(view.pause_button.get_parent() != view.controls_scroll and view.pause_button.visible)
 	assert(view.tiles[0].get_parent() != view.controls_scroll and view.controls_scroll.size.y > 0.0)
 	assert(view.controls_scroll.get_v_scroll_bar().max_value > view.controls_scroll.get_v_scroll_bar().page)
 	assert(view.speed_button.disabled and view.timer.wait_time == 0.2)

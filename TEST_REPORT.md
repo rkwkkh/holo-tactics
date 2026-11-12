@@ -337,3 +337,5 @@
 - 최신 세로 전투 레이아웃 Android 빌드 (2026-11-12 17:20 KST): APK 249,879,210 bytes, min API 29/target 36 및 apksigner v2 확인. AAB 86,288,227 bytes, bundletool 1.18.3 validate 성공, 필수 BundleConfig/manifest/dex 엔트리 및 API 29/36 확인. `jarsigner`는 unsigned로 보고. 기기에서 스크롤/노치 동작 및 FPS는 미검증.
 
 - 전투 UI 크기 회귀를 실제 `360×640` root window로 고정해 재실행했다. 보드 고정/조작부 overflow/컨텍스트 메뉴 경계 검사가 모두 통과했으며 전체 회귀와 validator도 재통과했다.
+
+- 고정 pause 푸터 변경 포함 Android Debug APK `build/holo-debug.apk` 249,879,286 bytes; API29/target36 및 v2 서명 확인. AAB `build/holo-test.aab` 86,288,306 bytes; bundletool validate/manifest 통과, unsigned. 실제 화면·기기 실행은 미검증.
