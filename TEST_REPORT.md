@@ -377,3 +377,10 @@
 - AAB 86,231,323 bytes. bundletool 1.18.3 validate, manifest API 29/36 통과; unsigned 테스트 번들.
 - APK sparse PCK에서 tests/, content_editor, editor_preview 씬/런처가 제외되고 런타임 ContentValidator는 포함됨을 확인. 5개 핵심 테스트 및 diff check 통과.
 - SDK adb: emulator-5554/5556 offline, 연결 기기 없음.
+
+
+## 2026-11-12 최신 APK AVD 실행 재확인
+
+- adb server 재시작으로 기존 API29/API37 AVD의 offline 상태가 해소됐다. API37 device 부팅 완료, 화면 1080×2400 density 420.
+- 최신 APK streamed install 성공. Godot 앱 pid가 실행 중이고 launcher activity가 resumed 상태.
+- 캡처 화면은 검정. logcat에서 GLES3 SwiftShader OpenGL ES 3.0 및 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)`로 SceneShaderGLES3/CanvasShaderGLES3 연결 오류가 발생했다. API37 AVD 렌더 검증 실패; 실제 Android 기기 성능 검증은 별도 대기.

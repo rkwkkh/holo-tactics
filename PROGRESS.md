@@ -128,3 +128,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12: 콘텐츠 검증을 Error/Warning으로 분리. 필수 6 메인+2 선택 스테이지는 Error 유지, 26웨이브는 조정 가능한 제작 목표로 Warning 처리한다. EditorPlugin은 경고만 있어도 저장하고 CI 검증기는 Warning 출력 후 성공 종료하도록 연결. 27웨이브 변형 테스트에서 Error 0/Warning 1 확인.
 
 - 2026-11-12: Android APK/AAB export에서 테스트, EditorPlugin, editor-preview 씬/런처를 제외하도록 설정. 생성된 APK sparse PCK를 검사해 해당 경로 부재와 런타임 ContentValidator 포함을 확인. APK v2/API29/36 및 AAB bundletool/manifest 검증 통과.
+
+- 2026-11-12: adb server 재시작 후 API29/API37 AVD를 online으로 복구. 최신 APK를 API37(1080×2400, density 420)에 설치·실행했고 앱 프로세스가 foreground에 유지됨. 화면 캡처는 검정이며 SwiftShader에서 GLES3 fragment uniform 261 오류 재현; AVD 실행 검증은 실패로 유지.
