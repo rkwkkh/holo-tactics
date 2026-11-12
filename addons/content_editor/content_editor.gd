@@ -5,6 +5,18 @@ const CATALOG_PATH := "res://data/catalog.json"
 var tabs: TabContainer
 var panels: Dictionary = {}
 
+static func read_catalog(path: String = CATALOG_PATH) -> Variant:
+	if not FileAccess.file_exists(path):
+		var backup_path := path + ".bak"
+		if not FileAccess.file_exists(backup_path) or DirAccess.rename_absolute(ProjectSettings.globalize_path(backup_path), ProjectSettings.globalize_path(path)) != OK:
+			return null
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return null
+	var catalog: Variant = JSON.parse_string(file.get_as_text())
+	file.close()
+	return catalog if catalog is Dictionary else null
+
 func _enter_tree() -> void:
 	tabs = TabContainer.new()
 	tabs.custom_minimum_size = Vector2(340, 260)
@@ -76,13 +88,9 @@ func _categories_for(key: String) -> Array[String]:
 func _refresh_records(key: String, selected_id: String = "") -> void:
 	var picker: OptionButton = panels[key].picker
 	picker.clear()
-	var file := FileAccess.open(CATALOG_PATH, FileAccess.READ)
-	if file == null:
-		panels[key].feedback.text = "카탈로그를 읽을 수 없습니다."
-		return
-	var catalog: Variant = JSON.parse_string(file.get_as_text())
+	var catalog: Variant = read_catalog()
 	if not catalog is Dictionary:
-		panels[key].feedback.text = "카탈로그 JSON 형식이 잘못되었습니다."
+		panels[key].feedback.text = "카탈로그를 읽거나 백업에서 복구할 수 없습니다."
 		return
 	for category in _categories_for(key):
 		for item in catalog.categories.get(category, []):
@@ -115,10 +123,9 @@ func _select_record(index: int, key: String) -> void:
 	if panels[key].drafts.has(item_meta.id):
 		panels[key].edit.text = panels[key].drafts[item_meta.id]
 		return
-	var file := FileAccess.open(CATALOG_PATH, FileAccess.READ)
-	if file == null:
+	var catalog: Variant = read_catalog()
+	if not catalog is Dictionary:
 		return
-	var catalog: Dictionary = JSON.parse_string(file.get_as_text())
 	for item in catalog.categories.get(item_meta.category, []):
 		if item.id == item_meta.id:
 			panels[key].edit.text = JSON.stringify(item, "\t")
@@ -159,13 +166,9 @@ func _save_record(key: String) -> void:
 	if edited.id != item_meta.id:
 		panel.feedback.text = "Error: 안정 ID 변경은 참조 무결성을 깨뜨릴 수 있어 여기서 허용하지 않습니다."
 		return
-	var file := FileAccess.open(CATALOG_PATH, FileAccess.READ)
-	if file == null:
-		panel.feedback.text = "Error: 카탈로그를 읽을 수 없습니다."
-		return
-	var catalog: Variant = JSON.parse_string(file.get_as_text())
+	var catalog: Variant = read_catalog()
 	if not catalog is Dictionary:
-		panel.feedback.text = "Error: 카탈로그 JSON을 읽을 수 없습니다."
+		panel.feedback.text = "Error: 카탈로그를 읽거나 백업에서 복구할 수 없습니다."
 		return
 	var replaced := false
 	for index in catalog.categories.get(item_meta.category, []).size():
@@ -222,10 +225,7 @@ func _preview_selected(direct_wave: bool) -> void:
 		panels.stages_waves.feedback.text = "Error: 스테이지 또는 웨이브를 선택하세요."
 		return
 	var selected: Dictionary = picker.get_item_metadata(picker.selected)
-	var file := FileAccess.open(CATALOG_PATH, FileAccess.READ)
-	if file == null:
-		return
-	var catalog: Variant = JSON.parse_string(file.get_as_text())
+	var catalog: Variant = read_catalog()
 	if not catalog is Dictionary:
 		return
 	var stage: Dictionary = {}

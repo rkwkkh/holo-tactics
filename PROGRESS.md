@@ -130,3 +130,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12: Android APK/AAB export에서 테스트, EditorPlugin, editor-preview 씬/런처를 제외하도록 설정. 생성된 APK sparse PCK를 검사해 해당 경로 부재와 런타임 ContentValidator 포함을 확인. APK v2/API29/36 및 AAB bundletool/manifest 검증 통과.
 
 - 2026-11-12: adb server 재시작 후 API29/API37 AVD를 online으로 복구. 최신 APK를 API37(1080×2400, density 420)에 설치·실행했고 앱 프로세스가 foreground에 유지됨. 화면 캡처는 검정이며 SwiftShader에서 GLES3 fragment uniform 261 오류 재현; AVD 실행 검증은 실패로 유지.
+
+- 2026-11-12: M5 카탈로그 백업 복구를 추가했다. EditorPlugin 원자 저장 중 본 JSON이 사라지고 .bak만 남은 복구 시나리오를 core 회귀에서 확인. plugin headless 초기화, editor preview 격리, 콘텐츠 validator 통과. 도구 스크립트는 Android export 제외 대상이어서 Android 런타임 산출물 재생성은 필요하지 않음.

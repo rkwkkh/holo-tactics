@@ -6,6 +6,20 @@ func _initialize() -> void:
 	assert(inspector_record._get("label") == "Before")
 	assert(inspector_record._set("cost", 50) and inspector_record.values.cost == 50)
 	assert(not inspector_record._set("unknown", 1))
+	var catalog_recovery_path := "user://catalog_recovery_test.json"
+	for suffix in ["", ".bak"]:
+		var stale_path: String = catalog_recovery_path + suffix
+		if FileAccess.file_exists(stale_path):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(stale_path))
+	var catalog_backup := FileAccess.open(catalog_recovery_path + ".bak", FileAccess.WRITE)
+	assert(catalog_backup != null)
+	catalog_backup.store_string("{\"recovered\":true}")
+	catalog_backup.close()
+	var content_editor_script: Script = load("res://addons/content_editor/content_editor.gd")
+	var recovered_catalog: Variant = content_editor_script.read_catalog(catalog_recovery_path)
+	assert(recovered_catalog is Dictionary and recovered_catalog.get("recovered", false))
+	assert(FileAccess.file_exists(catalog_recovery_path) and not FileAccess.file_exists(catalog_recovery_path + ".bak"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(catalog_recovery_path))
 	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "movement_type": "ground", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash", "skill.guard"], "dependencies": []}], "skills": [{"id": "skill.slash", "unit_kind": "swordsman", "mode": "automatic", "effect": "strike", "cooldown": 5.0, "cost": 0, "value": 10, "radius": 0, "label": "Strike", "references": [], "dependencies": []}, {"id": "skill.guard", "unit_kind": "swordsman", "mode": "manual", "effect": "shield", "cooldown": 5.0, "cost": 1, "value": 10, "radius": 1, "label": "Guard", "references": [], "dependencies": []}]}}
 	assert(ContentValidator.validate(valid).is_empty())
 	var progress_test_path := "user://progress_store_test.json"

@@ -83,3 +83,5 @@
 - Android 배포 포장 정리(2026-11-12): APK/AAB에서 tests, content_editor addon, editor_preview 씬/스크립트를 제외했다. 로컬 sparse PCK 검사에서 해당 경로가 없고 런타임 validator는 포함됨을 확인. 현재 adb 장치 emulator-5554/5556는 offline.
 
 - 2026-11-12 최신 APK 재실행: API37 AVD에서 install 성공, Godot 앱 프로세스 유지/foreground 확인. 캡처 화면은 검정이며 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)`와 SceneShader/CanvasShader GLES3 연결 오류가 발생했다. SwiftShader 가상 GPU 환경의 결과이며 물리 기기 통과로 대체하지 않는다.
+
+- 해결(2026-11-12): 콘텐츠 EditorPlugin은 원자 저장 중단 후 카탈로그 본 파일이 없을 때 .bak을 복구한다. 회귀 테스트는 백업 복원 후 원본 경로가 재생성되고 백업 경로가 없어짐을 확인.

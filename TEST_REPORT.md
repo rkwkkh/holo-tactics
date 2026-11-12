@@ -384,3 +384,10 @@
 - adb server 재시작으로 기존 API29/API37 AVD의 offline 상태가 해소됐다. API37 device 부팅 완료, 화면 1080×2400 density 420.
 - 최신 APK streamed install 성공. Godot 앱 pid가 실행 중이고 launcher activity가 resumed 상태.
 - 캡처 화면은 검정. logcat에서 GLES3 SwiftShader OpenGL ES 3.0 및 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)`로 SceneShaderGLES3/CanvasShaderGLES3 연결 오류가 발생했다. API37 AVD 렌더 검증 실패; 실제 Android 기기 성능 검증은 별도 대기.
+
+
+## 2026-11-12 재검증: 콘텐츠 저장 백업 복구
+
+- tests/run.gd에서 EditorPlugin의 저장된 카탈로그 경로에 본 파일 없이 .bak만 남은 상태를 만들고 복구 데이터 및 경로 복원을 확인했다.
+- headless EditorPlugin 초기화, editor preview 격리, 콘텐츠 validator 통과. `git diff --check` 통과.
+- 변경은 editor-only 플러그인과 tests 디렉터리에 한정되어 Android export 제외 규칙에 따라 APK/AAB 재생성은 생략.
