@@ -50,11 +50,19 @@ func _initialize() -> void:
 	legacy_file.close()
 	var migrated := ProgressStore.new(legacy_path)
 	assert(migrated.load_progress() and migrated.data.buildings.size() == 1 and migrated.data.buildings[0].kind == "headquarters")
+	var corrupt_path := "user://corrupt_village_progress_test.json"
+	var corrupt_file := FileAccess.open(corrupt_path, FileAccess.WRITE)
+	corrupt_file.store_string("{}")
+	corrupt_file.close()
+	var protected_village := VillageModel.new(corrupt_path)
+	assert(not protected_village.available and not protected_village.place_building("training_hall", Vector2i(0, 0)))
+	assert(FileAccess.get_file_as_string(corrupt_path) == "{}")
 	for path in [village_test_path, village_unlock_path]:
 		for suffix in ["", ".tmp", ".bak"]:
 			var cleanup_path: String = path + suffix
 			if FileAccess.file_exists(cleanup_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(cleanup_path))
 	if FileAccess.file_exists(legacy_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(legacy_path))
+	if FileAccess.file_exists(corrupt_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(corrupt_path))
 	var duplicate := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "same"}], "skills": [{"id": "same"}]}}
 	assert(ContentValidator.validate(duplicate).any(func(error): return error.contains("duplicate content id")))
 	var dangling := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.a", "references": ["missing"]}]}}

@@ -13,11 +13,11 @@ func _ready() -> void:
 	layout.add_theme_constant_override("separation", 6)
 	add_child(layout)
 	var title := Label.new()
-	title.text = "마을 관리 · 영구 재화 %d" % model.progress.data.permanent_currency
+	title.text = "마을 관리 · 영구 재화 %d" % model.progress.data.permanent_currency if model.available else "마을 관리 · 저장 오류, 데이터 보호 중"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	layout.add_child(title)
 	status = Label.new()
-	status.text = "건물을 선택한 뒤 빈 칸을 누르세요."
+	status.text = "건물을 선택한 뒤 빈 칸을 누르세요." if model.available else "저장 데이터를 읽지 못해 마을 변경을 잠갔습니다."
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	layout.add_child(status)
 	for kind in ["training_hall", "workshop", "arcane_lab"]:
@@ -30,10 +30,12 @@ func _ready() -> void:
 	var actions := HBoxContainer.new()
 	var move := Button.new()
 	move.text = "선택 건물 이동"
+	move.disabled = not model.available
 	move.pressed.connect(_move_selected)
 	actions.add_child(move)
 	var store := Button.new()
 	store.text = "선택 건물 보관"
+	store.disabled = not model.available
 	store.pressed.connect(_store_selected)
 	actions.add_child(store)
 	layout.add_child(actions)

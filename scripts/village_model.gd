@@ -5,11 +5,13 @@ const COLUMNS := 6
 const ROWS := 6
 var progress: ProgressStore
 var definitions: Dictionary = {}
+var available := false
 
 func _init(save_path: String = ProgressStore.PATH) -> void:
 	progress = ProgressStore.new(save_path)
 	if not progress.load_progress():
 		return
+	available = true
 	if not progress.data.has("buildings") or progress.data.buildings.is_empty():
 		progress.data.buildings = [{"kind": "headquarters", "cell": [2, 2], "stored": false}]
 	var file := FileAccess.open("res://data/catalog.json", FileAccess.READ)
@@ -31,7 +33,7 @@ func has_building(kind: String) -> bool:
 	return progress.data.get("buildings", []).any(func(building): return building.kind == kind and not building.get("stored", false))
 
 func can_build(kind: String) -> bool:
-	if not definitions.has(kind):
+	if not available or not definitions.has(kind):
 		return false
 	var owned := _building_by_kind(kind)
 	if not owned.is_empty():
@@ -68,7 +70,7 @@ func place_building(kind: String, cell: Vector2i) -> bool:
 		return _save_or_restore(before)
 
 func move_building(kind: String, cell: Vector2i) -> bool:
-	if not _is_valid_cell(cell) or not building_at(cell).is_empty():
+	if not available or not _is_valid_cell(cell) or not building_at(cell).is_empty():
 		return false
 	var building: Dictionary = _building_by_kind(kind)
 	if building.is_empty() or building.stored or kind == "headquarters":
@@ -78,6 +80,8 @@ func move_building(kind: String, cell: Vector2i) -> bool:
 	return _save_or_restore(before)
 
 func store_building(kind: String) -> bool:
+	if not available:
+		return false
 	var building: Dictionary = _building_by_kind(kind)
 	if building.is_empty() or building.stored or kind == "headquarters":
 		return false
