@@ -229,3 +229,7 @@ The computer-use native pipe again failed before listing Windows apps, so M5 GUI
 
 - Emulator 37.2.13과 임시 Android 10 Google Play AVD를 이용해 재검증했다. Vulkan APK는 present error 5, Compatibility APK는 GLES 2 EGL 컨텍스트 실패로 실행 화면을 표시하지 못했다. API29 Google APIs AVD에서도 최신 Emulator로 Vulkan 오류가 재현됐다.
 - 임시 Play AVD/이미지는 정리했고 기존 AVD 사용자 데이터는 보존했다. Android 10 실기기 검증 및 대표 기기 FPS 측정은 여전히 남아 있다. 상세 결과는 `ANDROID_TESTING.md`.
+
+## M6 fresh API37 launch check (2026-11-12)
+
+Reinstalled the current local Debug APK on `MaDangStage6_API37` with Emulator 37.2.13/API 37. The campaign menu rendered and no Godot/AndroidRuntime error was captured. ADB tap injection did not enter M1, so the check is limited to launch/menu; Android 10 and FPS remain unverified. Screenshot artifact is ignored under `build/mvp-followup-api37.png`.

@@ -582,3 +582,5 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 - Godot 4.7.2 Android export: 현행 Mobile/Vulkan APK를 Emulator 37.2.13의 API29 Google APIs 및 임시 Google Play AVD에서 실행했으나 양쪽에서 Vulkan present error 5가 재현됐다. 임시 Compatibility/OpenGL APK는 API29 AVD GLES 2 환경에서 EGL 컨텍스트 생성에 실패했다.
 - 실행 후 기존 API29 AVD 데이터는 보존하고 임시 Google Play 이미지/AVD는 제거했다. Emulator 업데이트는 유지했다. Android 10 실기기 동작과 FPS는 검증되지 않았다.
 - 전투 규칙 재검증: `tests/run.gd` — Godot 4.7.2 headless, 통과. 출혈/화상 보호막 우선·방어력 후순위와 빙결/기절 최대 남은 시간 동작 확인 포함.
+
+- 2026-11-12: fresh API37 install smoke showed the current APK campaign menu with Vulkan/SwiftShader and no captured runtime error. ADB touch did not enter M1. Count only as launch/menu evidence; no combat, Android 10 hardware, or FPS acceptance.

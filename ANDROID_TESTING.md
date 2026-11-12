@@ -126,3 +126,9 @@ Re-exported with the restored Mobile/Vulkan Android renderer after the temporary
 - 같은 AVD에서 임시 Compatibility/OpenGL APK는 GLES 2 컨텍스트 생성 실패로 GL thread가 종료됐다. 기존 API29 Google APIs AVD에서도 Vulkan 오류가 최신 Emulator와 host GPU 설정에서 재현됐다.
 - 따라서 검사한 두 API29 AVD 구성에서는 두 렌더러 경로 모두 동작하지 않았다. 이는 Android 10 실기기 호환 실패를 뜻하지 않는다. 임시 Google Play 이미지와 AVD는 검사 후 제거했고, 기존 AVD 데이터는 유지했다. Emulator 37.2.13은 유지.
 - 기기: API29 Vulkan 렌더링, Android 10 실기기 호환성, FPS는 검증 대기.
+
+## Latest API37 fresh install smoke (2026-11-12)
+
+- Started `MaDangStage6_API37` on Emulator 37.2.13/API 37, installed `build/holo-debug.apk` (249,834,691 bytes, exported 2026-11-12 20:58 KST), and launched `com.example.holotactics`.
+- Vulkan initialized on Goldfish GFXStream/SwiftShader. The campaign menu rendered in the captured 1080x2400 frame; no Godot script or AndroidRuntime error appeared in the captured log window.
+- ADB tap injection did not navigate into M1, so this smoke verifies launch/menu only, not combat. This API37 result does not establish Android 10 compatibility or FPS acceptance.
