@@ -249,3 +249,10 @@ Reproduced on the current APK: verified the M1 wave-start checkpoint JSON direct
 ## M1 victory result count fix (2026-11-12)
 
 API37 emulator repeat-play smoke completed the two-wave M1 defense. The result panel now reports `웨이브 2 / 2 완료`; the prior count incorrectly displayed 1/2 after victory. This was a presentation/counting defect; reward settlement did not depend on that count. Updated APK SHA-256: `B8845B0ECDA245D51EA6234D898C19B925982FB92C470111E3E141D806F0A5BA`. Updated test AAB SHA-256: `3941E299153244DB5BD4698DA95C6F2A9D9B6AD86C52A1E1CB038F8A8CED59E0`.
+
+## Acceptance snapshot reconciliation (2026-11-12)
+
+- M0–M4 implementation is in place; the 8-stage/26-wave seeded campaign simulation passes, while full manual campaign UX and balance acceptance remain distinct.
+- M5 panel construction/content checks pass in editor-headless mode. Visible dock/Inspector interaction remains unverified because the local computer-use host exposes no apps.
+- M6 debug APK/test AAB and local validations pass; API37 emulator victory is observed. Physical Android 10/FPS, release signing/package identity, and Play private-test upload remain pending.
+- See the current acceptance snapshot in `IMPLEMENTATION_PLAN.md`; immutable source-spec conflicts are resolved by the user-policy addenda in `ISSUES.md`.

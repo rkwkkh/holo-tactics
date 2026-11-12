@@ -604,3 +604,9 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 - API37/Emulator 37.2.13: installed fixed APK and manually replayed M1 to victory. Result panel displayed 2/2 completed waves and repeat reward +10; screenshot `build/mvp-fixed-result.png` is a local ignored artifact. This is emulator gameplay evidence only.
 - APK SHA-256 `B8845B0ECDA245D51EA6234D898C19B925982FB92C470111E3E141D806F0A5BA`; `apksigner verify --verbose` passed (v2 signature). Test AAB SHA-256 `3941E299153244DB5BD4698DA95C6F2A9D9B6AD86C52A1E1CB038F8A8CED59E0`; `bundletool validate` passed. Manifest: `com.example.holotactics`, min API 29, target API 36.
 - Release signing is not configured; this AAB is for testing. Physical Android 10 compatibility, physical FPS targets, GUI interaction of M5 panels, and Play private-test upload remain unverified.
+
+## Current GUI and catalog recheck (2026-11-12)
+
+- Correct CI invocation for the M5 editor structure check: Godot 4.7.2 `--headless --editor --path . --script res://tests/editor_panels.gd`; passed with stages/waves, 6 evolutions, and 20 upgrades. Engine prints renderer/ObjectDB leak diagnostics during standalone editor-script shutdown despite exit success; no clean GUI session was available.
+- `scripts/validate_content.gd --quit-after 2`: passed (0 content Errors).
+- Computer Use inventory still returns no apps because its native Windows pipe and browser host are unavailable. M5 visual dock/Inspector interaction remains unverified.

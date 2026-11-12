@@ -151,3 +151,7 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 
 - M1 victory UI used `wave - 1`, so the final wave was omitted from the result label. The shared completed-wave calculation now includes the current wave on victory and prior waves on defeat, clamped to stage bounds. Tests cover both outcomes; API37 emulator victory displayed 2/2.
 - No known save migration or reward-rule change; only the count passed to settlement and displayed UI now reflects actual completed waves.
+
+## M5 GUI access retry (2026-11-12)
+
+Computer Use state query returned no apps; native pipe and browser host are unavailable (Windows OS error 2). Headless editor-panel structure and content validation pass, but visible dock/Inspector interaction remains open. Retried this turn; no UI interaction occurred.
