@@ -216,3 +216,7 @@ Added `tests/editor_panels.gd` and wired it into GitHub Actions. Godot 4.7.2 edi
 ## M6 current AVD recheck (2026-11-12)
 
 Recovered the offline API29/API37 AVDs using the local Android SDK's ADB and installed current APK SHA `E0B817...`. API37 rendered the campaign menu with Vulkan/SwiftShader. API29 resumed the activity but repeated Vulkan present error 5. Headless ADB touch injection did not navigate to M1, so this run is only a launch/render smoke. No physical device was present; details in `ANDROID_TESTING.md`.
+
+## Full local CI-equivalent revalidation (2026-11-12)
+
+Godot 4.7.2 import, core, editor-preview isolation, editor-panel construction, results UI, 8/8 campaign wins, content validation, five scene starts, and actionlint all pass. Content validation has zero Errors. Stopped four additional stale `results_view.gd` workers; no new headless Godot process remained after the suite.

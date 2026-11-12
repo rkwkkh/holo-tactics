@@ -48,7 +48,7 @@
 - M5 Inspector 동기화 모델, Validator의 ID·필드 경로 표시, 오류별 레코드 이동은 구현됐지만 GUI에서 편집→가져오기→저장/오류 이동 흐름은 직접 확인하지 않았다.
 
 - 2026-11-12: computer-use 네이티브 연결이 unavailable 상태라 Godot 편집기 GUI 직접 검증이 막혔다. 자동 파싱/모델 검사와 씬 실행은 통과하지만, Inspector GUI 상호작용 및 모바일 실기기 UI/FPS 검증 증거는 없다.
-- Windows 로컬 검증 종료 후 `tests/run.gd`/AAB export를 실행한 오래된 headless Godot 프로세스 49개가 남아 있었다. 정리 완료. README와 CI의 동기 테스트 실행에 `--quit-after 2`를 적용해 핵심 테스트·콘텐츠 validator 종료를 재확인했다; test run 뒤 잔류 프로세스 0개.
+- Windows 로컬 검증 종료 후 테스트·AAB export를 실행한 오래된 headless Godot 프로세스 53개(추가 `results_view.gd` 4개 포함)가 남아 있었다. 정리 완료. README와 CI의 동기 테스트 실행에 `--quit-after 2`를 적용했다; 전체 회귀 실행 뒤 새 잔류 프로세스 0개.
 
 - 2026-11-12 AVD 재검증 결과: API 29 Android 10 이미지의 GLES 2 한계로 EGL 컨텍스트 생성 실패, API 37 SwiftShader는 Godot GLES3 canvas shader uniform 초과로 검은 화면. APK 설치만으로 Android 실행 호환성이 입증되지 않는다.
 - 추가 확인: API 29에 최신 APK 설치 후에도 GLThread `createContext failed: EGL_SUCCESS`로 시작 실패, API 37에서 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)` 오류를 재현했다. API 36 AVD는 지정된 `android-36/google_apis/x86_64` 시스템 이미지가 SDK에 없어 실행 불가.
