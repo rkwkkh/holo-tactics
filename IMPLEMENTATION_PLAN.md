@@ -111,3 +111,5 @@
 Status-effect changes are now included in fresh APK/AAB exports; manifest and package validation passed. Device/FPS validation is pending because both AVDs are offline, and Play release readiness remains gated on publisher package ID and release signing credentials. Continue when device or publisher environment is available; proceed with remaining M5 GUI validation in parallel.
 
 - M6 update: ADB reconnect enabled fresh APK smoke on API 37 and API 29 AVDs. API 37 renders menu/M1; API 29 remains black due Vulkan present error 5. Investigate Android 10 renderer support while seeking physical-device validation; don't treat AVD as performance evidence.
+
+- M6 next action: keep the API29 Vulkan present failure open after both host and SwiftShader AVD paths failed; validate on actual Android 10 hardware before choosing any renderer/configuration change.

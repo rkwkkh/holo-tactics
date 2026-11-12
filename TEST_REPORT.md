@@ -499,3 +499,5 @@
 - API 37 AVD: installed current status-effect APK and verified campaign menu/M1 screen rendering.
 - API 29 AVD: installed and launched but captured a black frame with repeated Vulkan present error 5.
 - Android 10 emulator rendering is still a release risk; no physical device or FPS target is verified. Details and local screenshot path are recorded in ANDROID_TESTING.md.
+
+- 2026-11-12: API29 AVD renderer isolation tried both host GPU and SwiftShader software GPU; both fail Vulkan presentation. API37 SwiftShader passes UI rendering. Android 10 acceptance remains pending physical hardware or a validated API29 emulator configuration.

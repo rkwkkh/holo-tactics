@@ -181,3 +181,5 @@ Verified with Godot 4.7.2 headless core, editor startup, results view, seeded 8-
 - 2026-11-12 M6 follow-up: Rebuilt APK/AAB after status-effect fixes; API29/36, APK debug signature, and bundletool validation pass. AVDs currently offline; no post-change device/FPS result. Publisher key/package ID remain unavailable.
 
 - 2026-11-12 M6 device follow-up: ADB server recovery brought API29/API37 AVDs online. Latest APK smoke: API37 campaign/M1 screen displays, API29 black screen with Vulkan present error 5. This improves the previous stale-device state but leaves Android 10 rendering unresolved; see ANDROID_TESTING.md/ISSUES.md.
+
+- M6 renderer follow-up: repeated API29 test in host-GPU and software-GPU modes; both black-screen with Vulkan present error 5. API37 SwiftShader renders. Recorded as unresolved emulator/device-path risk; no project renderer change made without real-device evidence.
