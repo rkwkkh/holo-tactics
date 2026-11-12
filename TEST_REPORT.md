@@ -391,3 +391,11 @@
 - tests/run.gd에서 EditorPlugin의 저장된 카탈로그 경로에 본 파일 없이 .bak만 남은 상태를 만들고 복구 데이터 및 경로 복원을 확인했다.
 - headless EditorPlugin 초기화, editor preview 격리, 콘텐츠 validator 통과. `git diff --check` 통과.
 - 변경은 editor-only 플러그인과 tests 디렉터리에 한정되어 Android export 제외 규칙에 따라 APK/AAB 재생성은 생략.
+
+
+## 2026-11-12 재검증: 재시작 전투 복원 진입
+
+- tests/run.gd에서 기본/스테이지별 checkpoint 경로 규칙, 격리된 폴더의 체크포인트 발견/없음 동작을 검사.
+- tests/run.gd, results_view.gd, editor_preview.gd, campaign_playability.gd, 콘텐츠 validator 및 main 씬 smoke 통과.
+- 런타임 변경 반영 APK 249,824,537 bytes (min API29/target36, v2 통과), AAB 86,232,303 bytes (bundletool validate 및 API29/36 manifest 통과, unsigned).
+- Main→Battle 실기기 화면/복원 카운트다운은 현재 AVD SwiftShader 화면 렌더 실패 때문에 검증 대기.

@@ -85,3 +85,5 @@
 - 2026-11-12 최신 APK 재실행: API37 AVD에서 install 성공, Godot 앱 프로세스 유지/foreground 확인. 캡처 화면은 검정이며 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)`와 SceneShader/CanvasShader GLES3 연결 오류가 발생했다. SwiftShader 가상 GPU 환경의 결과이며 물리 기기 통과로 대체하지 않는다.
 
 - 해결(2026-11-12): 콘텐츠 EditorPlugin은 원자 저장 중단 후 카탈로그 본 파일이 없을 때 .bak을 복구한다. 회귀 테스트는 백업 복원 후 원본 경로가 재생성되고 백업 경로가 없어짐을 확인.
+
+- 수정(2026-11-12): 재시작 시 Main이 체크포인트를 탐색하지 않아 BattleView의 자동 복원 코드에 도달하지 못하던 R-UI-005/R-SAVE-003 결함. 이제 캠페인 체크포인트 중 최신 파일의 스테이지로 직접 이동한다. 단위 경로/탐지 테스트와 메인 씬 smoke는 통과했으나 실기기 시작 화면 검증은 SwiftShader 렌더 실패로 미확인.

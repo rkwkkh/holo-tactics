@@ -24,6 +24,11 @@ func _ready() -> void:
 		return
 	var stages: Array = catalog.categories.stages.filter(func(stage): return stage.get("campaign_kind", "") in ["main", "optional"])
 	stages.sort_custom(func(a: Dictionary, b: Dictionary): return (a.campaign_kind == "main" and b.campaign_kind == "optional") or (a.campaign_kind == b.campaign_kind and int(a.campaign_order) < int(b.campaign_order)))
+	var resume_stage_id := CheckpointStore.latest_stage_with_checkpoint(stages)
+	if not resume_stage_id.is_empty():
+		get_tree().set_meta("selected_stage_id", resume_stage_id)
+		get_tree().call_deferred("change_scene_to_file", "res://scenes/battle.tscn")
+		return
 	var campaign := GridContainer.new()
 	campaign.columns = 2
 	campaign.size_flags_horizontal = Control.SIZE_SHRINK_CENTER

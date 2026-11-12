@@ -61,7 +61,7 @@ func _ready() -> void:
 		get_tree().change_scene_to_file("res://scenes/main.tscn")
 		return
 	var preview_id: String = get_tree().get_meta("editor_preview_id", "") if editor_preview else ""
-	var checkpoint_path := "user://editor_preview_checkpoint_%s.json" % preview_id if editor_preview else "user://battle_checkpoint.json" if selected_stage_id == BattleModel.STAGE_ID else "user://battle_checkpoint_%s.json" % selected_stage_id.replace(".", "_")
+	var checkpoint_path := "user://editor_preview_checkpoint_%s.json" % preview_id if editor_preview else CheckpointStore.path_for_stage(selected_stage_id)
 	store = CheckpointStore.new(checkpoint_path)
 	if editor_preview:
 		store.clear_checkpoint()

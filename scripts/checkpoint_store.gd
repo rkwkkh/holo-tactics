@@ -13,6 +13,26 @@ func _temp_path() -> String:
 func _backup_path() -> String:
 	return path + ".bak"
 
+static func path_for_stage(stage_id: String, base_path: String = "user://") -> String:
+	var filename := "battle_checkpoint.json" if stage_id == BattleModel.STAGE_ID else "battle_checkpoint_%s.json" % stage_id.replace(".", "_")
+	return base_path.path_join(filename)
+
+static func latest_stage_with_checkpoint(stages: Array, base_path: String = "user://") -> String:
+	var latest_stage_id := ""
+	var latest_modified := -1
+	for stage in stages:
+		if not stage is Dictionary or not stage.get("id", "") is String:
+			continue
+		var stage_id: String = stage.id
+		var checkpoint_path := path_for_stage(stage_id, base_path)
+		if not FileAccess.file_exists(checkpoint_path):
+			continue
+		var modified := FileAccess.get_modified_time(checkpoint_path)
+		if modified > latest_modified:
+			latest_modified = modified
+			latest_stage_id = stage_id
+	return latest_stage_id
+
 func save_checkpoint(data: Dictionary) -> bool:
 	var file := FileAccess.open(_temp_path(), FileAccess.WRITE)
 	if file == null:

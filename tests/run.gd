@@ -20,6 +20,20 @@ func _initialize() -> void:
 	assert(recovered_catalog is Dictionary and recovered_catalog.get("recovered", false))
 	assert(FileAccess.file_exists(catalog_recovery_path) and not FileAccess.file_exists(catalog_recovery_path + ".bak"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(catalog_recovery_path))
+	var resume_test_dir := "user://resume_discovery_%s" % Time.get_ticks_usec()
+	assert(DirAccess.make_dir_absolute(ProjectSettings.globalize_path(resume_test_dir)) == OK)
+	assert(CheckpointStore.path_for_stage(BattleModel.STAGE_ID, resume_test_dir) == resume_test_dir.path_join("battle_checkpoint.json"))
+	var resume_stage_id := "stage.m4.forest"
+	var resume_checkpoint_path := CheckpointStore.path_for_stage(resume_stage_id, resume_test_dir)
+	assert(resume_checkpoint_path == resume_test_dir.path_join("battle_checkpoint_stage_m4_forest.json"))
+	assert(CheckpointStore.latest_stage_with_checkpoint([{"id": resume_stage_id}], resume_test_dir).is_empty())
+	var resume_checkpoint := FileAccess.open(resume_checkpoint_path, FileAccess.WRITE)
+	assert(resume_checkpoint != null)
+	resume_checkpoint.store_string("{}")
+	resume_checkpoint.close()
+	assert(CheckpointStore.latest_stage_with_checkpoint([{"id": resume_stage_id}], resume_test_dir) == resume_stage_id)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(resume_checkpoint_path))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(resume_test_dir))
 	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "movement_type": "ground", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash", "skill.guard"], "dependencies": []}], "skills": [{"id": "skill.slash", "unit_kind": "swordsman", "mode": "automatic", "effect": "strike", "cooldown": 5.0, "cost": 0, "value": 10, "radius": 0, "label": "Strike", "references": [], "dependencies": []}, {"id": "skill.guard", "unit_kind": "swordsman", "mode": "manual", "effect": "shield", "cooldown": 5.0, "cost": 1, "value": 10, "radius": 1, "label": "Guard", "references": [], "dependencies": []}]}}
 	assert(ContentValidator.validate(valid).is_empty())
 	var progress_test_path := "user://progress_store_test.json"

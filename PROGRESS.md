@@ -132,3 +132,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12: adb server 재시작 후 API29/API37 AVD를 online으로 복구. 최신 APK를 API37(1080×2400, density 420)에 설치·실행했고 앱 프로세스가 foreground에 유지됨. 화면 캡처는 검정이며 SwiftShader에서 GLES3 fragment uniform 261 오류 재현; AVD 실행 검증은 실패로 유지.
 
 - 2026-11-12: M5 카탈로그 백업 복구를 추가했다. EditorPlugin 원자 저장 중 본 JSON이 사라지고 .bak만 남은 복구 시나리오를 core 회귀에서 확인. plugin headless 초기화, editor preview 격리, 콘텐츠 validator 통과. 도구 스크립트는 Android export 제외 대상이어서 Android 런타임 산출물 재생성은 필요하지 않음.
+
+- 2026-11-12: 재시작 시 메인 메뉴가 저장된 전투 체크포인트를 찾지 못해 자동 복원으로 진입하지 않던 흐름을 수정. 스테이지별 checkpoint path/latest save 검색을 공용화하고, 발견 시 메인 생성 전에 해당 전투 씬으로 이동시켜 기존 3초 복원을 사용한다. 분리된 테스트 경로에서 스테이지별 파일 이름/발견을 검증했다.
