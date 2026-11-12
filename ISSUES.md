@@ -43,3 +43,5 @@
 - M5 Inspector 동기화 모델은 구현됐지만 Godot GUI에서 편집→가져오기→저장 흐름은 직접 확인하지 않았다. 검증 오류는 텍스트 피드백만 제공하며 오류별 레코드 이동/필드 위치 선택은 미구현이다.
 
 - 2026-11-12: computer-use 네이티브 연결이 unavailable 상태라 Godot 편집기 GUI 직접 검증이 막혔다. 자동 파싱/모델 검사와 씬 실행은 통과하지만, Inspector GUI 상호작용 및 모바일 실기기 UI/FPS 검증 증거는 없다.
+
+- 2026-11-12 AVD 재검증 결과: API 29 Android 10 이미지의 GLES 2 한계로 EGL 컨텍스트 생성 실패, API 37 SwiftShader는 Godot GLES3 canvas shader uniform 초과로 검은 화면. APK 설치만으로 Android 실행 호환성이 입증되지 않는다.

@@ -196,3 +196,9 @@
 - 통과: 현재 저장소 소스로 Android Debug APK 재생성 (`build/holo-debug.apk`, 86,356,603 bytes, 2026-11-12 13:51 KST); apksigner v2/v3 서명 검증.
 - UI 확인: computer-use 연결이 세션에서 native pipe unavailable로 실패하여 Godot 도크/Inspector의 시각·상호작용 검증은 수행하지 못했다.
 - 여전히 대기: 실기기(Android 10+), FPS/P95, release AAB/Play 비공개 테스트. API 37 AVD의 GLES3 오류 기록은 해결되지 않았다.
+
+## 2026-11-12 AVD 앱 시작 재검증
+
+- API 29 / Android 10 AVD에 APK 설치는 성공했으나 실행 직후 `EGL_BAD_CONFIG: no ES 3 support`로 앱이 종료되고 홈 화면으로 돌아왔다. 해당 AVD는 GLES 2.0만 제공한다.
+- API 37 AVD에서는 Godot가 GLES 3.0 SwiftShader로 시작하고 프로세스가 유지됐지만, `CanvasShaderGLES3` fragment shader가 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)` 오류를 반복했고 캡처 화면은 검은색이었다. 실제 게임 UI 구동은 실패로 판정한다.
+- 결론: AVD 시작/설치 자체는 가능하나 Android 실행 수직 슬라이스는 통과하지 못했다. Android 10+ 실기기 GLES3 확인과 API 37 shader 문제의 분리가 필요하다.
