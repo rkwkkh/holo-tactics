@@ -270,3 +270,9 @@
 - 신규 `tests/campaign_playability.gd`가 메인 6·선택 2 스테이지를 순서대로 실제 `BattleModel`에 로드한다. 의존 스테이지 완료를 확인하고, 로스터에 맞춘 유닛 배치·공성 수동 이동·재정비 증원으로 전 웨이브를 승리한 뒤 `ProgressStore` 정산·완료 저장·중복 보상 방지를 확인한다.
 - 통과: `All 8 campaign stages won in the seeded playability simulation`. GitHub Actions에도 별도 단계로 추가했다.
 - 범위 제한: 게임 UI 없이 스테이지 ID를 직접 실행하므로 마을 UI/수동 조작 흐름은 검증하지 않는다. 한 개의 자동 전술 시드는 승리 가능성 증거이며 전체 전략 밸런스 승인은 아니다.
+
+## 2026-11-12 continuation regression
+
+- Godot 4.7.2 headless editor import, `tests/run.gd`, `tests/editor_preview.gd`, `tests/results_view.gd`, `tests/campaign_playability.gd`, and `scripts/validate_content.gd` all passed on commit `855590a`.
+- The export script's PowerShell parser check passed; APK manifest confirms min API 29/target API 36 and apksigner confirms v2. Test AAB contains bundle config, base manifest, and dex, but `jarsigner` reports it unsigned.
+- Physical-device rendering/FPS, publisher-key AAB signature, and Play Console upload remain unverified.

@@ -77,3 +77,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - M5 GUI 확인은 Computer Use 네이티브 연결 오류로 미실행, ADB의 두 AVD는 offline. M6 실기기/FPS는 미검증으로 유지한다.
 
 - 2026-11-12 Android export 재검증: Gradle APK/AAB 프리셋의 minimum API를 Android 10(API 29), target API 36으로 맞췄다. 최신 APK manifest와 v2 서명 확인 통과, AAB 패키징 생성 및 구조 확인 통과. AAB는 unsigned 테스트 산출물이다. release key 서명, Play 업로드, 실기기/FPS 검증은 미완료.
+
+- 2026-11-12 재검증: 현재 커밋에서 headless editor import, 전체 모델 테스트, editor preview, results view, 8-stage 캠페인 플레이어빌리티, 콘텐츠 검증이 모두 통과했다. Android export 설정 검증 결과는 `TEST_REPORT.md` 참조.
