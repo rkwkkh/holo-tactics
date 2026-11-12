@@ -354,3 +354,11 @@
 - Android APK 재생성: 249,881,554 bytes, min API 29 / target API 36, APK Signature Scheme v2 검증 성공.
 - Android AAB 재생성: 86,290,465 bytes, bundletool 1.18.3 validate 통과, manifest min API 29 / target API 36 확인. unsigned 테스트 번들.
 - 참고: 첫 bundletool XPath 조회는 element 반환 미지원으로 실패했으나 전체 manifest 출력 방식으로 재확인했다. 실제 Android 기기 실행/FPS, release signing 및 Play 업로드는 검증하지 않았다.
+
+
+## 2026-11-12 재검증: 진행 저장 백업 복구
+
+- tests/run.gd 백업만 남은 진행 저장 복구 회귀 통과. results_view.gd, editor_preview.gd, campaign_playability.gd, validate_content.gd 통과.
+- Godot 4.7.2 headless editor에서 콘텐츠 플러그인 초기화 오류 없음. main/battle/village/village_research/editor_preview 씬 smoke 통과.
+- Android APK 249,881,626 bytes: min API 29, target API 36, APK v2 서명 통과.
+- Android AAB 86,290,543 bytes: bundletool 1.18.3 validate 통과, manifest API 29/36, unsigned임을 확인.

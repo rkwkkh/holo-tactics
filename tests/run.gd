@@ -29,6 +29,10 @@ func _initialize() -> void:
 	assert(progress_restore.settle_run("attempt-4", "stage.m2.siege", "defeat", 0, 40, 12, 6) == 0)
 	progress_restore.data.permanent_currency = -1
 	assert(not progress_restore.save_progress())
+	assert(DirAccess.rename_absolute(ProjectSettings.globalize_path(progress_test_path), ProjectSettings.globalize_path(progress_test_path + ".bak")) == OK)
+	var backup_restore := ProgressStore.new(progress_test_path)
+	assert(backup_restore.load_progress() and backup_restore.data.permanent_currency == 174)
+	assert(FileAccess.file_exists(progress_test_path) and not FileAccess.file_exists(progress_test_path + ".bak"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(progress_test_path))
 	var village_test_path := "user://village_model_test.json"
 	for suffix in ["", ".tmp", ".bak"]:

@@ -11,7 +11,10 @@ func _init(save_path: String = PATH) -> void:
 
 func load_progress() -> bool:
 	if not FileAccess.file_exists(path):
-		return true
+		if not FileAccess.file_exists(path + ".bak"):
+			return true
+		if DirAccess.rename_absolute(ProjectSettings.globalize_path(path + ".bak"), ProjectSettings.globalize_path(path)) != OK:
+			return false
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		return false
