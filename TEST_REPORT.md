@@ -276,3 +276,5 @@
 - Godot 4.7.2 headless editor import, `tests/run.gd`, `tests/editor_preview.gd`, `tests/results_view.gd`, `tests/campaign_playability.gd`, and `scripts/validate_content.gd` all passed on commit `855590a`.
 - The export script's PowerShell parser check passed; APK manifest confirms min API 29/target API 36 and apksigner confirms v2. Test AAB contains bundle config, base manifest, and dex, but `jarsigner` reports it unsigned.
 - Physical-device rendering/FPS, publisher-key AAB signature, and Play Console upload remain unverified.
+
+- 편집기 GUI 직접 확인 재시도는 Computer Use native pipe 초기화 오류로 중단됐다(창 상태/플러그인 상호작용 증거 없음). 별도로 disposable signing key 생성이 자동 검토에서 차단돼 release signing 검증은 진행하지 않았다.

@@ -60,3 +60,6 @@
 
 - 2026-11-12 Android export 설정 이슈 해결: 이전 non-Gradle APK의 minimum API 24는 Android 10+ 기준에 못 미쳤다. Gradle APK/AAB로 전환하고 min API 29, target API 36을 적용했으며 최신 APK manifest에서 확인했다. 이전 산출물은 사용하지 않는다.
 - 출시 AAB 서명 및 업로드는 publisher-owned package ID, release keystore와 Play 권한이 필요하다. 로컬 unsigned AAB 패키징만 확인됨.
+
+- 2026-11-12 재시도: 편집기 직접 GUI 확인을 위해 Godot 창 탐색을 요청했으나 Computer Use native pipe가 “지정된 파일을 찾을 수 없습니다”로 실패해 창 상태를 관찰하지 못했다. M5 GUI 사용성 검증은 미완료로 유지한다.
+- 출시 서명 검증용 disposable keystore 생성 명령은 자동 검토에서 차단됐다. 키를 생성하거나 release 서명 테스트를 완료한 것으로 간주하지 않는다.
