@@ -50,6 +50,7 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	var unit_items := _as_array(categories.get("units", []))
 	var stage_items := _as_array(categories.get("stages", []))
 	var unit_teams: Dictionary = {}
+	var facility_teams: Dictionary = {}
 	var profile_ids := _ids_in(_as_array(categories.get("ai_profiles", [])))
 	for unit in unit_items:
 		if unit is Dictionary and (unit.get("team") not in ["ally", "enemy"] or not _is_positive_number(unit.get("hp")) or not _is_positive_number(unit.get("damage")) or not _is_positive_integer(unit.get("range")) or not _is_positive_number(unit.get("attack_time")) or not _is_nonnegative_integer(unit.get("cost"))):
@@ -64,6 +65,7 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	for facility in _as_array(categories.get("facilities", [])):
 		if not facility is Dictionary:
 			continue
+		facility_teams[facility.get("id", "")] = facility.get("team", "")
 		if facility.get("team") not in ["ally", "enemy"] or not _is_positive_number(facility.get("hp")) or not _is_nonnegative_number(facility.get("damage")) or not _is_nonnegative_number(facility.get("heal", 0)) or not _is_nonnegative_integer(facility.get("range")) or not _is_nonnegative_number(facility.get("attack_time")) or not _is_nonnegative_integer(facility.get("cost")) or not facility.get("blocks_path") is bool:
 			errors.append("%s has invalid facility data" % facility.get("id", "<missing-id>"))
 		elif facility.damage > 0 and (facility.range < 1 or facility.attack_time <= 0):
@@ -143,6 +145,33 @@ static func validate(catalog: Dictionary) -> Array[String]:
 				if blocked.has(wall_cell) or wall_cell == Vector2i(int(core_cell[0]), int(core_cell[1])) or wall_cells.has(wall_cell):
 					errors.append("%s has a conflicting wall cell" % stage.get("id", "<missing-id>"))
 				wall_cells[wall_cell] = true
+		for reference in stage.get("references", []):
+			for wave in wave_items:
+				if not wave is Dictionary or wave.get("id") != reference or not wave.has("enemy_facilities"):
+					continue
+				var placements: Variant = wave.enemy_facilities
+				if not placements is Array:
+					errors.append("%s enemy_facilities must be an array" % wave.get("id", "<missing-id>"))
+					continue
+				var placed_cells: Dictionary = {}
+				for placement in placements:
+					var facility_id: Variant = placement.get("facility_id", "") if placement is Dictionary else null
+					var cell: Variant = placement.get("cell", []) if placement is Dictionary else null
+					if not placement is Dictionary or facility_teams.get(facility_id, "") != "enemy" or not _is_integer_cell(cell) or int(cell[0]) >= columns or int(cell[1]) >= rows:
+						errors.append("%s has invalid enemy facility placement" % wave.get("id", "<missing-id>"))
+						continue
+					if not wave.get("references", []).has(facility_id):
+						errors.append("%s enemy facility must be referenced" % wave.get("id", "<missing-id>"))
+					var placed_cell := Vector2i(int(cell[0]), int(cell[1]))
+					if placed_cell.y > enemy_spawn_row or blocked.has(placed_cell) or wall_cells.has(placed_cell) or placed_cell == Vector2i(int(core_cell[0]), int(core_cell[1])) or placed_cells.has(placed_cell):
+						errors.append("%s has conflicting enemy facility cell" % wave.get("id", "<missing-id>"))
+					for spawn_index in int(wave.get("count", 0)):
+						if placed_cell == Vector2i(2 + spawn_index * 2, enemy_spawn_row):
+							errors.append("%s enemy facility conflicts with initial spawn" % wave.get("id", "<missing-id>"))
+					for group in wave.get("reinforcements", []):
+						if group is Dictionary and _is_integer_cell(group.get("spawn")) and placed_cell == Vector2i(int(group.spawn[0]), int(group.spawn[1])):
+							errors.append("%s enemy facility conflicts with reinforcement spawn" % wave.get("id", "<missing-id>"))
+					placed_cells[placed_cell] = true
 		if columns > 0 and rows > 0 and core_cell is Array and core_cell.size() == 2 and _is_nonnegative_integer(core_cell[0]) and _is_nonnegative_integer(core_cell[1]) and int(core_cell[0]) < columns and int(core_cell[1]) < rows:
 			for reference in stage.get("references", []):
 				for wave in wave_items:

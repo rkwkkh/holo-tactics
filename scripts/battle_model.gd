@@ -21,7 +21,9 @@ var combat_gold := 0
 var next_id := 1
 var units: Array[Dictionary] = []
 var enemies: Array[Dictionary] = []
+var preview_enemies: Array[Dictionary] = []
 var facilities: Array[Dictionary] = []
+var enemy_facilities: Array[Dictionary] = []
 var rewarded_waves: Array[int] = []
 var blocked_cells: Dictionary = {}
 var walls: Array[Dictionary] = []
@@ -63,6 +65,7 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 		walls.append({"cell": Vector2i(wall.cell[0], wall.cell[1]), "hp": float(wall.hp), "max_hp": float(wall.hp)})
 	core_hp = stage.core_hp
 	combat_gold = stage.start_resource
+	_prepare_wave_preview()
 
 func deploy(kind: String, cell: Vector2i) -> bool:
 	if not balance_seed.has(kind) or balance_seed[kind].team != "ally" or not _is_inside(cell) or cell.y < 6 or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied(cell):
@@ -108,16 +111,20 @@ func move_facility(facility_instance_id: int, destination: Vector2i) -> bool:
 func start_wave(store: CheckpointStore) -> bool:
 	if phase != "preparation" or not store.save_checkpoint(to_dict()):
 		return false
+	if not _prepare_wave_preview():
+		phase = "finished"
+		battle_result = "safe_abort"
+		return false
+	enemies.assign(preview_enemies)
+	preview_enemies.clear()
 	phase = "combat"
+	for enemy in enemies:
+		enemy.active = true
+	for facility in enemy_facilities:
+		facility.active = true
 	var wave_definition: Dictionary = waves[wave - 1]
 	wave_elapsed = 0.0
 	pending_reinforcements.clear()
-	for i in wave_definition.count:
-		var spawn := Vector2i(2 + i * 2, int(stage.get("enemy_spawn_row", 0)))
-		if not _spawn_enemy(wave_definition.enemy_id, spawn, wave_definition):
-			phase = "finished"
-			battle_result = "safe_abort"
-			return false
 	for reinforcement in wave_definition.get("reinforcements", []):
 		pending_reinforcements.append({"enemy_id": reinforcement.enemy_id, "remaining": reinforcement.count, "spawn": Vector2i(reinforcement.spawn[0], reinforcement.spawn[1]), "at": float(reinforcement.at), "attempts": 0})
 	return true
@@ -142,9 +149,9 @@ func tick(delta: float) -> void:
 				if unit.cell == unit.destination:
 					unit.erase("destination")
 				continue
-		var target_index := _closest_target(unit.cell, enemies, unit.range)
+		var target_index := _closest_target(unit.cell, enemies + enemy_facilities, unit.range)
 		if target_index >= 0:
-			_strike(unit, enemies[target_index])
+			_strike(unit, (enemies + enemy_facilities)[target_index])
 		elif stage.mode == "siege" and wave == waves.size() and unit.cooldown <= 0.0:
 			var distance := absi(unit.cell.x - core_cell.x) + absi(unit.cell.y - core_cell.y)
 			if distance <= unit.range:
@@ -159,17 +166,24 @@ func tick(delta: float) -> void:
 			continue
 		facility.cooldown = maxf(0.0, facility.cooldown - delta)
 		if facility.damage > 0:
-			var target_index := _closest_target(facility.cell, enemies, facility.range)
+			var target_index := _closest_target(facility.cell, enemies + enemy_facilities, facility.range)
 			if target_index >= 0:
-				_strike(facility, enemies[target_index])
+				_strike(facility, (enemies + enemy_facilities)[target_index])
 		elif facility.heal > 0 and facility.cooldown <= 0.0:
 			var ally_index := _lowest_hp_ally(facility.cell, facility.range)
 			if ally_index >= 0:
 				var ally: Dictionary = units[ally_index]
 				ally.hp = minf(float(balance_seed[ally.kind].hp), ally.hp + facility.heal)
 				facility.cooldown = facility.attack_time
+	for facility in enemy_facilities:
+		if not facility.active or not facility.alive:
+			continue
+		facility.cooldown = maxf(0.0, facility.cooldown - delta)
+		var target_index := _closest_target(facility.cell, units + facilities, facility.range)
+		if target_index >= 0:
+			_strike(facility, (units + facilities)[target_index])
 	for enemy in enemies:
-		if not enemy.alive:
+		if not enemy.alive or not enemy.get("active", true):
 			continue
 		enemy.cooldown = maxf(0.0, enemy.cooldown - delta)
 		var decision := _choose_enemy_action(enemy)
@@ -211,6 +225,7 @@ func tick(delta: float) -> void:
 					unit.hp = balance_seed[unit.kind].hp
 					unit.cooldown = 0.0
 			enemies.clear()
+			_prepare_wave_preview()
 			pending_reinforcements.clear()
 			wave_elapsed = 0.0
 
@@ -318,6 +333,7 @@ func restore(snapshot: Dictionary) -> bool:
 	walls.assign(restored_walls)
 	rewarded_waves.assign(snapshot.get("rewarded_waves", []))
 	enemies.clear()
+	_prepare_wave_preview()
 	return true
 
 func _version_matches(value: Variant, expected: int) -> bool:
@@ -337,7 +353,7 @@ func _closest_target(cell: Vector2i, targets: Array[Dictionary], attack_range: i
 	var best_distance := attack_range + 1
 	for index in targets.size():
 		var target := targets[index]
-		if not target.alive:
+		if not target.alive or not target.get("active", true):
 			continue
 		var distance: int = absi(cell.x - target.cell.x) + absi(cell.y - target.cell.y)
 		if distance <= attack_range and distance < best_distance:
@@ -389,7 +405,7 @@ func _facility_by_id(facility_instance_id: int) -> Dictionary:
 			return facility
 	return {}
 
-func _spawn_enemy(content_id: String, cell: Vector2i, wave_definition: Dictionary) -> bool:
+func _spawn_enemy(content_id: String, cell: Vector2i, wave_definition: Dictionary, active: bool = true) -> bool:
 	var enemy_definition := _unit_by_content_id(content_id)
 	if enemy_definition.is_empty():
 		return false
@@ -411,8 +427,25 @@ func _spawn_enemy(content_id: String, cell: Vector2i, wave_definition: Dictionar
 	var ai_weights: Dictionary = ai_profile.get("weights", {}).duplicate()
 	for action in wave_definition.get("ai_weight_overrides", {}):
 		ai_weights[action] = wave_definition.ai_weight_overrides[action]
-	enemies.append({"id": next_id, "kind": enemy_definition.kind, "cell": spawn, "hp": enemy_definition.hp, "damage": enemy_definition.damage, "range": enemy_definition.range, "ai_profile_id": enemy_definition.ai_profile_id, "ai_weights": ai_weights, "cooldown": 0.0, "alive": true})
-	next_id += 1
+	var destination := enemies if active else preview_enemies
+	destination.append({"id": -1000 - destination.size(), "kind": enemy_definition.kind, "cell": spawn, "hp": enemy_definition.hp, "damage": enemy_definition.damage, "range": enemy_definition.range, "ai_profile_id": enemy_definition.ai_profile_id, "ai_weights": ai_weights, "cooldown": 0.0, "alive": true, "active": active})
+	return true
+
+func _prepare_wave_preview() -> bool:
+	enemies.clear()
+	preview_enemies.clear()
+	enemy_facilities.clear()
+	if wave < 1 or wave > waves.size():
+		return false
+	var wave_definition: Dictionary = waves[wave - 1]
+	for index in wave_definition.get("enemy_facilities", []).size():
+		var placement: Dictionary = wave_definition.enemy_facilities[index]
+		var definition: Dictionary = facility_definitions[placement.facility_id]
+		enemy_facilities.append({"id": -index - 1, "facility_id": placement.facility_id, "kind": definition.kind, "cell": Vector2i(placement.cell[0], placement.cell[1]), "hp": definition.hp, "damage": definition.damage, "heal": definition.get("heal", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": 0.0, "alive": true, "active": false})
+	for index in wave_definition.count:
+		var spawn := Vector2i(2 + index * 2, int(stage.get("enemy_spawn_row", 0)))
+		if not _spawn_enemy(wave_definition.enemy_id, spawn, wave_definition, false):
+			return false
 	return true
 
 func _advance_reinforcements() -> bool:
@@ -436,7 +469,7 @@ func _advance_reinforcements() -> bool:
 	return true
 
 func _occupied(cell: Vector2i) -> bool:
-	for item in units + enemies + facilities:
+	for item in units + enemies + preview_enemies + facilities + enemy_facilities:
 		if item.alive and item.cell == cell:
 			return true
 	return false

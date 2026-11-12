@@ -45,6 +45,18 @@ func _initialize() -> void:
 	var invalid_healer_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_healer_catalog.categories.facilities[2].range = 0
 	assert(ContentValidator.validate(invalid_healer_catalog).any(func(error): return error.contains("invalid facility healing data")))
+	var invalid_enemy_facility_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_enemy_facility_catalog.categories.waves[2].enemy_facilities[0].facility_id = "facility.arrow_tower"
+	assert(ContentValidator.validate(invalid_enemy_facility_catalog).any(func(error): return error.contains("invalid enemy facility placement")))
+	invalid_enemy_facility_catalog = seeded_catalog.duplicate(true)
+	invalid_enemy_facility_catalog.categories.waves[2].enemy_facilities[0].cell = [8, 1]
+	assert(ContentValidator.validate(invalid_enemy_facility_catalog).any(func(error): return error.contains("invalid enemy facility placement")))
+	invalid_enemy_facility_catalog = seeded_catalog.duplicate(true)
+	invalid_enemy_facility_catalog.categories.waves[2].enemy_facilities[0].cell = [2, 2]
+	assert(ContentValidator.validate(invalid_enemy_facility_catalog).any(func(error): return error.contains("conflicts with initial spawn")))
+	invalid_enemy_facility_catalog = seeded_catalog.duplicate(true)
+	invalid_enemy_facility_catalog.categories.waves[2].references.erase("facility.enemy_watchtower")
+	assert(ContentValidator.validate(invalid_enemy_facility_catalog).any(func(error): return error.contains("enemy facility must be referenced")))
 	var wall_restore_source := BattleModel.new()
 	wall_restore_source.walls[0].hp = 20.0
 	var wall_snapshot: Dictionary = wall_restore_source.to_dict()
@@ -243,6 +255,23 @@ func _initialize() -> void:
 	assert(core_test.phase == "finished" and core_test.battle_result == "defeat")
 	var siege_test := BattleModel.new("stage.m2.siege")
 	assert(siege_test.stage.mode == "siege" and siege_test.core_cell == Vector2i(4, 0))
+	var enemy_facility_test := BattleModel.new("stage.m2.siege")
+	assert(enemy_facility_test.enemy_facilities.size() == 1 and not enemy_facility_test.enemy_facilities[0].active)
+	assert(enemy_facility_test.preview_enemies.size() == 2 and not enemy_facility_test.preview_enemies[0].active and enemy_facility_test.enemies.is_empty())
+	var enemy_facility_store := CheckpointStore.new("user://m2_enemy_facility_test.json")
+	assert(enemy_facility_test.start_wave(enemy_facility_store) and enemy_facility_test.enemy_facilities[0].active)
+	assert(enemy_facility_test.enemies.size() == 2 and enemy_facility_test.enemies.all(func(enemy: Dictionary): return enemy.active) and enemy_facility_test.preview_enemies.is_empty())
+	var watchtower: Dictionary = enemy_facility_test.enemy_facilities[0]
+	enemy_facility_test.units.append({"id": 400, "kind": "swordsman", "cell": Vector2i(1, 2), "hp": 120.0, "damage": 20.0, "range": 1, "cooldown": 0.0, "alive": true})
+	for enemy in enemy_facility_test.enemies:
+		enemy.alive = false
+	enemy_facility_test.enemies.append({"id": 401, "kind": "goblin", "cell": Vector2i(7, 2), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})
+	enemy_facility_test.tick(0.2)
+	assert(watchtower.hp == 80.0 and enemy_facility_test.units[0].hp == 108.0)
+	enemy_facility_test.enemies.back().alive = false
+	enemy_facility_test.tick(0.2)
+	assert(enemy_facility_test.wave == 2 and enemy_facility_test.enemy_facilities.size() == 1 and enemy_facility_test.enemy_facilities[0].kind == "mage_tower" and not enemy_facility_test.enemy_facilities[0].active)
+	enemy_facility_store.clear_checkpoint()
 	siege_test.wave = siege_test.waves.size()
 	siege_test.phase = "combat"
 	siege_test.core_hp = 20.0
@@ -259,6 +288,7 @@ func _initialize() -> void:
 	var siege_checkpoint := siege_checkpoint_source.to_dict()
 	var siege_restore_test := BattleModel.new("stage.m2.siege")
 	assert(siege_restore_test.restore(siege_checkpoint))
+	assert(siege_restore_test.preview_enemies.size() == 2 and siege_restore_test.enemy_facilities.size() == 1 and not siege_restore_test.enemy_facilities[0].active)
 	assert(not BattleModel.new().restore(siege_checkpoint))
 	var path_test := BattleModel.new()
 	path_test.phase = "combat"

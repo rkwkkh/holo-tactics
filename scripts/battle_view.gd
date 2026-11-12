@@ -215,9 +215,12 @@ func _refresh() -> void:
 					tile.text = "화" if facility.kind == "arrow_tower" else "마" if facility.kind == "magic_tower" else "지" if facility.kind == "support_outpost" else "방"
 					if facility.id == selected_facility_instance:
 						tile.text = "[" + tile.text + "]"
-			for enemy in battle.enemies:
+			for enemy in battle.enemies + battle.preview_enemies:
 				if enemy.alive and enemy.cell == cell:
 					tile.text = "적"
+			for facility in battle.enemy_facilities:
+				if facility.alive and facility.cell == cell:
+					tile.text = "적탑"
 		if not status_override.is_empty():
 			status.text = status_override
 		elif battle.phase == "finished":
