@@ -42,6 +42,9 @@ func _initialize() -> void:
 	var invalid_facility_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_facility_catalog.categories.facilities[0].hp = 0
 	assert(ContentValidator.validate(invalid_facility_catalog).any(func(error): return error.contains("invalid facility data")))
+	var invalid_healer_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_healer_catalog.categories.facilities[2].range = 0
+	assert(ContentValidator.validate(invalid_healer_catalog).any(func(error): return error.contains("invalid facility healing data")))
 	var wall_restore_source := BattleModel.new()
 	wall_restore_source.walls[0].hp = 20.0
 	var wall_snapshot: Dictionary = wall_restore_source.to_dict()
@@ -151,6 +154,31 @@ func _initialize() -> void:
 	var facility_snapshot: Dictionary = facility_snapshot_source.to_dict()
 	var facility_snapshot_target := BattleModel.new()
 	assert(facility_snapshot_target.restore(facility_snapshot) and facility_snapshot_target.facilities[0].hp == 35.0)
+	var support_heal_test := BattleModel.new()
+	support_heal_test.combat_gold = 205
+	assert(support_heal_test.deploy("swordsman", Vector2i(1, 8)) and support_heal_test.deploy("archer", Vector2i(2, 8)))
+	support_heal_test.units[0].hp = 110.0
+	support_heal_test.units[1].hp = 30.0
+	assert(support_heal_test.build_facility("facility.support_outpost", Vector2i(3, 8)))
+	support_heal_test.phase = "combat"
+	support_heal_test.enemies.append({"id": 4, "kind": "goblin", "cell": Vector2i.ZERO, "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})
+	support_heal_test.tick(0.2)
+	assert(support_heal_test.units[0].hp == 110.0 and support_heal_test.units[1].hp == 38.0)
+	assert(support_heal_test.facilities[0].cooldown == 1.5)
+	support_heal_test.facilities[0].cooldown = 0.0
+	support_heal_test.units[0].hp = 120.0
+	support_heal_test.units[1].hp = 75.0
+	support_heal_test.tick(0.2)
+	assert(support_heal_test.units[1].hp == 80.0)
+	support_heal_test.units[0].alive = false
+	support_heal_test.units[0].hp = 0.0
+	support_heal_test.facilities[0].cooldown = 0.0
+	support_heal_test.tick(0.2)
+	assert(support_heal_test.units[0].hp == 0.0 and support_heal_test.units[1].hp == 80.0 and support_heal_test.facilities[0].cooldown == 0.0)
+	support_heal_test.phase = "preparation"
+	var support_heal_snapshot := support_heal_test.to_dict()
+	var support_heal_restore := BattleModel.new()
+	assert(support_heal_restore.restore(support_heal_snapshot) and support_heal_restore.facilities[0].heal == 8)
 	var rebuilt_cell_model := BattleModel.new()
 	assert(rebuilt_cell_model.deploy("swordsman", Vector2i(3, 8)))
 	rebuilt_cell_model.units[0].alive = false

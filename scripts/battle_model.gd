@@ -91,7 +91,7 @@ func build_facility(facility_id: String, cell: Vector2i) -> bool:
 	if definition.team != "ally" or combat_gold < definition.cost:
 		return false
 	combat_gold -= definition.cost
-	facilities.append({"id": next_id, "facility_id": facility_id, "kind": definition.kind, "cell": cell, "hp": definition.hp, "damage": definition.damage, "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": 0.0, "alive": true})
+	facilities.append({"id": next_id, "facility_id": facility_id, "kind": definition.kind, "cell": cell, "hp": definition.hp, "damage": definition.damage, "heal": definition.get("heal", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": 0.0, "alive": true})
 	next_id += 1
 	return true
 
@@ -155,12 +155,19 @@ func tick(delta: float) -> void:
 				if not route.is_empty() and route[0] != core_cell:
 					unit.cell = route[0]
 	for facility in facilities:
-		if not facility.alive or facility.damage <= 0:
+		if not facility.alive:
 			continue
 		facility.cooldown = maxf(0.0, facility.cooldown - delta)
-		var target_index := _closest_target(facility.cell, enemies, facility.range)
-		if target_index >= 0:
-			_strike(facility, enemies[target_index])
+		if facility.damage > 0:
+			var target_index := _closest_target(facility.cell, enemies, facility.range)
+			if target_index >= 0:
+				_strike(facility, enemies[target_index])
+		elif facility.heal > 0 and facility.cooldown <= 0.0:
+			var ally_index := _lowest_hp_ally(facility.cell, facility.range)
+			if ally_index >= 0:
+				var ally: Dictionary = units[ally_index]
+				ally.hp = minf(float(balance_seed[ally.kind].hp), ally.hp + facility.heal)
+				facility.cooldown = facility.attack_time
 	for enemy in enemies:
 		if not enemy.alive:
 			continue
@@ -271,7 +278,7 @@ func restore(snapshot: Dictionary) -> bool:
 		var cell := Vector2i(int(saved_facility.cell[0]), int(saved_facility.cell[1]))
 		if definition.team != "ally" or ids.has(id) or cell.y < 5 or (saved_facility.alive and (cell == core_cell or occupied.has(cell) or blocked_cells.has(cell) or _wall_at(cell) >= 0)) or not _is_finite_nonnegative(saved_facility.get("hp")) or float(saved_facility.hp) > float(definition.hp) or not _is_finite_nonnegative(saved_facility.get("cooldown")) or (saved_facility.alive and saved_facility.hp <= 0.0) or (not saved_facility.alive and saved_facility.hp > 0.0):
 			return false
-		var facility: Dictionary = {"id": id, "facility_id": saved_facility.facility_id, "kind": definition.kind, "cell": cell, "hp": float(saved_facility.hp), "damage": definition.damage, "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": float(saved_facility.cooldown), "alive": saved_facility.alive}
+		var facility: Dictionary = {"id": id, "facility_id": saved_facility.facility_id, "kind": definition.kind, "cell": cell, "hp": float(saved_facility.hp), "damage": definition.damage, "heal": definition.get("heal", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": float(saved_facility.cooldown), "alive": saved_facility.alive}
 		ids[id] = true
 		if facility.alive:
 			occupied[cell] = true
@@ -336,6 +343,21 @@ func _closest_target(cell: Vector2i, targets: Array[Dictionary], attack_range: i
 		if distance <= attack_range and distance < best_distance:
 			best = index
 			best_distance = distance
+	return best
+
+func _lowest_hp_ally(cell: Vector2i, heal_range: int) -> int:
+	var best := -1
+	var lowest_ratio := 1.0
+	for index in units.size():
+		var unit: Dictionary = units[index]
+		var max_hp := float(balance_seed[unit.kind].hp)
+		var distance := absi(cell.x - unit.cell.x) + absi(cell.y - unit.cell.y)
+		if not unit.alive or unit.hp >= max_hp or distance > heal_range:
+			continue
+		var ratio: float = float(unit.hp) / max_hp
+		if ratio < lowest_ratio:
+			best = index
+			lowest_ratio = ratio
 	return best
 
 func _strike(attacker: Dictionary, target: Dictionary) -> void:
