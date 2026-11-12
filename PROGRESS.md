@@ -105,3 +105,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12 R-UI-002 진행: 선택 아군 유닛의 강화·수동 스킬을 타일 주변 플로팅 패널로 표시하고 화면 경계 안으로 위치를 보정한다. 선택 시설은 HP와 재배치 안내를 표시한다. headless UI 검사에서 표시 대상·부모 관계·화면 경계와 일시정지 조회를 확인했다. 시설 강화/수리 조작은 별도 정책/기능 미완료라 R-UI-002 전체 완료로 보지 않는다.
 
 - 2026-11-12: R-UI-002 플로팅 패널까지 포함해 Android Debug APK/AAB를 갱신했다. APK `build/holo-debug.apk` 249,877,422 bytes (min API 29/target API 36, v2 signature true); AAB `build/holo-test.aab` 86,286,445 bytes (bundletool 1.18.3 validation pass, same API levels, unsigned). 실기기/성능 및 Play 서명 미검증.
+
+- 2026-11-12 정책 회귀: 최신 사용자 결정인 기본 5종 단계별 스토리 해금을 `tests/campaign_playability.gd`에서 직접 assert한다. M1 시작 검사/궁수, M2 이후 창병, M4 숲 지원병, M5 성채 마법사 시점을 확인하고 8-stage 승리 시뮬레이션도 통과했다. 원본 기획 문서는 수정하지 않았다.

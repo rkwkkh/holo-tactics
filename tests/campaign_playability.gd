@@ -9,6 +9,7 @@ func _initialize() -> void:
 	var catalog: Dictionary = JSON.parse_string(file.get_as_text())
 	var stages: Array = catalog.categories.stages.filter(func(stage): return stage.get("campaign_kind", "") in ["main", "optional"])
 	stages.sort_custom(func(a: Dictionary, b: Dictionary): return a.campaign_kind == b.campaign_kind and a.campaign_order < b.campaign_order or a.campaign_kind == "main" and b.campaign_kind == "optional")
+	_assert_story_unit_unlocks(stages)
 	var progress_path := "user://campaign_playability_%s.json" % Time.get_ticks_usec()
 	var progress = ProgressStore.new(progress_path)
 	assert(progress.load_progress())
@@ -53,6 +54,17 @@ func _initialize() -> void:
 		if FileAccess.file_exists(cleanup_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(cleanup_path))
 	print("All 8 campaign stages won in the seeded playability simulation")
 	quit(0)
+
+func _assert_story_unit_unlocks(stages: Array) -> void:
+	var available_by_stage := {}
+	for stage in stages:
+		available_by_stage[stage.id] = stage.available_units
+	assert(available_by_stage["stage.m1.frontier"] == ["swordsman", "archer"])
+	assert(available_by_stage["stage.m2.crossroads"].has("spearman"))
+	assert(not available_by_stage["stage.m2.crossroads"].has("support"))
+	assert(available_by_stage["stage.m4.forest"].has("support"))
+	assert(not available_by_stage["stage.m4.forest"].has("mage"))
+	assert(available_by_stage["stage.m5.citadel"].has("mage"))
 
 func _deploy_reinforcements(model, preferred: Array[String]) -> void:
 	var cells: Array[Vector2i] = []
