@@ -112,3 +112,5 @@
 - AVD 시작 구간 17프레임의 p50 61ms/p90 300ms는 앱 실행/셰이더 준비가 포함된 불충분 샘플이다. 성능 목표 통과로 처리하지 않는다.
 - R-EFFECT-005 상태이상 저항, 행동불가 중첩 우선순위, 지속 피해의 방어/보호막 상호작용은 원문상 OPEN이다. 현재 SEED 동작은 개별 회귀 테스트로 검증되나 제품 규칙 확정은 아니다.
 - M5 EditorPlugin은 headless 초기화/데이터 편집 모델 테스트를 통과했으나 편집기 GUI에서 3개 탭의 실제 Inspector/저장/오류 이동 조작은 검증 대기다.
+
+- 2026-11-12 M5 GUI 재시도: Computer Use `getState()`에서 native app pipe의 지정 파일 없음과 browser host unavailable을 받았다. GUI 실행/클릭은 시작되지 않았고 M5 시각/Inspector 저장 흐름은 미검증이다. Headless EditorPlugin 초기화와 자동 테스트는 통과했다.

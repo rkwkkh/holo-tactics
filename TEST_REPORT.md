@@ -473,3 +473,9 @@
 - M1 1웨이브 전투 도중 Android 앱을 force-stop하고 다시 실행했다. 앱은 캠페인 메뉴 대신 진행 중이던 M1 전투로 직접 복귀했다.
 - 재개 화면에서 같은 웨이브, core HP 300, 생존 검사 및 남은 적, 전투 자원을 표시하고 전투를 계속했다. 비정상 종료가 포기로 처리되지 않고 저장된 전투를 복원하는 경로를 AVD에서 확인했다.
 - 영구 잔액 105도 앱 재시작 뒤 캠페인 메뉴에 유지됨을 확인했다. 증거는 API37 AVD Vulkan SwiftShader이며 물리 Android 데이터 마이그레이션/기기 다양성 검증은 아니다.
+
+## Android renderer 후속 회귀 및 편집기 연결 재시도 (2026-11-12)
+
+- Godot 4.7.2 headless editor/plugin 초기화 통과. `tests/run.gd`, `tests/results_view.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`(8/8), 콘텐츠 validator 모두 통과; 콘텐츠 Error 0.
+- Computer Use 연결은 native pipe 누락 파일, browser host unavailable로 다시 실패했다. 이번 시도는 GUI 클릭·시각 편집 테스트 증거가 아니며 M5 GUI 검증을 대신하지 않는다.
+- 코드/설정 변경이 없으므로 APK/AAB는 다시 생성하지 않았다. 현재 APK/AAB 증거는 2026-11-12 Android Vulkan 섹션을 참조한다.
