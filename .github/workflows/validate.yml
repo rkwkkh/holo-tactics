@@ -49,6 +49,7 @@ jobs:
           godot --headless --path . res://scenes/editor_preview.tscn --quit-after 2
 
   android-aab:
+    needs: godot
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

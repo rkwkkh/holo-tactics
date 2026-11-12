@@ -548,3 +548,7 @@ Passed Godot 4.7.2 headless editor import, `tests/run.gd`, `tests/editor_preview
 ## M0–M4 milestone evidence reconciliation (2026-11-12)
 
 Marked M0–M4 complete in `PROGRESS.md`: M1 has API37 manual defense evidence plus headless combat/checkpoint/reward tests; M2/M3 have outcome, AI/path, growth/evolution/status tests; M4 has campaign lock/reward persistence checks and a seeded 8/8 stage win simulation across all 26 waves. The seeded simulation is not a full manual UI campaign run; that remains additional QA. M5 GUI interaction and M6 physical-device/FPS/release-signing gates remain incomplete.
+
+## CI build gate correction (2026-11-12)
+
+The Android AAB job now declares `needs: godot`, so export and artifact upload are skipped unless import, tests, content validation, and scene smoke all succeed. Reviewed the workflow diff and `git diff --check`; no local actionlint/YAML parser is installed, so a hosted GitHub Actions run remains the authoritative workflow validation.
