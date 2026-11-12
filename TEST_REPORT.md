@@ -88,3 +88,8 @@
 - 통과: Godot 4.7.2 headless editor import, 테스트 성공 sentinel, 콘텐츠 validator, main scene 실행, Android Debug APK export/sign/verify 및 `git diff --check`.
 - 최신 `build/holo-debug.apk`: 86,280,823 bytes, 2026-11-12 09:51 KST. APK Signature v2/v3 검증 통과.
 - ADB: `emulator-5554`, `emulator-5556` 모두 offline. APK 설치·실행은 불가했고 실기기/Android 10 기기는 미검증이다. 이전 GLES2/GLES3 AVD 한계도 해결 증거가 없다.
+
+## 해금 목록 validator 경계 검사 (2026-11-12)
+
+- 잘못된 스테이지 해금 목록이 유닛 누락·중복 또는 잘못된 `references` 형태를 가져도 validator가 충돌하지 않고 Error를 반환하는 회귀 검사를 추가했다.
+- 통과: Godot 4.7.2 headless editor import, 전체 테스트 성공 sentinel, 콘텐츠 검사, `git diff --check`.

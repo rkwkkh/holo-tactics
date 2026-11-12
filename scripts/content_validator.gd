@@ -113,12 +113,13 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		if not stage is Dictionary:
 			continue
 		var available_units: Variant = stage.get("available_units", [])
+		var stage_references: Variant = stage.get("references", [])
 		if not available_units is Array or available_units.is_empty():
 			errors.append("%s must list available units" % stage.get("id", "<missing-id>"))
 		else:
 			for kind in available_units:
 				var matching_units: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == kind and unit.get("team") == "ally")
-				if matching_units.size() != 1 or not stage.get("references", []).has(matching_units[0].get("id", "")):
+				if matching_units.size() != 1 or not stage_references is Array or not stage_references.has(matching_units[0].get("id", "")):
 					errors.append("%s has invalid available unit: %s" % [stage.get("id", "<missing-id>"), kind])
 		var columns := int(stage.get("columns", 0))
 		var rows := int(stage.get("rows", 0))

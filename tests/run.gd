@@ -33,6 +33,11 @@ func _initialize() -> void:
 	var invalid_support_unit: Dictionary = seeded_catalog.duplicate(true)
 	invalid_support_unit.categories.units[3].heal_range = 0
 	assert(ContentValidator.validate(invalid_support_unit).any(func(error): return error.contains("invalid unit healing data")))
+	var invalid_available_unit: Dictionary = seeded_catalog.duplicate(true)
+	invalid_available_unit.categories.stages[0].available_units.append("support")
+	assert(ContentValidator.validate(invalid_available_unit).any(func(error): return error.contains("invalid available unit: support")))
+	invalid_available_unit.categories.stages[0].references = "malformed"
+	assert(not ContentValidator.validate(invalid_available_unit).is_empty())
 	var ai_override_catalog: Dictionary = seeded_catalog.duplicate(true)
 	ai_override_catalog.categories.waves[0].ai_weight_overrides = {"objective": 1.5}
 	assert(ContentValidator.validate(ai_override_catalog).is_empty())

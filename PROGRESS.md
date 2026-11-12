@@ -23,3 +23,5 @@
 재검증 (2026-11-12): 5/6종 유닛을 카탈로그 검증, 실제 배치·전투 대상으로 확장했다. 상세는 `TEST_REPORT.md`. M1 OPEN 승패 정책, 시설 수리와 실기기 확인은 미완료 항목으로 유지한다.
 
 재검증 (2026-11-12): stage.available_units를 배치 UI·전투 모델·validator에서 공통으로 사용한다. M1은 검사/궁수, M2는 창병까지 허용한다. headless 전체 테스트와 APK export 통과; 실기기 화면 검증은 미완료다.
+
+validator 회귀 검사 (2026-11-12): 잘못된 해금 유닛과 비정상 stage references에서 충돌 없이 Error를 반환함을 검증했다. 전체 headless 테스트 및 카탈로그 검증 통과.
