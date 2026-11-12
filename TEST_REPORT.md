@@ -28,6 +28,12 @@
 - 편집기 GUI에서 패널 렌더링/저장 버튼 상호작용과 실시간 게임 실행은 직접 클릭하지 않아 미검증이다. Error 필드 클릭 탐색과 Inspector 통합은 미구현.
 - M5 preview 포함 Android Debug APK 재생성: `build/holo-debug.apk`, 86,348,202 bytes (2026-11-12 13:18 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 실기기 실행과 성능은 미검증.
 
+## 공성 전진 및 캠페인 시뮬레이션 (2026-11-12)
+
+- 수정 전에는 아군 이동/복원 목적지가 y≥5로 제한되어 적 진영 전진이 불가능했다. 제한 해제 후 적 진영(y<5) 이동, 방벽으로 완전히 막힌 이동 명령 거부, 재정비 체크포인트 복원을 자동 테스트한다.
+- 탐색용 headless 자동 전투(제한된 단순 전술, 수동 스킬/강화 미사용)는 8개 중 7개 승리했다. M4 숲 W4 패배는 `ISSUES.md`에 플레이 밸런스 검증 위험으로 남겼다. 해당 진단은 정식 인수 테스트가 아니며 모든 경로·플레이스타일의 승리를 증명하지 않는다.
+- 적 진영 이동/도달 경로 수정 포함 Android Debug APK 재생성: `build/holo-debug.apk`, 86,352,298 bytes (2026-11-12 13:35 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 실기기/성능 미검증.
+
 ## M0
 
 - 실행 환경: Windows, Godot 4.7.2 stable, Java 17; Android SDK 경로는 `%LOCALAPPDATA%/Android/Sdk`.

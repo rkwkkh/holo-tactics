@@ -37,12 +37,18 @@ func _initialize() -> void:
 	assert(village_test.store_building("training_hall") and not village_test.has_building("training_hall"))
 	assert(village_test.place_building("training_hall", Vector2i(0, 1)) and village_test.progress.data.permanent_currency == 25)
 	var village_unlock_path := "user://village_unlock_test.json"
+	for suffix in ["", ".tmp", ".bak"]:
+		var old_unlock_path: String = village_unlock_path + suffix
+		if FileAccess.file_exists(old_unlock_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(old_unlock_path))
 	var village_unlock_test := VillageModel.new(village_unlock_path)
 	assert(not village_unlock_test.place_building("workshop", Vector2i(0, 0)))
 	village_unlock_test.progress.data.completed_stages.append("stage.m2.crossroads")
 	assert(village_unlock_test.progress.save_progress() and village_unlock_test.place_building("workshop", Vector2i(0, 0)))
 	assert(village_unlock_test.has_building("workshop") and village_unlock_test.progress.data.permanent_currency == 0)
 	var research_path := "user://village_research_test.json"
+	for suffix in ["", ".tmp", ".bak"]:
+		var old_research_path: String = research_path + suffix
+		if FileAccess.file_exists(old_research_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(old_research_path))
 	var research_village := VillageModel.new(research_path)
 	research_village.progress.data.completed_stages.append("stage.m1.frontier")
 	research_village.progress.data.permanent_currency = 200
@@ -65,6 +71,21 @@ func _initialize() -> void:
 	var direct_wave_preview := BattleModel.new("stage.m1.frontier")
 	assert(direct_wave_preview.select_preview_wave(direct_wave_preview.waves[1].id))
 	assert(direct_wave_preview.wave == 2 and direct_wave_preview.phase == "preparation" and direct_wave_preview.combat_gold == direct_wave_preview.stage.start_resource)
+	var siege_movement := BattleModel.new("stage.m3.fortress")
+	var siege_movement_store := CheckpointStore.new("user://siege_movement_test.json")
+	assert(siege_movement.deploy("swordsman", Vector2i(3, 8)))
+	assert(siege_movement.start_wave(siege_movement_store))
+	var original_blocked := siege_movement.blocked_cells.duplicate()
+	for x in BattleModel.COLUMNS:
+		siege_movement.blocked_cells[Vector2i(x, 4)] = true
+	assert(not siege_movement.move_unit(1, Vector2i(2, 3)))
+	siege_movement.blocked_cells = original_blocked
+	assert(siege_movement.move_unit(1, Vector2i(2, 3)))
+	siege_movement.phase = "preparation"
+	var siege_movement_restore := BattleModel.new("stage.m3.fortress")
+	assert(siege_movement_restore.restore(siege_movement.to_dict()))
+	assert(siege_movement_restore.units[0].destination == Vector2i(2, 3))
+	siege_movement_store.clear_checkpoint()
 	var legacy_path := "user://legacy_progress_test.json"
 	var legacy := village_unlock_test.progress.data.duplicate(true)
 	legacy.erase("buildings")

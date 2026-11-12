@@ -235,7 +235,7 @@ func _distance(a: Vector2i, b: Vector2i) -> int:
 
 func move_unit(unit_id: int, destination: Vector2i) -> bool:
 	var unit := _unit_by_id(unit_id)
-	if unit.is_empty() or phase != "combat" or not _is_inside(destination) or destination.y < 5 or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or _occupied(destination):
+	if unit.is_empty() or phase != "combat" or not _is_inside(destination) or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or _occupied(destination) or _find_path(unit, destination).is_empty():
 		return false
 	unit.destination = destination
 	unit.cooldown = maxf(unit.cooldown, 0.5)
@@ -302,8 +302,10 @@ func tick(delta: float) -> void:
 				unit.erase("destination")
 			else:
 				var route := _find_path(unit, unit.destination)
-				if not route.is_empty():
-					unit.cell = route[0]
+				if route.is_empty():
+					unit.erase("destination")
+					continue
+				unit.cell = route[0]
 				if unit.cell == unit.destination:
 					unit.erase("destination")
 				continue
@@ -482,14 +484,12 @@ func restore(snapshot: Dictionary) -> bool:
 		unit.shield = 0.0
 		unit.attack_count = int(saved_unit.get("attack_count", 0))
 		_apply_unit_upgrades(unit)
-		if ids.has(id) or cell.y < 5 or occupied.has(cell) or not _is_finite_nonnegative(saved_unit.get("hp")) or float(saved_unit.hp) > stats.hp or not _version_matches(saved_unit.get("damage"), int(unit.damage)) or not _version_matches(saved_unit.get("range"), int(unit.range)) or not _version_matches(saved_unit.get("heal", stats.get("heal", 0)), int(unit.heal)) or not _version_matches(saved_unit.get("heal_range", stats.get("heal_range", 0)), int(unit.heal_range)) or not _version_matches(saved_unit.get("splash_radius", stats.get("splash_radius", 0)), int(unit.splash_radius)) or not _is_finite_nonnegative(saved_unit.get("cooldown")):
+		if ids.has(id) or occupied.has(cell) or not _is_finite_nonnegative(saved_unit.get("hp")) or float(saved_unit.hp) > stats.hp or not _version_matches(saved_unit.get("damage"), int(unit.damage)) or not _version_matches(saved_unit.get("range"), int(unit.range)) or not _version_matches(saved_unit.get("heal", stats.get("heal", 0)), int(unit.heal)) or not _version_matches(saved_unit.get("heal_range", stats.get("heal_range", 0)), int(unit.heal_range)) or not _version_matches(saved_unit.get("splash_radius", stats.get("splash_radius", 0)), int(unit.splash_radius)) or not _is_finite_nonnegative(saved_unit.get("cooldown")):
 			return false
 		if unit.has("destination") and not _is_valid_cell(unit.destination):
 			return false
 		if unit.has("destination"):
 			unit.destination = Vector2i(int(unit.destination[0]), int(unit.destination[1]))
-			if unit.destination.y < 5:
-				return false
 		if unit.alive and unit.hp <= 0.0 or not unit.alive and unit.hp > 0.0:
 			return false
 		unit.cell = cell
