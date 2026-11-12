@@ -413,7 +413,9 @@ func _initialize() -> void:
 	for index in ally_kinds.size():
 		assert(roster_deploy_test.deploy(ally_kinds[index], Vector2i(index, 8)))
 	assert(roster_deploy_test.units.size() == 5 and roster_deploy_test.combat_gold == 660)
-	assert(seeded_catalog.categories.upgrades.size() == 20)
+	assert(seeded_catalog.categories.upgrades.size() == 24)
+	assert(seeded_catalog.categories.upgrades.filter(func(upgrade): return upgrade.has("unit_kind")).size() == 20)
+	assert(seeded_catalog.categories.upgrades.filter(func(upgrade): return upgrade.has("facility_id")).size() == 4)
 	assert(seeded_catalog.categories.skills.size() == 10)
 	var incomplete_campaign: Dictionary = seeded_catalog.duplicate(true)
 	incomplete_campaign.categories.stages.erase(incomplete_campaign.categories.stages.filter(func(stage): return stage.get("id") == "stage.s2.supply")[0])
@@ -560,7 +562,7 @@ func _initialize() -> void:
 	assert(support_upgrade_test.units[0].hp == 68.0 and support_upgrade_test.units[1].hp == 48.0)
 	assert(support_upgrade_test.units[0].shield == 10.0 and support_upgrade_test.units[1].shield == 10.0 and not support_upgrade_test.units[1].statuses.has("freeze"))
 	assert(support_upgrade_test.units[1].statuses.attack_buff.value == 0.1)
-	for upgrade in seeded_catalog.categories.upgrades:
+	for upgrade in seeded_catalog.categories.upgrades.filter(func(item): return item.has("unit_kind")):
 		var every_upgrade_test := BattleModel.new()
 		every_upgrade_test.stage.available_units = [upgrade.unit_kind]
 		every_upgrade_test.combat_gold = 10000
@@ -616,7 +618,7 @@ func _initialize() -> void:
 	invalid_upgrade_checkpoint.units[0].upgrades["upgrade.swordsman.charge"] = 4
 	assert(not BattleModel.new().restore(invalid_upgrade_checkpoint))
 	var invalid_upgrade: Dictionary = seeded_catalog.duplicate(true)
-	invalid_upgrade.categories.upgrades.pop_back()
+	invalid_upgrade.categories.upgrades.remove_at(19)
 	assert(ContentValidator.validate(invalid_upgrade).any(func(error): return error.contains("exactly four combat upgrades")))
 	var invalid_support_unit: Dictionary = seeded_catalog.duplicate(true)
 	invalid_support_unit.categories.units[3].heal_range = 0
@@ -648,6 +650,18 @@ func _initialize() -> void:
 	var invalid_facility_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_facility_catalog.categories.facilities[0].hp = 0
 	assert(ContentValidator.validate(invalid_facility_catalog).any(func(error): return error.contains("invalid facility data")))
+	var invalid_facility_upgrade_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_facility_upgrade_catalog.categories.upgrades[20].facility_id = "facility.unknown"
+	assert(ContentValidator.validate(invalid_facility_upgrade_catalog).any(func(error): return error.contains("invalid facility upgrade target")))
+	invalid_facility_upgrade_catalog = seeded_catalog.duplicate(true)
+	invalid_facility_upgrade_catalog.categories.upgrades[0].facility_id = 42
+	assert(ContentValidator.validate(invalid_facility_upgrade_catalog).any(func(error): return error.contains("exactly one upgrade target is required")))
+	invalid_facility_upgrade_catalog = seeded_catalog.duplicate(true)
+	invalid_facility_upgrade_catalog.categories.upgrades[20].effect = "facility_hp"
+	assert(ContentValidator.validate(invalid_facility_upgrade_catalog).any(func(error): return error.contains("invalid facility upgrade effect")))
+	invalid_facility_upgrade_catalog = seeded_catalog.duplicate(true)
+	invalid_facility_upgrade_catalog.categories.upgrades.remove_at(20)
+	assert(ContentValidator.validate(invalid_facility_upgrade_catalog).any(func(error): return error.contains("must have exactly one facility upgrade")))
 	var invalid_splash_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_splash_catalog.categories.facilities[1].damage = 0
 	assert(ContentValidator.validate(invalid_splash_catalog).any(func(error): return error.contains("invalid facility splash data")))
@@ -905,6 +919,50 @@ func _initialize() -> void:
 	assert(facility_targeting.repair_facility(repair_target.id))
 	assert(repair_target.hp == facility_targeting.facility_definitions[repair_target.facility_id].hp and facility_targeting.combat_gold == repair_gold - 8)
 	assert(not facility_targeting.repair_facility(repair_target.id))
+	var facility_upgrade_test := BattleModel.new()
+	facility_upgrade_test.combat_gold = 500
+	assert(facility_upgrade_test.build_facility("facility.arrow_tower", Vector2i(1, 8)))
+	var upgraded_tower: Dictionary = facility_upgrade_test.facilities[0]
+	var tower_upgrade: Dictionary = facility_upgrade_test.facility_upgrade_definitions["facility.arrow_tower"]
+	assert(facility_upgrade_test.facility_upgrade_cost(upgraded_tower.id) == 25)
+	assert(facility_upgrade_test.purchase_facility_upgrade(upgraded_tower.id))
+	assert(upgraded_tower.damage == 20.0 and facility_upgrade_test.combat_gold == 395)
+	facility_upgrade_test.phase = "combat"
+	assert(facility_upgrade_test.facility_upgrade_cost(upgraded_tower.id) == 40)
+	assert(facility_upgrade_test.purchase_facility_upgrade(upgraded_tower.id))
+	assert(upgraded_tower.damage == 24.0 and upgraded_tower.upgrades[tower_upgrade.id] == 2)
+	facility_upgrade_test.phase = "preparation"
+	var facility_upgrade_snapshot: Dictionary = facility_upgrade_test.to_dict()
+	var facility_upgrade_restore := BattleModel.new()
+	assert(facility_upgrade_restore.restore(facility_upgrade_snapshot))
+	assert(facility_upgrade_restore.facilities[0].damage == 24.0 and facility_upgrade_restore.facility_upgrade_cost(upgraded_tower.id) == 60)
+	assert(facility_upgrade_restore.purchase_facility_upgrade(upgraded_tower.id))
+	assert(facility_upgrade_restore.facilities[0].damage == 28.0 and not facility_upgrade_restore.purchase_facility_upgrade(upgraded_tower.id))
+	var invalid_facility_upgrade_save := facility_upgrade_snapshot.duplicate(true)
+	invalid_facility_upgrade_save.facilities[0].upgrades[tower_upgrade.id] = 4
+	assert(not BattleModel.new().restore(invalid_facility_upgrade_save))
+	var legacy_facility_upgrade_save := facility_upgrade_test.to_dict()
+	legacy_facility_upgrade_save.facilities[0].erase("upgrades")
+	var legacy_facility_upgrade_restore := BattleModel.new()
+	assert(legacy_facility_upgrade_restore.restore(legacy_facility_upgrade_save))
+	assert(legacy_facility_upgrade_restore.facilities[0].damage == 16.0 and legacy_facility_upgrade_restore.facilities[0].upgrades.is_empty())
+	var wall_upgrade_test := BattleModel.new()
+	wall_upgrade_test.combat_gold = 200
+	assert(wall_upgrade_test.build_facility("facility.defense_wall", Vector2i(1, 8)))
+	wall_upgrade_test.phase = "combat"
+	assert(wall_upgrade_test.purchase_facility_upgrade(wall_upgrade_test.facilities[0].id))
+	assert(wall_upgrade_test.facilities[0].max_hp == 80.0 and wall_upgrade_test.facilities[0].hp == 60.0)
+	assert(wall_upgrade_test.facility_repair_cost(wall_upgrade_test.facilities[0].id) == 4)
+	assert(wall_upgrade_test.repair_facility(wall_upgrade_test.facilities[0].id) and wall_upgrade_test.facilities[0].hp == 80.0)
+	for fixture in [{"id": "facility.magic_tower", "damage": 31.0}, {"id": "facility.support_outpost", "heal": 10.0}]:
+		var facility_stat_test := BattleModel.new()
+		facility_stat_test.combat_gold = 500
+		assert(facility_stat_test.build_facility(fixture.id, Vector2i(1, 8)))
+		assert(facility_stat_test.purchase_facility_upgrade(facility_stat_test.facilities[0].id))
+		if fixture.id == "facility.magic_tower":
+			assert(facility_stat_test.facilities[0].damage == fixture.damage)
+		else:
+			assert(facility_stat_test.facilities[0].heal == fixture.heal)
 	facility_targeting.phase = "preparation"
 	var destroyed_facility_snapshot: Dictionary = facility_targeting.to_dict()
 	var destroyed_facility_restore := BattleModel.new()

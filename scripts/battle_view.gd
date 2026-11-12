@@ -58,6 +58,7 @@ var context_panel: PanelContainer
 var context_box: VBoxContainer
 var context_info: Label
 var repair_button: Button
+var facility_upgrade_button: Button
 var controls_scroll: ScrollContainer
 var status_override := ""
 var result_reward := -1
@@ -114,6 +115,11 @@ func _ready() -> void:
 	repair_button.pressed.connect(_repair_selected_facility)
 	repair_button.add_to_group("battle_commands")
 	context_box.add_child(repair_button)
+	facility_upgrade_button = Button.new()
+	facility_upgrade_button.text = "시설 강화"
+	facility_upgrade_button.pressed.connect(_upgrade_selected_facility)
+	facility_upgrade_button.add_to_group("battle_commands")
+	context_box.add_child(facility_upgrade_button)
 	hud = Label.new()
 	hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	layout.add_child(hud)
@@ -440,6 +446,11 @@ func _repair_selected_facility() -> void:
 	status_override = "" if battle.repair_facility(selected_facility_instance) else "시설 수리 자원 또는 상태를 확인하세요"
 	_refresh()
 
+func _upgrade_selected_facility() -> void:
+	if paused: return
+	status_override = "" if battle.purchase_facility_upgrade(selected_facility_instance) else "시설 강화 자원 또는 상태를 확인하세요"
+	_refresh()
+
 func _on_back_pressed() -> void:
 	if editor_preview:
 		store.clear_checkpoint()
@@ -648,13 +659,21 @@ func _refresh_context_panel() -> void:
 			unit_label = battle.evolution_definitions[unit.evolution_id].label
 		context_info.text = "%s · HP %.0f/%.0f" % [unit_label, unit.hp, battle.balance_seed[unit.kind].hp]
 		repair_button.visible = false
+		facility_upgrade_button.visible = false
 	else:
 		var move_hint := "다른 타일을 눌러 이동" if battle.phase == "preparation" else "전투 중 이동 불가"
-		context_info.text = "시설 · HP %.0f/%.0f\n%s" % [facility.hp, battle.facility_definitions[facility.facility_id].hp, move_hint]
+		context_info.text = "시설 · HP %.0f/%.0f\n%s" % [facility.hp, facility.max_hp, move_hint]
 		var repair_cost := battle.facility_repair_cost(selected_facility_instance)
 		repair_button.visible = true
 		repair_button.text = "수리 · %d" % repair_cost if repair_cost > 0 else "수리 완료"
 		repair_button.disabled = battle.phase not in ["preparation", "combat"] or repair_cost <= 0 or battle.combat_gold < repair_cost
+		var upgrade: Dictionary = battle.facility_upgrade_definitions.get(facility.facility_id, {})
+		facility_upgrade_button.visible = not upgrade.is_empty()
+		if not upgrade.is_empty():
+			var level := int(facility.upgrades.get(upgrade.id, 0))
+			var upgrade_cost := battle.facility_upgrade_cost(selected_facility_instance)
+			facility_upgrade_button.text = "%s %d/3 · %d" % [upgrade.label, level, upgrade_cost] if level < 3 else "%s 최대" % upgrade.label
+			facility_upgrade_button.disabled = battle.phase not in ["preparation", "combat"] or level >= 3 or battle.combat_gold < upgrade_cost
 	var cell: Vector2i = unit.cell if not unit.is_empty() else facility.cell
 	var tile_rect := tiles[cell.y * BattleModel.COLUMNS + cell.x].get_global_rect()
 	var menu_size := context_panel.get_combined_minimum_size()
@@ -744,7 +763,7 @@ func _refresh_upgrade_controls() -> void:
 		upgrade_buttons.clear()
 		upgrade_controls_unit = -1
 		return
-	var definitions: Array = battle.content.categories.upgrades.filter(func(item): return item.unit_kind == unit.kind)
+	var definitions: Array = battle.content.categories.upgrades.filter(func(item): return item.get("unit_kind", "") == unit.kind)
 	if upgrade_controls_unit != unit.id:
 		for button in upgrade_buttons:
 			button.queue_free()

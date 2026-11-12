@@ -40,6 +40,19 @@ func _run() -> void:
 	var menu_rect := Rect2(view.context_panel.global_position, view.context_panel.get_combined_minimum_size())
 	assert(menu_rect.position.x >= 0.0 and menu_rect.position.y >= 0.0)
 	assert(menu_rect.end.x <= view.get_viewport_rect().size.x and menu_rect.end.y <= view.get_viewport_rect().size.y)
+	assert(view.battle.build_facility("facility.arrow_tower", Vector2i(1, 8)))
+	view.battle.combat_gold += 100
+	view._on_tile_pressed(Vector2i(1, 8))
+	assert(view.facility_upgrade_button.visible and not view.facility_upgrade_button.disabled and view.facility_upgrade_button.text.contains("0/3"))
+	var tower_before: float = view.battle.facilities[0].damage
+	view._upgrade_selected_facility()
+	assert(view.battle.facilities[0].damage == tower_before + 4.0 and view.facility_upgrade_button.text.contains("1/3"))
+	view.battle.phase = "combat"
+	view._refresh_context_panel()
+	assert(not view.facility_upgrade_button.disabled)
+	view._upgrade_selected_facility()
+	assert(view.battle.facilities[0].damage == tower_before + 8.0)
+	view.battle.phase = "preparation"
 	view._toggle_pause()
 	view._on_tile_pressed(Vector2i(0, 8))
 	assert(view.status.text.begins_with("검사 · HP"))

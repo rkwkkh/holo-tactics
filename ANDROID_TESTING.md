@@ -2,8 +2,8 @@
 
 ## Current artifact
 
-- Debug APK: `build/holo-debug.apk` (249,834,691 bytes; SHA-256 `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC`; debug-signed).
-- Test AAB: `build/holo-test.aab` (86,242,634 bytes; SHA-256 `1E6F4981551B749BDCE3FE6CB25AD70539245DFAE196672149A8529146BE7389`; unsigned packaging artifact, not uploadable to Play).
+- Debug APK: `build/holo-debug.apk` (249,837,983 bytes; SHA-256 `6823CA453156ED7AB8B157C2C4AE65FBE6C98C6C89E3C29F9BC132356A4A5CB2`; debug-signed).
+- Test AAB: `build/holo-test.aab` (86,245,875 bytes; SHA-256 `80842D888B27FAC689502F1FFB8B1EBE391362ACA93E718C61FBB4E832FD182C`; unsigned packaging artifact, not uploadable to Play).
 - Package ID: `com.example.holotactics` (placeholder; replace with the publisher's permanent ID before release).
 - Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
 - The APK is debug-signed. It is for device smoke tests, not Google Play upload.
@@ -150,3 +150,7 @@ Re-exported with the restored Mobile/Vulkan Android renderer after the temporary
 ## API37 M1 victory repeat smoke (2026-11-12)
 
 Installed updated APK on `MaDangStage6_API37`, replayed the two-wave M1 defense, and confirmed the victory panel now reports 2/2 waves with repeat reward +10. Updated artifact hashes and signature/AAB validation are in `TEST_REPORT.md`. This does not replace physical-device Android 10 or FPS validation.
+
+## Facility upgrades and updated Android artifacts (2026-11-13)
+
+User selected facility upgrades during both preparation and combat. The latest APK/AAB hashes, content/upgrade SEEDs, regression coverage, and export checks are recorded in `TEST_REPORT.md`. API37 AVD launch/menu smoke passed; touch entry to M1 was not reproduced. This is not physical-device or FPS acceptance.

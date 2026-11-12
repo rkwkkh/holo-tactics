@@ -620,3 +620,17 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 ## Android AAB export exit probe (2026-11-12)
 
 Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Android Gradle export but did not return within the observation window; the existing test AAB stayed at SHA-256 `3941E299153244DB5BD4698DA95C6F2A9D9B6AD86C52A1E1CB038F8A8CED59E0`. `bundletool validate` still passed for that existing artifact, which does not prove this export attempt completed. Stopped only the Godot process started by this probe. No workflow change was retained because the added quit option was not verified to resolve the lingering process.
+
+## Facility upgrades: implementation and regression (2026-11-13)
+
+- User decision: facility upgrades are available during both preparation and combat. Four ally facility upgrade records were added to `data/catalog.json`, each with three SEED levels: arrow tower damage +4/+8/+12, magic tower damage +6/+12/+18, support outpost healing +2/+4/+6, defense wall max HP +20/+40/+60. Each tier costs 25/40/60 combat resources. Bonuses are cumulative tier values; wall upgrades do not heal current HP. Rebuilding creates a fresh facility with no retained upgrades (SEED consistent with the design draft).
+- Added `BattleModel.purchase_facility_upgrade`, cost validation, per-instance levels, computed stats, max-HP-aware repairs, save/restore validation and legacy checkpoint defaulting. Added a selected-facility context button. Editor validator accepts exactly one unit/facility target and enforces one upgrade record per ally facility.
+- Godot 4.7.2: core suite, results/facility UI test, 8/8 seeded campaign simulation, content validator (0 Errors), editor import, 3-panel editor structural test (24 upgrade records), and five scene starts passed. Regression covers both phases, per-effect stats, cost/max-level, wall repair after HP upgrade, save/restore, legacy missing field, malformed target/effect/count, and UI availability in combat.
+- APK export produced and validated: 249,837,983 bytes, debug signature v2=true, package `com.example.holotactics`, min API29/target API36; SHA-256 `6823CA453156ED7AB8B157C2C4AE65FBE6C98C6C89E3C29F9BC132356A4A5CB2`. AAB: `bundletool validate` passed, JAR unsigned as expected for test artifact, 86,245,875 bytes; SHA-256 `80842D888B27FAC689502F1FFB8B1EBE391362ACA93E718C61FBB4E832FD182C`.
+- API37 AVD installed the new APK and displayed the campaign menu with existing progress intact. ADB taps did not enter M1 in this pass; no facility interaction is claimed from the AVD. Physical Android10+ and FPS acceptance remain pending.
+
+## Resumed-session revalidation (2026-11-13)
+
+- Re-ran Godot 4.7.2 core suite, content validation (0 Errors), and seeded campaign simulation: all passed (8/8 stages).
+- Re-ran battle/facility UI regression and editor-panel structure test: both passed (24 upgrade records). The editor-headless process reports resource/ObjectDB cleanup warnings on exit; test assertions pass.
+- `git diff --check` passes. Godot was invoked by its installed console executable because no `godot` command alias is on PATH.

@@ -47,7 +47,11 @@
       {"id":"upgrade.mage.chain","unit_kind":"mage","label":"연쇄 마법","effect":"chain","costs":[30,45,65],"values":[1,2,3]},
       {"id":"upgrade.mage.area","unit_kind":"mage","label":"범위 확대","effect":"splash","costs":[30,45,65],"values":[1,2,3]},
       {"id":"upgrade.mage.burn","unit_kind":"mage","label":"화상","effect":"burn","costs":[25,40,60],"values":[3,4,5]},
-      {"id":"upgrade.mage.burst","unit_kind":"mage","label":"마력 폭발","effect":"mana_burst","costs":[30,45,65],"values":[1.2,1.5,2.0]}
+      {"id":"upgrade.mage.burst","unit_kind":"mage","label":"마력 폭발","effect":"mana_burst","costs":[30,45,65],"values":[1.2,1.5,2.0]},
+      {"id":"upgrade.facility.arrow_tower.damage","facility_id":"facility.arrow_tower","label":"화살탑 강화","effect":"facility_damage","costs":[25,40,60],"values":[4,8,12]},
+      {"id":"upgrade.facility.magic_tower.damage","facility_id":"facility.magic_tower","label":"마법탑 강화","effect":"facility_damage","costs":[25,40,60],"values":[6,12,18]},
+      {"id":"upgrade.facility.support_outpost.heal","facility_id":"facility.support_outpost","label":"지원 초소 강화","effect":"facility_heal","costs":[25,40,60],"values":[2,4,6]},
+      {"id":"upgrade.facility.defense_wall.hp","facility_id":"facility.defense_wall","label":"방어벽 강화","effect":"facility_hp","costs":[25,40,60],"values":[20,40,60]}
     ],
     "evolutions": [
       {"id":"evolution.spearman.guardian","unit_kind":"spearman","label":"수호 창병","total_upgrade_levels":5,"required_upgrades":{"upgrade.spearman.shield":2},"combat_cost":80,"special_skill":{"mode":"automatic","effect":"shield","cooldown":14.0,"cost":0,"value":15,"radius":2,"label":"수호 오라"},"references":["unit.spearman","upgrade.spearman.shield"],"dependencies":[]},

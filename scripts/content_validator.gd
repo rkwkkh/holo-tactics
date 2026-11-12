@@ -70,6 +70,7 @@ static func validate(catalog: Dictionary) -> Array[String]:
 					errors.append("%s has unresolved reference: %s" % [item.get("id", "<missing-id>"), target])
 	var wave_items := _as_array(categories.get("waves", []))
 	var unit_items := _as_array(categories.get("units", []))
+	var facility_items := _as_array(categories.get("facilities", []))
 	var stage_items := _as_array(categories.get("stages", []))
 	var unit_teams: Dictionary = {}
 	var facility_teams: Dictionary = {}
@@ -98,26 +99,45 @@ static func validate(catalog: Dictionary) -> Array[String]:
 			if not profile_ids.has(profile_id) or not references is Array or not references.has(profile_id):
 				_append_field_error(errors, unit_id, "ai_profile_id|references", "must reference an AI profile")
 	var upgrade_counts: Dictionary = {}
+	var facility_upgrade_counts: Dictionary = {}
 	for upgrade in _as_array(categories.get("upgrades", [])):
 		if not upgrade is Dictionary:
 			continue
 		var levels: Variant = upgrade.get("values", [])
 		var costs: Variant = upgrade.get("costs", [])
-		var matches: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == upgrade.get("unit_kind") and unit.get("team") == "ally")
+		var unit_kind: Variant = upgrade.get("unit_kind", "")
+		var facility_id: Variant = upgrade.get("facility_id", "")
 		var effect: Variant = upgrade.get("effect", null)
 		var upgrade_id: String = upgrade.get("id", "<missing-id>")
-		if matches.size() != 1:
-			_append_field_error(errors, upgrade_id, "unit_kind", "invalid combat upgrade data")
+		var targets_unit: bool = unit_kind is String and not unit_kind.is_empty()
+		var targets_facility: bool = facility_id is String and not facility_id.is_empty()
+		if targets_unit == targets_facility or upgrade.has("unit_kind") != targets_unit or upgrade.has("facility_id") != targets_facility:
+			_append_field_error(errors, upgrade_id, "unit_kind|facility_id", "exactly one upgrade target is required")
+		elif targets_unit:
+			var matches: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == unit_kind and unit.get("team") == "ally")
+			if matches.size() != 1:
+				_append_field_error(errors, upgrade_id, "unit_kind", "invalid combat upgrade data")
+			upgrade_counts[unit_kind] = int(upgrade_counts.get(unit_kind, 0)) + 1
+			if not effect is String or effect not in ["combo", "bleed", "splash", "charge", "pierce", "multishot", "freeze", "pushback", "counter", "taunt", "defense", "heal_area", "shield", "attack_buff", "cleanse", "chain", "burn", "mana_burst"]:
+				_append_field_error(errors, upgrade_id, "effect", "invalid combat upgrade data")
+		else:
+			var matches: Array = facility_items.filter(func(facility): return facility is Dictionary and facility.get("id") == facility_id and facility.get("team") == "ally")
+			var expected_effect: String = {"facility.arrow_tower": "facility_damage", "facility.magic_tower": "facility_damage", "facility.support_outpost": "facility_heal", "facility.defense_wall": "facility_hp"}.get(facility_id, "")
+			if matches.size() != 1:
+				_append_field_error(errors, upgrade_id, "facility_id", "invalid facility upgrade target")
+			elif effect != expected_effect:
+				_append_field_error(errors, upgrade_id, "effect", "invalid facility upgrade effect")
+			facility_upgrade_counts[facility_id] = int(facility_upgrade_counts.get(facility_id, 0)) + 1
 		if not levels is Array or levels.size() != 3 or levels.any(func(value): return not _is_positive_number(value)):
 			_append_field_error(errors, upgrade_id, "values", "invalid combat upgrade data")
 		if not costs is Array or costs.size() != 3 or costs.any(func(value): return not _is_positive_integer(value)):
 			_append_field_error(errors, upgrade_id, "costs", "invalid combat upgrade data")
-		if not effect is String or effect not in ["combo", "bleed", "splash", "charge", "pierce", "multishot", "freeze", "pushback", "counter", "taunt", "defense", "heal_area", "shield", "attack_buff", "cleanse", "chain", "burn", "mana_burst"]:
-			_append_field_error(errors, upgrade_id, "effect", "invalid combat upgrade data")
-		upgrade_counts[upgrade.get("unit_kind", "")] = int(upgrade_counts.get(upgrade.get("unit_kind", ""), 0)) + 1
 	for unit in unit_items:
 		if categories.has("upgrades") and unit is Dictionary and unit.get("team") == "ally" and upgrade_counts.get(unit.get("kind", ""), 0) != 4:
 			errors.append("%s must have exactly four combat upgrades" % unit.get("id", "<missing-id>"))
+	for facility in facility_items:
+		if categories.has("upgrades") and facility is Dictionary and facility.get("team") == "ally" and facility_upgrade_counts.get(facility.get("id", ""), 0) != 1:
+			errors.append("%s must have exactly one facility upgrade" % facility.get("id", "<missing-id>"))
 	var evolution_items := _as_array(categories.get("evolutions", []))
 	if categories.has("evolutions") and evolution_items.size() != 6:
 		errors.append("evolutions must contain exactly six forms")

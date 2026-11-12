@@ -14,7 +14,7 @@
 - [x] M0: Godot 프로젝트 골격, 안정 ID/참조/버전 검증기, headless 테스트, GitHub Actions 검증 작성. 엔진 검증 결과는 `TEST_REPORT.md` 참조.
 - [x] M1: completed. API37 AVD manual M1 defense reached deployment and combat; unit loss while core survived continued the stage, core HP 0 produced defeat/partial reward. Unit movement, attack, wave/intermission, checkpoint and reward invariants pass headless regression. Evidence: `TEST_REPORT.md` M1/API37 entries.
 - [x] M2: completed. Siege/defense outcomes, A*/FSM+Utility AI, reinforcements and safe termination, walls/obstacles, four facilities, repair, status effects and checkpoint restore are covered by core/integration tests; all campaign stages simulate to victory. Repair cost remains a documented SEED.
-- [x] M3: completed. Five ally/six enemy kinds, 20 upgrades, six fixed evolutions, 10 skills, four village buildings, research unlocks and persistent battle effects are implemented and covered by regression tests.
+- [x] M3: completed. Five ally/six enemy kinds, 20 unit upgrades plus four facility upgrades, six fixed evolutions, 10 skills, four village buildings, research unlocks and persistent battle effects are implemented and covered by regression tests.
 - [x] M4: completed. Main 6 + optional 2 stages and 26 waves are wired through story locks, rewards and progress persistence; `tests/campaign_playability.gd` wins all 8 stages and checks idempotent rewards/unlocks. Content balance remains SEED; a full manual playthrough is still useful QA.
 - [ ] M5: implementation is in place (three EditorPlugin tabs, Inspector sync, validator-gated atomic saves, error navigation, isolated full-stage/direct-wave preview); headless tests pass. GUI interaction remains unverified because the Computer Use host is unavailable.
 - [ ] M6: local tests and current Mobile/Vulkan APK/AAB export pass; APK v2 signature and AAB structure are checked. API37 AVD displays campaign/M1, but its SwiftShader sample is below target; API29 AVD fails both Vulkan presentation and Compatibility EGL startup. Physical Android/FPS, publisher-signed AAB/Play, and M5 GUI remain open.
@@ -258,3 +258,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - See the current acceptance snapshot in `IMPLEMENTATION_PLAN.md`; immutable source-spec conflicts are resolved by the user-policy addenda in `ISSUES.md`.
 
 - 2026-11-12 full local Godot revalidation repeated: core, preview isolation, editor panels, results, 8-stage playability, content validator, and five scene starts pass. Current ADB has no attached device; release signing environment remains unset, so M6 external gates are still open.
+
+## Facility upgrade policy and implementation (2026-11-13)
+
+- Resolved R-FAC-003/R-UI-002 timing per the user: upgrades may be purchased in preparation and combat. Added four three-level facility upgrades, runtime stat application, resource cost, context-panel button, validator rules, checkpoint persistence/defaults, and unit/integration/UI regression tests.
+- Current values/costs are SEED; details and latest APK/AAB validations are in `TEST_REPORT.md`. 24 total upgrade records (20 unit + 4 facility) are covered by the editor panel structure check.
+- Latest local Godot test suite and API37 launch/menu check pass. Physical Android 10, device FPS, GUI dock/Inspector interaction, package ID/signing, and Play upload remain unverified.

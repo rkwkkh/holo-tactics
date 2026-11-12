@@ -9,7 +9,7 @@ func _initialize() -> void:
 		plugin.call("_build_panel", key)
 	assert(plugin.tabs.get_child_count() == 3)
 	assert(plugin.panels.evolutions.picker.item_count == 6)
-	assert(plugin.panels.upgrades.picker.item_count == 20)
+	assert(plugin.panels.upgrades.picker.item_count == 24)
 	assert(plugin.panels.stages_waves.picker.item_count > 0)
 	for key in ["stages_waves", "evolutions", "upgrades"]:
 		var panel: Dictionary = plugin.panels[key]
@@ -18,7 +18,7 @@ func _initialize() -> void:
 	var preview_controls: HBoxContainer = plugin.tabs.get_child(0).get_child(8)
 	assert(preview_controls.get_child(0).text == "스테이지 실행")
 	assert(preview_controls.get_child(1).text == "선택 웨이브 실행")
-	print("Editor content panels passed: stages/waves, 6 evolutions, 20 upgrades")
+	print("Editor content panels passed: stages/waves, 6 evolutions, 24 upgrades")
 	plugin.tabs.queue_free()
 	plugin.free()
 	await create_timer(2.0).timeout

@@ -16,6 +16,7 @@ var evolution_definitions: Dictionary = {}
 var permanent_research: Array[String] = []
 var unlocked_evolutions: Array[String] = []
 var upgrade_definitions: Dictionary = {}
+var facility_upgrade_definitions: Dictionary = {}
 var skill_definitions: Dictionary = {}
 var facility_definitions: Dictionary = {}
 var obstacle_definitions: Dictionary = {}
@@ -59,6 +60,8 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 		research_definitions[research.id] = research
 	for upgrade in content.categories.upgrades:
 		upgrade_definitions[upgrade.id] = upgrade
+		if upgrade.has("facility_id"):
+			facility_upgrade_definitions[upgrade.facility_id] = upgrade
 	for skill in content.categories.skills:
 		skill_definitions[skill.id] = skill
 	for evolution in content.categories.evolutions:
@@ -308,15 +311,59 @@ func build_facility(facility_id: String, cell: Vector2i) -> bool:
 	if definition.team != "ally" or combat_gold < definition.cost:
 		return false
 	combat_gold -= definition.cost
-	facilities.append({"id": next_id, "facility_id": facility_id, "kind": definition.kind, "cell": cell, "hp": definition.hp, "damage": definition.damage, "heal": definition.get("heal", 0), "splash_radius": definition.get("splash_radius", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": 0.0, "alive": true})
+	var facility := {"id": next_id, "facility_id": facility_id, "kind": definition.kind, "cell": cell, "hp": definition.hp, "upgrades": {}, "cooldown": 0.0, "alive": true}
+	_apply_facility_upgrades(facility)
+	facilities.append(facility)
 	next_id += 1
 	return true
+
+func facility_upgrade_cost(facility_instance_id: int) -> int:
+	var facility := _facility_by_id(facility_instance_id)
+	if facility.is_empty():
+		return -1
+	var definition: Dictionary = facility_upgrade_definitions.get(facility.facility_id, {})
+	if definition.is_empty():
+		return -1
+	var level := int(facility.get("upgrades", {}).get(definition.id, 0))
+	return int(definition.costs[level]) if level < 3 else 0
+
+func purchase_facility_upgrade(facility_instance_id: int) -> bool:
+	var facility := _facility_by_id(facility_instance_id)
+	var cost := facility_upgrade_cost(facility_instance_id)
+	if phase not in ["preparation", "combat"] or facility.is_empty() or cost <= 0 or combat_gold < cost:
+		return false
+	var definition: Dictionary = facility_upgrade_definitions[facility.facility_id]
+	facility.upgrades[definition.id] = int(facility.upgrades.get(definition.id, 0)) + 1
+	combat_gold -= cost
+	_apply_facility_upgrades(facility)
+	return true
+
+func _apply_facility_upgrades(facility: Dictionary) -> void:
+	var base: Dictionary = facility_definitions[facility.facility_id]
+	facility.damage = float(base.damage)
+	facility.heal = float(base.get("heal", 0))
+	facility.max_hp = float(base.hp)
+	facility.splash_radius = int(base.get("splash_radius", 0))
+	facility.range = int(base.range)
+	facility.attack_time = float(base.attack_time)
+	facility.blocks_path = bool(base.blocks_path)
+	var upgrade: Dictionary = facility_upgrade_definitions.get(facility.facility_id, {})
+	if upgrade.is_empty():
+		return
+	var level := int(facility.get("upgrades", {}).get(upgrade.id, 0))
+	if level <= 0:
+		return
+	var value := float(upgrade.values[level - 1])
+	match upgrade.effect:
+		"facility_damage": facility.damage += value
+		"facility_heal": facility.heal += value
+		"facility_hp": facility.max_hp += value
 
 func facility_repair_cost(facility_instance_id: int) -> int:
 	var facility := _facility_by_id(facility_instance_id)
 	if facility.is_empty():
 		return -1
-	var missing_hp: float = float(facility_definitions[facility.facility_id].hp) - float(facility.hp)
+	var missing_hp: float = float(facility.max_hp) - float(facility.hp)
 	return ceili(missing_hp / 5.0) if missing_hp > 0.0 else 0
 
 func repair_facility(facility_instance_id: int) -> bool:
@@ -325,7 +372,7 @@ func repair_facility(facility_instance_id: int) -> bool:
 	if phase not in ["preparation", "combat"] or facility.is_empty() or cost <= 0 or combat_gold < cost:
 		return false
 	combat_gold -= cost
-	facility.hp = facility_definitions[facility.facility_id].hp
+	facility.hp = facility.max_hp
 	return true
 
 func install_obstacle(obstacle_id: String, cell: Vector2i) -> bool:
@@ -627,9 +674,20 @@ func restore(snapshot: Dictionary) -> bool:
 		var definition: Dictionary = facility_definitions[saved_facility.facility_id]
 		var id := int(saved_facility.id)
 		var cell := Vector2i(int(saved_facility.cell[0]), int(saved_facility.cell[1]))
-		if definition.team != "ally" or ids.has(id) or cell.y < 5 or (saved_facility.alive and (cell == core_cell or occupied.has(cell) or blocked_cells.has(cell) or _wall_at(cell) >= 0)) or not _is_finite_nonnegative(saved_facility.get("hp")) or float(saved_facility.hp) > float(definition.hp) or not _is_finite_nonnegative(saved_facility.get("cooldown")) or (saved_facility.alive and saved_facility.hp <= 0.0) or (not saved_facility.alive and saved_facility.hp > 0.0):
+		if definition.team != "ally" or ids.has(id) or cell.y < 5 or (saved_facility.alive and (cell == core_cell or occupied.has(cell) or blocked_cells.has(cell) or _wall_at(cell) >= 0)) or not _is_finite_nonnegative(saved_facility.get("hp")) or not _is_finite_nonnegative(saved_facility.get("cooldown")) or (saved_facility.alive and saved_facility.hp <= 0.0) or (not saved_facility.alive and saved_facility.hp > 0.0):
 			return false
-		var facility: Dictionary = {"id": id, "facility_id": saved_facility.facility_id, "kind": definition.kind, "cell": cell, "hp": float(saved_facility.hp), "damage": definition.damage, "heal": definition.get("heal", 0), "splash_radius": definition.get("splash_radius", 0), "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": float(saved_facility.cooldown), "alive": saved_facility.alive}
+		var saved_upgrades: Variant = saved_facility.get("upgrades", {})
+		if not saved_upgrades is Dictionary:
+			return false
+		for upgrade_id in saved_upgrades:
+			var upgrade: Dictionary = upgrade_definitions.get(upgrade_id, {})
+			var level: Variant = saved_upgrades[upgrade_id]
+			if upgrade.get("facility_id", "") != saved_facility.facility_id or not _is_integer_value(level) or int(level) < 1 or int(level) > 3:
+				return false
+		var facility: Dictionary = {"id": id, "facility_id": saved_facility.facility_id, "kind": definition.kind, "cell": cell, "hp": float(saved_facility.hp), "upgrades": saved_upgrades.duplicate(true), "cooldown": float(saved_facility.cooldown), "alive": saved_facility.alive}
+		_apply_facility_upgrades(facility)
+		if float(facility.hp) > float(facility.max_hp):
+			return false
 		ids[id] = true
 		if facility.alive:
 			occupied[cell] = true
