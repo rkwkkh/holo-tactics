@@ -86,6 +86,23 @@ func _initialize() -> void:
 	assert(siege_movement_restore.restore(siege_movement.to_dict()))
 	assert(siege_movement_restore.units[0].destination == Vector2i(2, 3))
 	siege_movement_store.clear_checkpoint()
+	var m4_store_path := "user://m4_playability_test.json"
+	if FileAccess.file_exists(m4_store_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(m4_store_path))
+	var m4_playable := BattleModel.new("stage.m4.forest")
+	assert(m4_playable.combat_gold == 260)
+	assert(m4_playable.deploy("swordsman", Vector2i(2, 8)))
+	assert(m4_playable.deploy("archer", Vector2i(4, 8)))
+	assert(m4_playable.deploy("spearman", Vector2i(3, 8)))
+	assert(m4_playable.build_facility("facility.arrow_tower", Vector2i(5, 8)))
+	var m4_playable_store := CheckpointStore.new(m4_store_path)
+	for _wave in 4:
+		assert(m4_playable.start_wave(m4_playable_store))
+		for _frame in 2500:
+			if m4_playable.phase != "combat": break
+			m4_playable.tick(0.2)
+		if m4_playable.phase == "finished": break
+	assert(m4_playable.phase == "finished" and m4_playable.battle_result == "victory")
+	m4_playable_store.clear_checkpoint()
 	var legacy_path := "user://legacy_progress_test.json"
 	var legacy := village_unlock_test.progress.data.duplicate(true)
 	legacy.erase("buildings")
