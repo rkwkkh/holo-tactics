@@ -42,12 +42,13 @@
 - M4 초기 방어 전술 진단: 시작 재화 220으로 기본 유닛만 배치한 시험은 W4에서 패배했다. 검사/궁수/창병 3종과 핵심 앞 화살탑(5,8)을 사용하는 전술은 260 자원에서 4개 웨이브 모두 이겼다. `start_resource`를 220→260으로 조정하고 해당 전술을 자동 회귀 테스트에 고정했다. 이는 한 유효 전략을 입증하지만 전체 밸런스 승인이나 모든 전술의 승리를 뜻하지 않는다.
 
 - 로컬 Godot 4.7.2와 Android SDK가 설치되어 있다. Godot·ADB는 PATH에 없어 전체 경로로 실행하며, ADB는 `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe`에서 확인했다. API29/API37 AVD는 현재 online이다.
-- 원격 저장소, GitHub Actions 실행 권한, 실기기 연결, Google Play 계정/서명 키는 확인되지 않았다. 해당 외부 상태를 완료로 표시하지 않는다.
+- 로컬 Git remote가 없고 연결된 GitHub 저장소 목록에도 이 Godot 프로젝트가 없다. hosted Actions 결과를 확인할 저장소 식별정보가 없으며, 실기기 연결·Google Play 계정·서명 키도 확인되지 않았다. 외부 상태를 완료로 표시하지 않는다.
 - 최신 APK는 API37 AVD에서 캠페인 메뉴를 렌더링하지만, 현재 headless AVD ADB touch 입력으로는 화면 전환이 재현되지 않았다. API29 Android 10 AVD는 Vulkan 초기화 후 queue present error 5가 반복된다. 과거 GLES 호환 렌더러 실패도 기록했으나 물리 Android 10 호환성 판단 근거는 아니다.
 
 - M5 Inspector 동기화 모델, Validator의 ID·필드 경로 표시, 오류별 레코드 이동은 구현됐지만 GUI에서 편집→가져오기→저장/오류 이동 흐름은 직접 확인하지 않았다.
 
 - 2026-11-12: computer-use 네이티브 연결이 unavailable 상태라 Godot 편집기 GUI 직접 검증이 막혔다. 자동 파싱/모델 검사와 씬 실행은 통과하지만, Inspector GUI 상호작용 및 모바일 실기기 UI/FPS 검증 증거는 없다.
+- 2026-11-12 재확인: @oai/sky `list_apps()`가 native pipe 연결 실패(os error 2)로 반환되어 UI 제어를 시작하지 못했다. 따라서 Godot dock/Inspector GUI 검증은 계속 대기.
 - Windows 로컬 검증 종료 후 테스트·AAB export를 실행한 오래된 headless Godot 프로세스 53개(추가 `results_view.gd` 4개 포함)가 남아 있었다. 정리 완료. README와 CI의 동기 테스트 실행에 `--quit-after 2`를 적용했다; 전체 회귀 실행 뒤 새 잔류 프로세스 0개.
 
 - 2026-11-12 AVD 재검증 결과: API 29 Android 10 이미지의 GLES 2 한계로 EGL 컨텍스트 생성 실패, API 37 SwiftShader는 Godot GLES3 canvas shader uniform 초과로 검은 화면. APK 설치만으로 Android 실행 호환성이 입증되지 않는다.

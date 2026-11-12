@@ -220,3 +220,7 @@ Recovered the offline API29/API37 AVDs using the local Android SDK's ADB and ins
 ## Full local CI-equivalent revalidation (2026-11-12)
 
 Godot 4.7.2 import, core, editor-preview isolation, editor-panel construction, results UI, 8/8 campaign wins, content validation, five scene starts, and actionlint all pass. Content validation has zero Errors. Stopped four additional stale `results_view.gd` workers; no new headless Godot process remained after the suite.
+
+## External validation access check (2026-11-12)
+
+The computer-use native pipe again failed before listing Windows apps, so M5 GUI interaction could not be attempted. The connected GitHub account lists no repository corresponding to this project, and the local repository has no remote; hosted Actions remain unavailable. Local CI-equivalent results remain the available validation.

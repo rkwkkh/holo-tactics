@@ -571,3 +571,8 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 
 - Found and stopped 53 stale Godot headless processes with test or AAB export command lines; these were hours old and no active exec sessions remained. Updated the documented local test commands and CI's synchronous test/validator invocations with `--quit-after 2`.
 - Re-ran the full Godot CI-equivalent suite: import, core, preview isolation, editor panels, results UI, 8/8 seeded campaign wins, content validation, five scene starts, and actionlint all passed. A process query found zero new headless leftovers. The editor panel process still prints engine renderer/ObjectDB teardown diagnostics while exiting successfully.
+
+## External CI/GUI access recheck (2026-11-12)
+
+- Computer-use initialization reached the `@oai/sky` package, but `list_apps()` returned native pipe unavailable (Windows error 2). No window actions were executed.
+- The connected GitHub account's accessible repository list did not include this Godot project, and the local Git repo has no remote. No hosted workflow run can be attributed to this checkout; actionlint and full local CI-equivalent checks pass.
