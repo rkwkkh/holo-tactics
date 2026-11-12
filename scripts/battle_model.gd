@@ -86,19 +86,26 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 	_prepare_wave_preview()
 
 func set_permanent_research(research_ids: Array) -> bool:
+	var research_state := _build_research_state(research_ids)
+	if research_state.is_empty():
+		return false
+	permanent_research = research_state.ids
+	balance_seed = research_state.balance
+	return true
+
+func _build_research_state(research_ids: Array) -> Dictionary:
 	var selected: Array[String] = []
+	var adjusted_balance := base_balance_seed.duplicate(true)
 	for research_id in research_ids:
 		if not research_id is String or not research_definitions.has(research_id) or selected.has(research_id):
-			return false
+			return {}
 		selected.append(research_id)
-	balance_seed = base_balance_seed.duplicate(true)
-	permanent_research = selected
-	for research_id in permanent_research:
+	for research_id in selected:
 		var research: Dictionary = research_definitions[research_id]
 		var unit_kind: String = research.unit_kind
-		if balance_seed.has(unit_kind) and balance_seed[unit_kind].team == "ally" and research.stat == "damage":
-			balance_seed[unit_kind].damage += float(research.amount)
-	return true
+		if adjusted_balance.has(unit_kind) and adjusted_balance[unit_kind].team == "ally" and research.stat == "damage":
+			adjusted_balance[unit_kind].damage += float(research.amount)
+	return {"ids": selected, "balance": adjusted_balance}
 
 func select_preview_wave(wave_id: String) -> bool:
 	for index in waves.size():
@@ -215,8 +222,8 @@ func _upgrade_value(unit: Dictionary, effect: String) -> float:
 			value += float(definition.values[int(unit.upgrades[upgrade_id]) - 1])
 	return value
 
-func _apply_unit_upgrades(unit: Dictionary) -> void:
-	var stats: Dictionary = balance_seed[unit.kind]
+func _apply_unit_upgrades(unit: Dictionary, balance: Dictionary = {}) -> void:
+	var stats: Dictionary = balance.get(unit.kind, balance_seed[unit.kind])
 	unit.damage = float(stats.damage)
 	unit.range = int(stats.range)
 	unit.heal = float(stats.get("heal", 0))
@@ -498,7 +505,10 @@ func to_dict() -> Dictionary:
 
 func restore(snapshot: Dictionary) -> bool:
 	var saved_research: Variant = snapshot.get("permanent_research", [])
-	if not saved_research is Array or not set_permanent_research(saved_research):
+	if not saved_research is Array:
+		return false
+	var research_state := _build_research_state(saved_research)
+	if research_state.is_empty():
 		return false
 	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or (snapshot.has("run_id") and (not snapshot.run_id is String or snapshot.run_id.is_empty())) or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _version_matches(snapshot.get("save_version"), ProjectVersions.SAVE_VERSION) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array or (snapshot.has("walls") and not snapshot.walls is Array) or (snapshot.has("facilities") and not snapshot.facilities is Array) or (snapshot.has("obstacles") and not snapshot.obstacles is Array):
 		return false
@@ -514,12 +524,12 @@ func restore(snapshot: Dictionary) -> bool:
 	var occupied: Dictionary = {}
 	var max_id := 0
 	for saved_unit in snapshot.units:
-		if not saved_unit is Dictionary or not _is_integer_value(saved_unit.get("id")) or not _is_valid_cell(saved_unit.get("cell")) or not balance_seed.has(saved_unit.get("kind")) or balance_seed[saved_unit.kind].team != "ally" or not stage.get("available_units", []).has(saved_unit.get("kind")) or not saved_unit.get("alive") is bool:
+		if not saved_unit is Dictionary or not _is_integer_value(saved_unit.get("id")) or not _is_valid_cell(saved_unit.get("cell")) or not research_state.balance.has(saved_unit.get("kind")) or research_state.balance[saved_unit.kind].team != "ally" or not stage.get("available_units", []).has(saved_unit.get("kind")) or not saved_unit.get("alive") is bool:
 			return false
 		var unit: Dictionary = saved_unit.duplicate(true)
 		var id := int(saved_unit.id)
 		var cell := Vector2i(int(saved_unit.cell[0]), int(saved_unit.cell[1]))
-		var stats: Dictionary = balance_seed[saved_unit.kind]
+		var stats: Dictionary = research_state.balance[saved_unit.kind]
 		if saved_unit.has("movement_type") and saved_unit.movement_type != stats.movement_type:
 			return false
 		unit.movement_type = stats.movement_type
@@ -531,7 +541,7 @@ func restore(snapshot: Dictionary) -> bool:
 		unit.statuses = {}
 		unit.shield = 0.0
 		unit.attack_count = int(saved_unit.get("attack_count", 0))
-		_apply_unit_upgrades(unit)
+		_apply_unit_upgrades(unit, research_state.balance)
 		if ids.has(id) or occupied.has(cell) or not _is_finite_nonnegative(saved_unit.get("hp")) or float(saved_unit.hp) > stats.hp or not _version_matches(saved_unit.get("damage"), int(unit.damage)) or not _version_matches(saved_unit.get("range"), int(unit.range)) or not _version_matches(saved_unit.get("heal", stats.get("heal", 0)), int(unit.heal)) or not _version_matches(saved_unit.get("heal_range", stats.get("heal_range", 0)), int(unit.heal_range)) or not _version_matches(saved_unit.get("splash_radius", stats.get("splash_radius", 0)), int(unit.splash_radius)) or not _is_finite_nonnegative(saved_unit.get("cooldown")):
 			return false
 		if unit.has("destination") and not _is_valid_cell(unit.destination):
@@ -608,6 +618,8 @@ func restore(snapshot: Dictionary) -> bool:
 		return false
 	if restored_next_id <= max_id:
 		return false
+	permanent_research = research_state.ids
+	balance_seed = research_state.balance
 	wave = int(snapshot.wave)
 	run_id = snapshot.get("run_id", run_id)
 	phase = "preparation"

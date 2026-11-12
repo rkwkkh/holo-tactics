@@ -278,3 +278,9 @@
 - Physical-device rendering/FPS, publisher-key AAB signature, and Play Console upload remain unverified.
 
 - 편집기 GUI 직접 확인 재시도는 Computer Use native pipe 초기화 오류로 중단됐다(창 상태/플러그인 상호작용 증거 없음). 별도로 disposable signing key 생성이 자동 검토에서 차단돼 release signing 검증은 진행하지 않았다.
+
+## 2026-11-12 checkpoint restore atomicity
+
+- `BattleModel.restore()` previously applied permanent research before validating checkpoint versions and contents. A rejected snapshot could therefore mutate research and unit balance on the live model.
+- Changed restore to build a temporary research/balance state, validate unit upgrades against that state, and commit research plus combat state only after all checks pass. Added regression coverage for both unsupported schema and malformed unit stats.
+- First test run exposed `_apply_unit_upgrades()` reading the live model balance; it now accepts the candidate balance for restore validation. Re-run passed: editor import, `tests/run.gd`, campaign playability, and content validator. `git diff --check` passed.
