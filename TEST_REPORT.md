@@ -314,3 +314,5 @@
 - 제한: 실제 기기 터치/화면 배치 및 성능은 이전 Android 렌더러/기기 접근 차단 상태로 검증되지 않았다.
 
 - R-UI-003 포함 Debug APK 재생성: `build/holo-debug.apk`, 249,875,578 bytes (2026-11-12 16:51 KST); `aapt` min API 29/target API 36, `apksigner` v2=true 확인. 실기기 실행과 FPS는 미검증.
+
+- R-UI-003 반영 AAB 재검증 (2026-11-12 16:55 KST): `build/holo-test.aab`, 86,284,601 bytes. bundletool 1.18.3 `validate` 성공; `BundleConfig.pb`, `base/manifest/AndroidManifest.xml`, `base/dex/classes.dex` 존재; base manifest minSdk 29/targetSdk 36 확인. `jarsigner`는 unsigned로 보고함. release 서명/Play 업로드 검증은 아님.

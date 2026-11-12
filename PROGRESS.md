@@ -99,3 +99,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 재검증: Godot 4.7.2 headless editor import, `tests/results_view.gd`, `tests/run.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`, 콘텐츠 validator, `git diff --check` 통과.
 
 - 2026-11-12: 일시정지 변경을 포함해 Android Debug APK를 다시 내보냈다 (`build/holo-debug.apk`, 249,875,578 bytes). manifest min API 29/target API 36 및 APK v2 서명 확인 통과. Debug 빌드이며 실기기 실행·FPS 검증은 미완료다.
+
+- 2026-11-12: R-UI-003 반영 소스의 Android Debug AAB를 다시 생성했다 (`build/holo-test.aab`, 86,284,601 bytes). bundletool 1.18.3 검증과 필수 bundle/dex/manifest 항목, manifest min API 29·target API 36을 확인했다. 테스트 번들은 unsigned이며 Play 업로드용 배포본이 아니다.
