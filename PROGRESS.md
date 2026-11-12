@@ -51,3 +51,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12 이어하기: 기존 M0–M4 회귀 상태를 headless로 재검증했다. M5 패널에 선택 레코드 Inspector 편집/값 가져오기를 추가했고, 모델 속성 테스트가 통과했다. GUI 상호작용, 저장 UX, 오류 위치 이동은 미검증 또는 미구현이라 M5는 진행 중이다.
 
 - 2026-11-12 M6 이어하기: 5개 주요 씬 smoke 및 현재 소스 Android Debug APK 재생성/서명(v2/v3) 통과. Editor GUI 검증은 computer-use native pipe 연결 불가로 진행되지 않았다. 실기기/성능/release AAB/Play 배포는 검증 대기이며 M6 완료가 아니다.
+
+- 2026-11-12 M5 보강: Validator Error 목록을 클릭하면 해당 콘텐츠 레코드가 있는 도구 탭으로 이동하고, 다른 레코드로 이동할 때 미저장 JSON 초안을 보존한다. Error→ID 추출과 전역 오류/잘못된 categories 입력을 회귀 검사했다. 실제 GUI 사용과 필드별 위치는 미검증이다.

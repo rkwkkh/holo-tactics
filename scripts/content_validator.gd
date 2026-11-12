@@ -272,6 +272,21 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		errors.append("cyclic dependency involving: %s" % id)
 	return errors
 
+static func content_id_from_error(message: String, catalog: Dictionary) -> String:
+	var match_id := ""
+	var categories: Variant = catalog.get("categories", {})
+	if not categories is Dictionary:
+		return match_id
+	for category in categories:
+		if not categories[category] is Array:
+			continue
+		for item in categories[category]:
+			if item is Dictionary:
+				var id: String = item.get("id", "")
+				if not id.is_empty() and message.contains(id) and id.length() > match_id.length():
+					match_id = id
+	return match_id
+
 static func _ids_in(items: Array) -> Array[String]:
 	var result: Array[String] = []
 	for item in items:

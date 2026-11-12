@@ -210,3 +210,11 @@
 - 공식 Godot 이슈 [#109550](https://github.com/godotengine/godot/issues/109550)은 Godot 4.7.2 + Android Emulator SwiftShader에서 동일한 261-vector 로그를 재현하며 SwiftShader의 GLES3 불완전 구현을 지적한다. 이 경고만으로 실기기 실패를 단정하지 않는다.
 - Android 10 API 29 Compatibility 렌더러는 GLES 3.0이 필요하지만 현재 AVD 이미지는 GLES 2.0만 제공해 실행 실패가 예상 범위다.
 - 비교용 Mobile/Vulkan 변형 APK export까지 성공했으나 설치 시 API 37 AVD가 offline이어서 비교 실행은 성립하지 않았다. 임시 설정/산출물은 제거하고 Compatibility 설정을 복원한 뒤 기본 APK를 재생성·서명 검증했다.
+
+## M5 오류 탐색 재검증
+
+- 통과: editor import/플러그인 스크립트 parse check, 전체 `tests/run.gd`, `tests/editor_preview.gd`, 카탈로그 validator.
+- 추가 검사: Error 메시지에서 가장 구체적인 stable ID를 찾고, 글로벌 오류/잘못된 categories는 안전하게 빈 ID를 돌려준다. 오류 이동 시 저장 전 패널 초안을 ID별로 유지하도록 구현.
+- 미검증: GUI에서 ItemList 클릭 후 실제 탭/레코드 이동, Inspector 동기화 및 저장 UX. field-level 경로가 Validator에 없어 레코드 단위까지만 이동한다.
+
+- M5 오류 탐색 변경 포함 Android APK 재내보내기 통과: `build/holo-debug.apk`, 86,352,507 bytes (2026-11-12 14:10 KST). apksigner v2/v3 검증 통과. EditorPlugin은 런타임 게임 흐름을 바꾸지 않으며 실제 GUI는 여전히 미검증이다.

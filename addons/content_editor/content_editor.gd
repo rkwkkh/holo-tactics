@@ -30,6 +30,12 @@ func _build_panel(key: String) -> void:
 	feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	feedback.custom_minimum_size.y = 60
 	page.add_child(feedback)
+	var errors_label := Label.new()
+	errors_label.text = "검증 오류 · 클릭하면 해당 레코드 열기"
+	page.add_child(errors_label)
+	var error_list := ItemList.new()
+	error_list.custom_minimum_size.y = 84
+	page.add_child(error_list)
 	var inspector_controls := HBoxContainer.new()
 	var inspect := Button.new()
 	inspect.text = "Inspector에서 편집"
@@ -59,8 +65,9 @@ func _build_panel(key: String) -> void:
 		previews.add_child(selected_wave)
 		page.add_child(previews)
 	tabs.add_child(page)
-	panels[key] = {"picker": picker, "edit": edit, "feedback": feedback, "inspector_record": null}
+	panels[key] = {"picker": picker, "edit": edit, "feedback": feedback, "errors": error_list, "drafts": {}, "active_id": "", "inspector_record": null}
 	picker.item_selected.connect(_select_record.bind(key))
+	error_list.item_selected.connect(_open_error_record.bind(key))
 	_refresh_records(key)
 
 func _categories_for(key: String) -> Array[String]:
@@ -99,8 +106,15 @@ func _select_record(index: int, key: String) -> void:
 	var picker: OptionButton = panels[key].picker
 	if index < 0 or index >= picker.item_count:
 		return
+	var previous_id: String = panels[key].active_id
+	if not previous_id.is_empty():
+		panels[key].drafts[previous_id] = panels[key].edit.text
 	var item_meta: Dictionary = picker.get_item_metadata(index)
+	panels[key].active_id = item_meta.id
 	panels[key].inspector_record = null
+	if panels[key].drafts.has(item_meta.id):
+		panels[key].edit.text = panels[key].drafts[item_meta.id]
+		return
 	var file := FileAccess.open(CATALOG_PATH, FileAccess.READ)
 	if file == null:
 		return
@@ -165,13 +179,38 @@ func _save_record(key: String) -> void:
 	var errors := ContentValidator.validate(catalog)
 	if not errors.is_empty():
 		panel.feedback.text = "Error · 저장 차단\n" + "\n".join(errors.slice(0, 5))
+		_show_validation_errors(key, errors, catalog)
 		return
 	if not _write_catalog(JSON.stringify(catalog, "\t")):
 		panel.feedback.text = "Error: 원자적 저장에 실패했습니다. 원본을 보존했습니다."
 		return
 	panel.feedback.text = "검증 통과 · 저장했습니다."
+	panel.errors.clear()
+	panel.drafts.erase(item_meta.id)
+	panel.active_id = ""
 	EditorInterface.get_resource_filesystem().scan()
 	_refresh_records(key, item_meta.id)
+
+func _show_validation_errors(key: String, errors: Array[String], catalog: Dictionary) -> void:
+	var panel: Dictionary = panels[key]
+	panel.errors.clear()
+	for error in errors:
+		panel.errors.add_item(error)
+		panel.errors.set_item_metadata(panel.errors.item_count - 1, ContentValidator.content_id_from_error(error, catalog))
+
+func _open_error_record(index: int, source_key: String) -> void:
+	var source: Dictionary = panels[source_key]
+	var target_id: String = source.errors.get_item_metadata(index)
+	if target_id.is_empty():
+		return
+	for key in ["stages_waves", "evolutions", "upgrades"]:
+		var picker: OptionButton = panels[key].picker
+		for item_index in picker.item_count:
+			if picker.get_item_metadata(item_index).id == target_id:
+				tabs.current_tab = ["stages_waves", "evolutions", "upgrades"].find(key)
+				picker.select(item_index)
+				_select_record(item_index, key)
+				return
 
 func _preview_selected(direct_wave: bool) -> void:
 	var picker: OptionButton = panels.stages_waves.picker

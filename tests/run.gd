@@ -146,6 +146,9 @@ func _initialize() -> void:
 	assert(GridPathfinder.find_path(Vector2i(0, 0), Vector2i(2, 0), 3, 1, {Vector2i(1, 0): true}).is_empty())
 	var seeded_catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/catalog.json"))
 	assert(ContentValidator.validate(seeded_catalog).is_empty())
+	assert(ContentValidator.content_id_from_error("stage.m1.frontier has invalid core data", seeded_catalog) == "stage.m1.frontier")
+	assert(ContentValidator.content_id_from_error("campaign must have six main stages", seeded_catalog).is_empty())
+	assert(ContentValidator.content_id_from_error("stage.m1.frontier failed", {"categories": 1}).is_empty())
 	var invalid_research_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_research_catalog.categories.research[0].amount = 0
 	assert(ContentValidator.validate(invalid_research_catalog).any(func(error): return error.contains("invalid permanent research data")))
