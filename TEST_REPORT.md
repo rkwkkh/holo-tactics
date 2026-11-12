@@ -479,3 +479,10 @@
 - Godot 4.7.2 headless editor/plugin 초기화 통과. `tests/run.gd`, `tests/results_view.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`(8/8), 콘텐츠 validator 모두 통과; 콘텐츠 Error 0.
 - Computer Use 연결은 native pipe 누락 파일, browser host unavailable로 다시 실패했다. 이번 시도는 GUI 클릭·시각 편집 테스트 증거가 아니며 M5 GUI 검증을 대신하지 않는다.
 - 코드/설정 변경이 없으므로 APK/AAB는 다시 생성하지 않았다. 현재 APK/AAB 증거는 2026-11-12 Android Vulkan 섹션을 참조한다.
+
+## Status-effect policy regression (2026-11-12)
+
+- Passed: `Godot_v4.7.2-stable_win64_console.exe --headless --path . --script tests/run.gd --quit-after 10` (includes shield-first DOT mitigation, overlapping freeze/stun, blocked movement/skill, and action resumption).
+- Passed: headless editor startup; `tests/results_view.gd`; `tests/campaign_playability.gd` (8/8 stages); `tests/editor_preview.gd`; `scripts/validate_content.gd` (0 errors).
+- Environment: Godot 4.7.2 stable, Windows headless.
+- Not rerun: Android package export/device smoke and FPS. Changes affect battle runtime; refresh Android build before next device validation.

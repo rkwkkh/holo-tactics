@@ -461,6 +461,30 @@ func _initialize() -> void:
 	assert(freeze_test.enemies[0].statuses.freeze.remaining == 0.5)
 	freeze_test._add_status(freeze_test.enemies[0], "freeze", 0.2, 0.0)
 	assert(freeze_test.enemies[0].statuses.freeze.remaining == 0.2)
+	var status_damage_test := BattleModel.new()
+	var status_target := {"id": 93, "kind": "goblin", "team": "enemy", "hp": 100.0, "damage_reduction": 0.5, "shield": 8.0, "alive": true, "statuses": {"bleed": {"stacks": [{"remaining": 1.0, "damage": 10.0}]}, "burn": {"stacks": [{"remaining": 1.0, "damage": 20.0}]}}}
+	status_damage_test._tick_statuses(status_target, 0.5)
+	assert(status_target.hp == 96.5 and status_target.shield == 0.0)
+	var incapacitation_test := BattleModel.new()
+	incapacitation_test.combat_gold = 500
+	assert(incapacitation_test.deploy("swordsman", Vector2i(1, 8)))
+	var incapacitated_unit: Dictionary = incapacitation_test.units[0]
+	incapacitation_test._add_status(incapacitated_unit, "freeze", 0.5, 0.0)
+	incapacitation_test._add_status(incapacitated_unit, "stun", 0.8, 0.0)
+	incapacitation_test.enemies.append({"id": 94, "kind": "goblin", "team": "enemy", "cell": Vector2i(2, 8), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 100.0, "alive": true, "active": true, "statuses": {}})
+	incapacitation_test.phase = "combat"
+	var incapacitated_gold := incapacitation_test.combat_gold
+	assert(incapacitation_test._incapacitated_remaining(incapacitated_unit) == 0.8)
+	assert(not incapacitation_test.move_unit(incapacitated_unit.id, Vector2i(1, 7)))
+	assert(not incapacitation_test.cast_skill(incapacitated_unit.id, "skill.swordsman.heroic_charge"))
+	assert(incapacitation_test.combat_gold == incapacitated_gold and not incapacitated_unit.skill_cooldowns.has("skill.swordsman.heroic_charge"))
+	incapacitation_test._add_status(incapacitated_unit, "freeze", 0.2, 0.0)
+	assert(incapacitation_test._incapacitated_remaining(incapacitated_unit) == 0.8)
+	incapacitation_test.tick(0.2)
+	assert(incapacitation_test._is_incapacitated(incapacitated_unit) and incapacitation_test.enemies[0].hp == 100.0)
+	incapacitation_test.tick(0.6)
+	assert(not incapacitation_test._is_incapacitated(incapacitated_unit) and incapacitation_test.enemies[0].hp < 100.0)
+	assert(incapacitation_test.cast_skill(incapacitated_unit.id, "skill.swordsman.heroic_charge"))
 	var defense_test := BattleModel.new()
 	defense_test.combat_gold = 500
 	defense_test.stage.available_units = ["swordsman", "archer", "spearman"]

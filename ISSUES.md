@@ -114,3 +114,7 @@
 - M5 EditorPlugin은 headless 초기화/데이터 편집 모델 테스트를 통과했으나 편집기 GUI에서 3개 탭의 실제 Inspector/저장/오류 이동 조작은 검증 대기다.
 
 - 2026-11-12 M5 GUI 재시도: Computer Use `getState()`에서 native app pipe의 지정 파일 없음과 browser host unavailable을 받았다. GUI 실행/클릭은 시작되지 않았고 M5 시각/Inspector 저장 흐름은 미검증이다. Headless EditorPlugin 초기화와 자동 테스트는 통과했다.
+
+## Resolved status-effect decisions (2026-11-12)
+
+R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/burn damage, and max remaining duration for overlapping freeze/stun. Implemented in BattleModel and covered by tests/run.gd. Resistance/immunity policy remains open; no additional statuses were added.

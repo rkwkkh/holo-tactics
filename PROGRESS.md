@@ -171,3 +171,9 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - API 37 AVD 수동 전투 추가 검증: 터치로 M1 진입·유닛 2기 배치/자원 차감·웨이브 시작. 유닛 전멸 후 핵심 HP가 생존한 채 2웨이브로 진행했고, 핵심 HP 0에서만 패배/부분 보상 화면을 확인했다. 수성 생존 결정은 에뮬레이터 화면에서도 검증됐다. 실기기/FPS는 미검증.
 
 - API 37 AVD 재시작 복원 추가 확인: M1 진행 중 force-stop/재실행 후 캠페인 메뉴가 아닌 기존 웨이브 전투로 복귀했고 core HP·아군·남은 적 상태로 진행했다. 이전 패배 정산 영구 잔액 105도 재실행 뒤 유지됐다. 실제기기/버전 업그레이드 마이그레이션은 별도 미검증.
+
+## 2026-11-12 status-effect policy implementation
+
+User-confirmed rules: bleed/burn damage consumes shield first, then applies armor/damage reduction; freeze/stun incapacitation duration is the longer remaining time. Incapacitated units cannot move, use skills, or attack. Fractions near zero are clamped so locks expire reliably.
+
+Verified with Godot 4.7.2 headless core, editor startup, results view, seeded 8-stage campaign, editor preview isolation, and content validator. See TEST_REPORT.md. Android export/device performance were not rerun for this logic-only change.

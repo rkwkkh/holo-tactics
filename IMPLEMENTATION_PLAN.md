@@ -100,3 +100,8 @@
 - 2026-11-12: API 37에서 기존 GL Compatibility의 uniform 초과 검정 화면을 재현한 뒤, Android 모바일 렌더러를 Godot Mobile(Vulkan)로 전환했다. 새 APK는 API 37 AVD에서 메뉴/전투 화면 표시와 기본 터치 경로를 통과했다.
 - API 29 AVD는 Vulkan present error 5로 실패해 Android 10 실기기 인수는 열려 있다. 시작 구간 frame stats로 목표 FPS를 판정하지 않는다.
 - 다음 독립 단계: 편집기 GUI 실사용 및 status-effect OPEN 규칙 결정 필요성, 실기기/FPS 측정, release signing/Play 자료는 credential 및 장치 접근이 제공될 때 검증한다.
+
+## Status-effect policy follow-up (2026-11-12)
+
+- User decisions recorded in ISSUES.md and implemented: shield then mitigation for bleed/burn; longer remaining freeze/stun lock. Core tests and content/campaign regressions pass.
+- Continue with pending M5 GUI verification and M6 Android device/FPS/signing readiness; previous environment blockers remain in ISSUES.md.

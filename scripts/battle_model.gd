@@ -196,7 +196,7 @@ func purchase_upgrade(unit_id: int, upgrade_id: String) -> bool:
 
 func cast_skill(unit_id: int, skill_id: String) -> bool:
 	var unit := _unit_by_id(unit_id)
-	if unit.is_empty() or phase != "combat" or unit.has("destination"):
+	if unit.is_empty() or phase != "combat" or unit.has("destination") or _is_incapacitated(unit):
 		return false
 	var skill: Dictionary = skill_definitions.get(skill_id, {})
 	if skill.is_empty() and unit.has("evolution_id") and skill_id == _evolution_skill_id(unit.evolution_id):
@@ -226,6 +226,8 @@ func _tick_skills(unit: Dictionary, delta: float) -> void:
 			unit.skill_cooldowns[skill_id] = float(skill.cooldown)
 
 func _execute_skill(unit: Dictionary, skill: Dictionary) -> bool:
+	if _is_incapacitated(unit):
+		return false
 	var enemies_in_range := (enemies + enemy_facilities).filter(func(target: Dictionary): return target.alive and target.get("active", true) and _distance(unit.cell, target.cell) <= 5)
 	match skill.effect:
 		"strike":
@@ -293,7 +295,7 @@ func _distance(a: Vector2i, b: Vector2i) -> int:
 
 func move_unit(unit_id: int, destination: Vector2i) -> bool:
 	var unit := _unit_by_id(unit_id)
-	if unit.is_empty() or phase != "combat" or not _is_inside(destination) or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or _occupied(destination) or _find_path(unit, destination).is_empty():
+	if unit.is_empty() or _is_incapacitated(unit) or phase != "combat" or not _is_inside(destination) or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or _occupied(destination) or _find_path(unit, destination).is_empty():
 		return false
 	unit.destination = destination
 	unit.cooldown = maxf(unit.cooldown, 0.5)
@@ -401,7 +403,7 @@ func tick(delta: float) -> void:
 		if not unit.alive:
 			continue
 		_tick_statuses(unit, delta)
-		if not unit.alive:
+		if not unit.alive or _is_incapacitated(unit):
 			continue
 		unit.cooldown = maxf(0.0, unit.cooldown - delta)
 		_tick_skills(unit, delta)
@@ -473,7 +475,7 @@ func tick(delta: float) -> void:
 		if not enemy.alive or not enemy.get("active", true):
 			continue
 		_tick_statuses(enemy, delta)
-		if not enemy.alive or enemy.get("statuses", {}).has("freeze"):
+		if not enemy.alive or _is_incapacitated(enemy):
 			continue
 		enemy.cooldown = maxf(0.0, enemy.cooldown - delta)
 		if enemy.get("heal", 0) > 0 and enemy.cooldown <= 0.0:
@@ -808,7 +810,7 @@ func _apply_support_effects(support: Dictionary, ally: Dictionary) -> void:
 		ally.statuses.attack_buff.value = maxf(float(ally.statuses.attack_buff.get("value", 0.0)), buff)
 
 func _strike(attacker: Dictionary, target: Dictionary) -> void:
-	if attacker.cooldown > 0.0:
+	if attacker.cooldown > 0.0 or _is_incapacitated(attacker):
 		return
 	attacker.attack_count = int(attacker.get("attack_count", 0)) + 1
 	var hits := 1 + _upgrade_level(attacker, "combo")
@@ -836,7 +838,7 @@ func _strike(attacker: Dictionary, target: Dictionary) -> void:
 	attacker.cooldown = float(attacker.attack_time) if attacker.has("attack_time") else float(balance_seed[attacker.kind].attack_time)
 
 func _strike_area(attacker: Dictionary, targets: Array[Dictionary], center: Vector2i, radius: int) -> void:
-	if attacker.cooldown > 0.0:
+	if attacker.cooldown > 0.0 or _is_incapacitated(attacker):
 		return
 	attacker.attack_count = int(attacker.get("attack_count", 0)) + 1
 	var hit_ids: Dictionary = {}
@@ -918,13 +920,32 @@ func _add_status(target: Dictionary, id: String, duration: float, damage: float)
 	status.damage = damage
 	target.statuses[id] = status
 
+func _incapacitated_remaining(target: Dictionary) -> float:
+	var statuses: Dictionary = target.get("statuses", {})
+	return maxf(float(statuses.get("freeze", {}).get("remaining", 0.0)), float(statuses.get("stun", {}).get("remaining", 0.0)))
+
+func _is_incapacitated(target: Dictionary) -> bool:
+	return _incapacitated_remaining(target) > 0.000001
+
+func _apply_status_damage(target: Dictionary, damage: float) -> void:
+	var remaining := maxf(0.0, damage)
+	var shield := float(target.get("shield", 0.0))
+	if shield > 0.0:
+		var absorbed := minf(shield, remaining)
+		target.shield = shield - absorbed
+		remaining -= absorbed
+	var reduction := float(target.get("damage_reduction", 0.0))
+	if target.has("upgrades"):
+		reduction = maxf(reduction, _upgrade_value(target, "defense"))
+	_deal_damage(target, remaining * (1.0 - clampf(reduction, 0.0, 0.8)))
+
 func _tick_statuses(target: Dictionary, delta: float) -> void:
 	for id in target.get("statuses", {}).keys():
 		var status: Dictionary = target.statuses[id]
 		if id in ["bleed", "burn"]:
 			var active_stacks: Array = []
 			for stack in status.get("stacks", []):
-				_deal_damage(target, float(stack.damage) * delta)
+				_apply_status_damage(target, float(stack.damage) * delta)
 				stack.remaining -= delta
 				if stack.remaining > 0.0:
 					active_stacks.append(stack)
@@ -932,7 +953,7 @@ func _tick_statuses(target: Dictionary, delta: float) -> void:
 			if active_stacks.is_empty():
 				target.statuses.erase(id)
 		elif status.get("remaining", 0.0) > 0.0:
-			status.remaining -= delta
+			status.remaining = maxf(0.0, float(status.remaining) - delta)
 			if status.remaining <= 0.0:
 				target.statuses.erase(id)
 
