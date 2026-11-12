@@ -164,6 +164,6 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 ## Android 렌더러 및 AVD 재검증 (2026-11-12)
 
 - Android 전용 Godot 렌더러를 Mobile(Vulkan)로 설정하고 Debug APK/AAB를 다시 빌드했다. 데스크톱 renderer는 GL Compatibility 유지.
-- API 37 AVD (1080×2400, density 420): Vulkan SwiftShader 초기화, 캠페인 메뉴/수성 보드 화면 렌더링, 터치로 M1 진입 및 보드 유닛 glyph 표시 확인. AVD 시작 구간 `gfxinfo`는 17 frames / 11 janky / p50 61ms / p90 300ms였으며 시작 프레임만 포함한 짧은 샘플이라 60FPS 인수로 사용하지 않는다.
+- API 37 AVD (1080×2400, density 420): Vulkan SwiftShader 초기화, 캠페인 메뉴/수성 보드 화면 렌더링, 터치로 M1 진입, 검사 2기 배치 및 전투 자원 160→60 차감까지 확인. AVD 시작 구간 `gfxinfo`는 17 frames / 11 janky / p50 61ms / p90 300ms였으며 시작 프레임만 포함한 짧은 샘플이라 60FPS 인수로 사용하지 않는다.
 - API 29 AVD: 앱은 foreground까지 열렸으나 Vulkan present가 `VkResult error 5`를 기록하고 정상 화면 검증은 통과하지 못했다. Android 10 실기기 검증과 FPS 측정은 대기.
 - 전체 headless core/UI/editor-preview/campaign/content validator 및 5개 주요 씬 smoke 통과. APK API29/36, v2 서명; AAB bundletool 1.18.3 구조 검증 통과, unsigned.
