@@ -241,6 +241,24 @@ static func validate(catalog: Dictionary) -> Array[String]:
 			errors.append("%s must reference at least one wave" % stage.get("id", "<missing-id>"))
 		if not _is_positive_number(stage.get("core_hp")) or not _is_nonnegative_integer(stage.get("start_resource")) or not _is_nonnegative_integer(stage.get("kill_reward")) or not _is_nonnegative_integer(stage.get("wave_reward")) or not _is_nonnegative_integer(stage.get("permanent_first_bonus")) or not _is_nonnegative_integer(stage.get("permanent_repeat_reward")) or not _is_nonnegative_integer(stage.get("permanent_partial_per_wave")) or not _is_positive_integer(stage.get("intermission_seconds")):
 			errors.append("%s has invalid core or resource values" % stage.get("id", "<missing-id>"))
+	var campaign_stages: Array = stage_items.filter(func(stage): return stage is Dictionary and stage.get("campaign_kind", "") in ["main", "optional"])
+	if not campaign_stages.is_empty():
+		var main_stages: Array = campaign_stages.filter(func(stage): return stage.campaign_kind == "main")
+		var optional_stages: Array = campaign_stages.filter(func(stage): return stage.campaign_kind == "optional")
+		var campaign_wave_count := 0
+		var campaign_orders: Dictionary = {}
+		for stage in campaign_stages:
+			if not _is_positive_integer(stage.get("campaign_order")):
+				errors.append("%s has invalid campaign order" % stage.get("id", "<missing-id>"))
+			var order_key := "%s:%s" % [stage.get("campaign_kind", ""), stage.get("campaign_order", "")]
+			if campaign_orders.has(order_key):
+				errors.append("%s duplicates campaign order" % stage.get("id", "<missing-id>"))
+			campaign_orders[order_key] = true
+			for reference in stage.get("references", []):
+				if wave_items.any(func(wave): return wave is Dictionary and wave.get("id") == reference):
+					campaign_wave_count += 1
+		if main_stages.size() != 6 or optional_stages.size() != 2 or campaign_wave_count != 26:
+			errors.append("campaign must contain six main stages, two optional stages, and 26 waves")
 	var cycle_nodes := _find_dependency_cycles(categories)
 	for id in cycle_nodes:
 		errors.append("cyclic dependency involving: %s" % id)

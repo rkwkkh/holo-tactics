@@ -59,6 +59,28 @@ func _initialize() -> void:
 	assert(roster_deploy_test.units.size() == 5 and roster_deploy_test.combat_gold == 660)
 	assert(seeded_catalog.categories.upgrades.size() == 20)
 	assert(seeded_catalog.categories.skills.size() == 10)
+	var incomplete_campaign: Dictionary = seeded_catalog.duplicate(true)
+	incomplete_campaign.categories.stages.erase(incomplete_campaign.categories.stages.filter(func(stage): return stage.get("id") == "stage.s2.supply")[0])
+	assert(ContentValidator.validate(incomplete_campaign).any(func(error): return error.contains("six main stages, two optional stages, and 26 waves")))
+	var campaign_stages: Array = seeded_catalog.categories.stages.filter(func(stage): return stage.get("campaign_kind", "") in ["main", "optional"])
+	assert(campaign_stages.size() == 8)
+	for campaign_stage in campaign_stages:
+		var stage_smoke := BattleModel.new(campaign_stage.id)
+		assert(not stage_smoke.stage.is_empty() and not stage_smoke.waves.is_empty())
+		assert(stage_smoke.preview_enemies.size() == int(stage_smoke.waves[0].count))
+		var stage_checkpoint := CheckpointStore.new("user://campaign_smoke_%s.json" % campaign_stage.id.replace(".", "_"))
+		stage_smoke.combat_gold = 500
+		assert(stage_smoke.deploy("swordsman", Vector2i(1, 8)))
+		for wave_index in stage_smoke.waves.size():
+			assert(stage_smoke.start_wave(stage_checkpoint))
+			for enemy in stage_smoke.enemies:
+				enemy.alive = false
+			stage_smoke.pending_reinforcements.clear()
+			if stage_smoke.stage.mode == "siege" and stage_smoke.wave == stage_smoke.waves.size():
+				stage_smoke.core_hp = 0.0
+			stage_smoke.tick(0.1)
+			assert(stage_smoke.phase == ("finished" if wave_index == stage_smoke.waves.size() - 1 else "preparation"))
+		stage_checkpoint.clear_checkpoint()
 	var skill_test := BattleModel.new()
 	skill_test.stage.available_units = ["swordsman", "archer"]
 	skill_test.combat_gold = 100
@@ -80,6 +102,10 @@ func _initialize() -> void:
 	var skill_restore := BattleModel.new()
 	assert(skill_restore.restore(skill_snapshot))
 	assert(skill_restore.units[0].skill_cooldowns["skill.swordsman.heroic_charge"] == 4.0)
+	var legacy_skill_snapshot: Dictionary = skill_snapshot.duplicate(true)
+	legacy_skill_snapshot.erase("run_id")
+	var legacy_checkpoint_restore := BattleModel.new()
+	assert(legacy_checkpoint_restore.restore(legacy_skill_snapshot) and not legacy_checkpoint_restore.run_id.is_empty())
 	var invalid_skill_snapshot: Dictionary = skill_snapshot.duplicate(true)
 	invalid_skill_snapshot.units[0].skill_cooldowns["skill.swordsman.heroic_charge"] = 99.0
 	assert(not BattleModel.new().restore(invalid_skill_snapshot))
@@ -495,6 +521,7 @@ func _initialize() -> void:
 	assert(battle.start_wave(store))
 	for enemy in battle.enemies:
 		enemy.alive = false
+	battle.pending_reinforcements.clear()
 	battle.tick(0.2)
 	assert(battle.phase == "finished" and battle.battle_result == "victory")
 	assert(battle.rewarded_waves == [1, 2])
