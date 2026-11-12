@@ -41,6 +41,7 @@ var skill_controls_unit := -1
 var context_panel: PanelContainer
 var context_box: VBoxContainer
 var context_info: Label
+var repair_button: Button
 var controls_scroll: ScrollContainer
 var status_override := ""
 var result_reward := -1
@@ -91,6 +92,11 @@ func _ready() -> void:
 	context_info = Label.new()
 	context_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	context_box.add_child(context_info)
+	repair_button = Button.new()
+	repair_button.text = "시설 수리"
+	repair_button.pressed.connect(_repair_selected_facility)
+	repair_button.add_to_group("battle_commands")
+	context_box.add_child(repair_button)
 	hud = Label.new()
 	hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	layout.add_child(hud)
@@ -358,6 +364,11 @@ func _cast_skill(unit_id: int, skill_id: String) -> void:
 	status_override = "" if battle.cast_skill(unit_id, skill_id) else "스킬을 사용할 수 없습니다"
 	_refresh()
 
+func _repair_selected_facility() -> void:
+	if paused: return
+	status_override = "" if battle.repair_facility(selected_facility_instance) else "시설 수리 자원 또는 상태를 확인하세요"
+	_refresh()
+
 func _on_back_pressed() -> void:
 	if editor_preview:
 		store.clear_checkpoint()
@@ -539,9 +550,14 @@ func _refresh_context_panel() -> void:
 		return
 	if not unit.is_empty():
 		context_info.text = "%s · HP %.0f/%.0f" % [_unit_name(unit.kind), unit.hp, battle.balance_seed[unit.kind].hp]
+		repair_button.visible = false
 	else:
 		var move_hint := "다른 타일을 눌러 이동" if battle.phase == "preparation" else "전투 중 이동 불가"
 		context_info.text = "시설 · HP %.0f/%.0f\n%s" % [facility.hp, battle.facility_definitions[facility.facility_id].hp, move_hint]
+		var repair_cost := battle.facility_repair_cost(selected_facility_instance)
+		repair_button.visible = true
+		repair_button.text = "수리 · %d" % repair_cost if repair_cost > 0 else "수리 완료"
+		repair_button.disabled = battle.phase not in ["preparation", "combat"] or repair_cost <= 0 or battle.combat_gold < repair_cost
 	var cell: Vector2i = unit.cell if not unit.is_empty() else facility.cell
 	var tile_rect := tiles[cell.y * BattleModel.COLUMNS + cell.x].get_global_rect()
 	var menu_size := context_panel.get_combined_minimum_size()

@@ -426,3 +426,9 @@
 - 통과: tests/run.gd (유효 주 파일 + stale backup 정리, 오류 주 파일 + backup 보존).
 - 통과: editor_preview.gd, results_view.gd, campaign_playability.gd (8개 스테이지), validate_content.gd, headless editor import, editor_preview.tscn smoke, git diff --check.
 - 실행 엔진: Godot 4.7.2 stable, Windows headless. Android 산출물은 에디터 플러그인/테스트 전용 변경이라 재생성하지 않음.
+
+## 2026-11-12 규칙 결정 후 검증
+
+- 통과: tests/run.gd — 수성 아군 0명/core 생존 계속 진행; 전투 중 시설 수리 비용 차감, HP 복구, 중복 수리 차단.
+- 통과: tests/results_view.gd — 손상된 시설 선택 시 전투 중 수리 버튼 활성화 및 HP 복구.
+- Android AVD: API29에서 APK 설치 후 GLES3 EGL 시작 실패, 앱 Activity 미유지. API37에서 설치/foreground 성공이나 캡처 화면 검정, CanvasShaderGLES3 GL_MAX_FRAGMENT_UNIFORM_VECTORS (261) 오류 재현. 실기기 호환성/렌더 합격으로 취급하지 않음.

@@ -124,9 +124,14 @@ func _run() -> void:
 	obstacle_view._on_tile_pressed(Vector2i(1, 5))
 	assert(obstacle_view.context_panel.visible and obstacle_view.context_info.text.begins_with("시설 · HP"))
 	assert(obstacle_view.context_info.text.contains("다른 타일을 눌러 이동"))
+	var selected_facility: Dictionary = obstacle_view.battle.facilities.back()
+	selected_facility.hp -= 5.0
 	obstacle_view.battle.phase = "combat"
 	obstacle_view._refresh()
 	assert(obstacle_view.context_info.text.contains("전투 중 이동 불가"))
+	assert(obstacle_view.repair_button.visible and not obstacle_view.repair_button.disabled)
+	obstacle_view._repair_selected_facility()
+	assert(selected_facility.hp == obstacle_view.battle.facility_definitions[selected_facility.facility_id].hp)
 	obstacle_view._toggle_pause()
 	obstacle_view._on_tile_pressed(Vector2i(1, 5))
 	assert(obstacle_view.status.text.begins_with("아군 시설 · HP"))

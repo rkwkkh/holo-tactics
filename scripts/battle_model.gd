@@ -270,6 +270,22 @@ func build_facility(facility_id: String, cell: Vector2i) -> bool:
 	next_id += 1
 	return true
 
+func facility_repair_cost(facility_instance_id: int) -> int:
+	var facility := _facility_by_id(facility_instance_id)
+	if facility.is_empty():
+		return -1
+	var missing_hp: float = float(facility_definitions[facility.facility_id].hp) - float(facility.hp)
+	return ceili(missing_hp / 5.0) if missing_hp > 0.0 else 0
+
+func repair_facility(facility_instance_id: int) -> bool:
+	var facility := _facility_by_id(facility_instance_id)
+	var cost := facility_repair_cost(facility_instance_id)
+	if phase not in ["preparation", "combat"] or facility.is_empty() or cost <= 0 or combat_gold < cost:
+		return false
+	combat_gold -= cost
+	facility.hp = facility_definitions[facility.facility_id].hp
+	return true
+
 func install_obstacle(obstacle_id: String, cell: Vector2i) -> bool:
 	if phase not in ["preparation", "combat"] or not obstacle_definitions.has(obstacle_id) or obstacles.size() >= int(stage.get("obstacle_max_owned", 0)) or _placed_obstacle_count() >= int(stage.get("obstacle_max_placed", 0)):
 		return false

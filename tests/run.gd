@@ -776,6 +776,16 @@ func _initialize() -> void:
 	assert(not facility_targeting.facilities[0].alive and facility_targeting.facilities[0].hp == 0.0)
 	facility_targeting.phase = "preparation"
 	assert(facility_targeting.build_facility("facility.arrow_tower", Vector2i(2, 8)))
+	var repair_target: Dictionary = facility_targeting.facilities.back()
+	repair_target.hp -= 40.0
+	facility_targeting.phase = "combat"
+	facility_targeting.combat_gold = 40
+	var repair_gold := facility_targeting.combat_gold
+	assert(facility_targeting.facility_repair_cost(repair_target.id) == 8)
+	assert(facility_targeting.repair_facility(repair_target.id))
+	assert(repair_target.hp == facility_targeting.facility_definitions[repair_target.facility_id].hp and facility_targeting.combat_gold == repair_gold - 8)
+	assert(not facility_targeting.repair_facility(repair_target.id))
+	facility_targeting.phase = "preparation"
 	var destroyed_facility_snapshot: Dictionary = facility_targeting.to_dict()
 	var destroyed_facility_restore := BattleModel.new()
 	assert(destroyed_facility_restore.restore(destroyed_facility_snapshot) and not destroyed_facility_restore.facilities[0].alive and destroyed_facility_restore.facilities[1].alive)
@@ -820,6 +830,15 @@ func _initialize() -> void:
 	core_test.enemies.append({"id": 99, "kind": "goblin", "cell": Vector2i(4, 8), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "alive": true})
 	core_test.tick(0.2)
 	assert(core_test.phase == "finished" and core_test.battle_result == "defeat")
+	var defense_no_allies_test := BattleModel.new()
+	defense_no_allies_test.phase = "combat"
+	defense_no_allies_test.core_hp = 300.0
+	defense_no_allies_test.enemies.append({"id": 100, "kind": "goblin", "cell": Vector2i(4, 8), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "alive": true})
+	defense_no_allies_test.tick(0.2)
+	assert(defense_no_allies_test.units.is_empty() and defense_no_allies_test.core_hp > 0.0 and defense_no_allies_test.phase == "combat")
+	defense_no_allies_test.enemies[0].alive = false
+	defense_no_allies_test.tick(0.2)
+	assert(defense_no_allies_test.phase == "preparation" and defense_no_allies_test.battle_result.is_empty())
 	var siege_test := BattleModel.new("stage.m2.siege")
 	assert(siege_test.stage.mode == "siege" and siege_test.core_cell == Vector2i(4, 0))
 	var enemy_facility_test := BattleModel.new("stage.m2.siege")
