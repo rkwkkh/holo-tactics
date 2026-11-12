@@ -202,3 +202,5 @@
 - API 29 / Android 10 AVD에 APK 설치는 성공했으나 실행 직후 `EGL_BAD_CONFIG: no ES 3 support`로 앱이 종료되고 홈 화면으로 돌아왔다. 해당 AVD는 GLES 2.0만 제공한다.
 - API 37 AVD에서는 Godot가 GLES 3.0 SwiftShader로 시작하고 프로세스가 유지됐지만, `CanvasShaderGLES3` fragment shader가 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)` 오류를 반복했고 캡처 화면은 검은색이었다. 실제 게임 UI 구동은 실패로 판정한다.
 - 결론: AVD 시작/설치 자체는 가능하나 Android 실행 수직 슬라이스는 통과하지 못했다. Android 10+ 실기기 GLES3 확인과 API 37 shader 문제의 분리가 필요하다.
+
+- 보강: 사용자 결정으로 확정한 스토리 단계별 기본 유닛 해금 순서(검사·궁수 → 창병 → 지원병 → 마법사)가 스테이지 `available_units` 카탈로그에 유지되는지 `tests/run.gd` 회귀 assertion으로 확인.

@@ -151,6 +151,10 @@ func _initialize() -> void:
 	assert(ContentValidator.validate(invalid_research_catalog).any(func(error): return error.contains("invalid permanent research data")))
 	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "ally").size() == 5)
 	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "enemy").size() == 6)
+	var story_rosters := {"stage.m1.frontier": ["swordsman", "archer"], "stage.m2.crossroads": ["swordsman", "archer", "spearman"], "stage.m3.fortress": ["swordsman", "archer", "spearman"], "stage.m4.forest": ["swordsman", "archer", "spearman", "support"], "stage.m5.citadel": ["swordsman", "archer", "spearman", "support", "mage"]}
+	for stage_id in story_rosters:
+		var roster_stage: Dictionary = seeded_catalog.categories.stages.filter(func(stage): return stage.id == stage_id)[0]
+		assert(roster_stage.available_units == story_rosters[stage_id])
 	var roster_deploy_test := BattleModel.new()
 	roster_deploy_test.combat_gold = 1000
 	var ally_kinds := ["swordsman", "archer", "spearman", "support", "mage"]
