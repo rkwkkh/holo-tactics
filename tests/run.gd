@@ -42,10 +42,19 @@ func _initialize() -> void:
 	village_unlock_test.progress.data.completed_stages.append("stage.m2.crossroads")
 	assert(village_unlock_test.progress.save_progress() and village_unlock_test.place_building("workshop", Vector2i(0, 0)))
 	assert(village_unlock_test.has_building("workshop") and village_unlock_test.progress.data.permanent_currency == 0)
+	var legacy_path := "user://legacy_progress_test.json"
+	var legacy := village_unlock_test.progress.data.duplicate(true)
+	legacy.erase("buildings")
+	var legacy_file := FileAccess.open(legacy_path, FileAccess.WRITE)
+	legacy_file.store_string(JSON.stringify(legacy))
+	legacy_file.close()
+	var migrated := ProgressStore.new(legacy_path)
+	assert(migrated.load_progress() and migrated.data.buildings.size() == 1 and migrated.data.buildings[0].kind == "headquarters")
 	for path in [village_test_path, village_unlock_path]:
 		for suffix in ["", ".tmp", ".bak"]:
 			var cleanup_path: String = path + suffix
 			if FileAccess.file_exists(cleanup_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(cleanup_path))
+	if FileAccess.file_exists(legacy_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(legacy_path))
 	var duplicate := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "same"}], "skills": [{"id": "same"}]}}
 	assert(ContentValidator.validate(duplicate).any(func(error): return error.contains("duplicate content id")))
 	var dangling := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.a", "references": ["missing"]}]}}

@@ -2,6 +2,7 @@ extends Control
 
 var model: VillageModel
 var selected_kind := ""
+var moving_kind := ""
 var status: Label
 var grid: GridContainer
 
@@ -26,6 +27,16 @@ func _ready() -> void:
 		button.disabled = not model.can_build(kind)
 		button.pressed.connect(_select_building.bind(kind))
 		layout.add_child(button)
+	var actions := HBoxContainer.new()
+	var move := Button.new()
+	move.text = "선택 건물 이동"
+	move.pressed.connect(_move_selected)
+	actions.add_child(move)
+	var store := Button.new()
+	store.text = "선택 건물 보관"
+	store.pressed.connect(_store_selected)
+	actions.add_child(store)
+	layout.add_child(actions)
 	grid = GridContainer.new()
 	grid.columns = VillageModel.COLUMNS
 	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -47,7 +58,18 @@ func _select_building(kind: String) -> void:
 	status.text = "%s 배치 위치를 선택하세요." % model.definitions[kind].label
 
 func _select_cell(cell: Vector2i) -> void:
+	if not moving_kind.is_empty():
+		if model.move_building(moving_kind, cell):
+			status.text = "건물을 이동했습니다."
+			moving_kind = ""
+			_refresh_grid()
+		else:
+			status.text = "이 위치로 이동할 수 없습니다."
+		return
 	if selected_kind.is_empty():
+		var building := model.building_at(cell)
+		selected_kind = str(building.get("kind", ""))
+		status.text = "선택: %s" % model.definitions.get(selected_kind, {}).get("label", "없음")
 		return
 	if model.place_building(selected_kind, cell):
 		selected_kind = ""
@@ -55,6 +77,20 @@ func _select_cell(cell: Vector2i) -> void:
 		_refresh_grid()
 	else:
 		status.text = "배치할 수 없는 위치이거나 해금되지 않았습니다."
+
+func _move_selected() -> void:
+	if selected_kind.is_empty() or selected_kind == "headquarters":
+		return
+	moving_kind = selected_kind
+	selected_kind = ""
+	status.text = "이동할 빈 칸을 선택하세요."
+
+func _store_selected() -> void:
+	if selected_kind.is_empty() or not model.store_building(selected_kind):
+		return
+	status.text = "건물을 보관했습니다. 영구 효과와 연구는 유지됩니다."
+	selected_kind = ""
+	_refresh_grid()
 
 func _refresh_grid() -> void:
 	for index in grid.get_child_count():
