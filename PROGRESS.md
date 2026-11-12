@@ -6,7 +6,7 @@
 - Godot `4.7.2-stable` 발견: `%LOCALAPPDATA%/Programs/Godot/Godot_v4.7.2-stable_win64_console.exe`.
 - Android Studio/SDK 발견: `%LOCALAPPDATA%/Android/Sdk`; 설치된 플랫폼 API 35/36/37.0, 빌드 도구 35.0.0/35.0.1/36.0.0/36.1.0. Java 17 발견.
 - Godot 사용자 설정에 JDK 17/Android SDK 경로가 이미 연결되어 있고, Android 4.7.2 내보내기 템플릿도 설치됨. Godot/adb는 PATH에 없으므로 로컬 명령에서 전체 경로 사용.
-- Android API 29 및 37 AVD 확인. API 29 이미지는 GLES2만 제공하고, API 37 SwiftShader는 GLES uniform 오류를 내며 화면이 검게 나왔다. 물리 기기는 연결되지 않았다. GitHub 원격 및 Actions 권한은 확인하지 않음.
+- Android API 29 및 37 AVD 확인. 최신 Android 모바일 렌더러는 Vulkan이다. API 37 AVD에서 메뉴/M1 보드 및 두 유닛 배치/자원 차감을 화면으로 확인했다. API 29 AVD는 Vulkan present error 5로 렌더링 실패. Android 실기기/FPS, GitHub 원격 및 Actions hosted run 권한은 확인하지 않음.
 
 ## 마일스톤
 
