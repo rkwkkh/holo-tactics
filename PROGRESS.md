@@ -177,3 +177,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 User-confirmed rules: bleed/burn damage consumes shield first, then applies armor/damage reduction; freeze/stun incapacitation duration is the longer remaining time. Incapacitated units cannot move, use skills, or attack. Fractions near zero are clamped so locks expire reliably.
 
 Verified with Godot 4.7.2 headless core, editor startup, results view, seeded 8-stage campaign, editor preview isolation, and content validator. See TEST_REPORT.md. Android export/device performance were not rerun for this logic-only change.
+
+- 2026-11-12 M6 follow-up: Rebuilt APK/AAB after status-effect fixes; API29/36, APK debug signature, and bundletool validation pass. AVDs currently offline; no post-change device/FPS result. Publisher key/package ID remain unavailable.

@@ -118,3 +118,5 @@
 ## Resolved status-effect decisions (2026-11-12)
 
 R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/burn damage, and max remaining duration for overlapping freeze/stun. Implemented in BattleModel and covered by tests/run.gd. Resistance/immunity policy remains open; no additional statuses were added.
+
+- 2026-11-12 M5 재확인: computer-use native pipe 연결이 다시 `지정된 파일을 찾을 수 없습니다`로 실패해 Godot GUI 패널 상호작용을 관찰하지 못했다. 이 환경의 GUI 검증 차단은 반복 중이며, headless 플러그인 시작/모델 검증 결과만 유지한다. 편집기 시각 검증은 여전히 미완료다.

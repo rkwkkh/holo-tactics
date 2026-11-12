@@ -486,3 +486,10 @@
 - Passed: headless editor startup; `tests/results_view.gd`; `tests/campaign_playability.gd` (8/8 stages); `tests/editor_preview.gd`; `scripts/validate_content.gd` (0 errors).
 - Environment: Godot 4.7.2 stable, Windows headless.
 - Not rerun: Android package export/device smoke and FPS. Changes affect battle runtime; refresh Android build before next device validation.
+
+## 2026-11-12 Android status-effect rebuild
+
+- Re-exported debug APK and test AAB after BattleModel changes. APK API29/36 manifest and debug v2 signature verified; AAB bundletool 1.18.3 validation and API29/36 base manifest verified.
+- AAB remains unsigned; publisher signing key and permanent package ID are unavailable. Both AVDs report offline, so no device smoke/FPS run was possible. Detailed hashes and sizes are in ANDROID_TESTING.md.
+
+- 2026-11-12: M5 GUI 검증 재시도도 computer-use native pipe 부재로 실패. plugin headless 시작 및 자동 preview/data 검사만 통과했으므로 GUI 패널 완료로 간주하지 않는다.

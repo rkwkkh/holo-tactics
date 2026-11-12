@@ -105,3 +105,7 @@
 
 - User decisions recorded in ISSUES.md and implemented: shield then mitigation for bleed/burn; longer remaining freeze/stun lock. Core tests and content/campaign regressions pass.
 - Continue with pending M5 GUI verification and M6 Android device/FPS/signing readiness; previous environment blockers remain in ISSUES.md.
+
+## M6 rebuild update (2026-11-12)
+
+Status-effect changes are now included in fresh APK/AAB exports; manifest and package validation passed. Device/FPS validation is pending because both AVDs are offline, and Play release readiness remains gated on publisher package ID and release signing credentials. Continue when device or publisher environment is available; proceed with remaining M5 GUI validation in parallel.

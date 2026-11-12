@@ -76,3 +76,11 @@ Latest local exports (2026-11-12): Debug APK 249,828,829 bytes; unsigned test AA
 On API 37 AVD, manual taps entered M1, placed two swordsmen (resource 160→60), and started the wave. After all allies were gone, the game advanced into wave 2 while core HP remained 300, continued combat as core HP fell (188, then 76), and showed defeat only at core HP 0. The result panel showed 1/2 completed waves and +5 partial reward (balance 105). This verifies the core-survival rule and basic defense UI on an emulator; it does not establish physical-device compatibility, victory flow, or FPS.
 
 - API 37 AVD supplement: force-stop/relaunch during M1 combat returned directly to the same active battle; HUD/core and surviving combat state were visible. The settled permanent balance 105 also survived a separate app relaunch. Repeat checkpoint restoration and schema migration checks on physical Android devices before release.
+
+## 2026-11-12 status-effect Android export
+
+- Re-exported after status-effect runtime changes: `build/holo-debug.apk` (249,829,245 bytes) and `build/holo-test.aab` (86,237,040 bytes).
+- APK manifest: `com.example.holotactics`, min API 29, target API 36. `apksigner verify` passed with one signer (debug key).
+- AAB: `bundletool 1.18.3 validate` passed; base manifest reports the same application ID and API levels. The AAB is unsigned and not Play-upload ready.
+- SHA-256: APK `60067B5D69CF2AD4B812BD3E1B00E68D2222C27D0B8836D4E492B2FE53096F3`; AAB `CE0EFCBA65218F42553F341CB794076E6089B9E7D4AA08D3651EFAC0D9AE7B66`.
+- adb currently reports both installed AVDs offline. No post-change device smoke or FPS measurement was possible; the prior API 29 Vulkan-render failure and physical-device verification remain open.
