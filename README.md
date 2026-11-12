@@ -17,8 +17,8 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
 - Open `project.godot` in the Godot editor to run the portrait project.
 - The enabled **Holo Content Editor** dock has stage/wave, evolution, and combat-upgrade JSON panels. Stage/wave preview runs from saved catalog data in an isolated checkpoint and does not settle rewards.
 - Android device smoke, frame-rate measurement, and private-test readiness steps are in [ANDROID_TESTING.md](ANDROID_TESTING.md).
-- The main menu exposes the seeded 6-main/2-optional campaign. Village management includes the four growth buildings and a scrollable permanent-research screen. Base-stat amounts and evolution research prices are balance seeds; evolution purchase unlocks are persisted, but combat transformation still awaits the branch/re-evolution policy. Battle controls expose only units and facilities available in the selected stage.
-- The Android presets use Gradle so the manifest minimum is API 29 (Android 10); target API is 36. Install the Android build template and export the debug APK with:
+- The main menu exposes the seeded 6-main/2-optional campaign. Village management includes the four growth buildings and a scrollable permanent-research screen. Base-stat amounts and evolution research prices are balance seeds. Combat evolution is implemented; each unit locks its first selected form. Battle controls expose only units and facilities available in the selected stage.
+- The Android presets use Gradle and Godot Mobile (Vulkan) for Android rendering; the desktop project remains on GL Compatibility. The manifest minimum is API 29 (Android 10); target API is 36. Install the Android build template and export the debug APK with:
 
   ```powershell
   New-Item -ItemType Directory -Force build | Out-Null

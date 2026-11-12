@@ -94,3 +94,9 @@
 - 전투 진화와 특수 스킬, 진화 체크포인트, SaveVersion 1 비진화 저장 호환을 구현했다. 자동 회귀와 8개 스테이지 시뮬레이션이 통과했다.
 - 수리 비용은 5 HP당 전투 자원 1의 미승인 SEED다. APK/AAB 최신 런타임 export는 다음 확인 단계다.
 - M3 전투 진화 구현과 자동 검증 완료. 현재 남은 인수 작업은 M1/M2/M3 실기기 플레이 밸런스, M5 EditorPlugin GUI 직접 확인, M6 실제 Android/FPS 및 서명/Play 비공개 테스트 준비다. 계정/패키지 ID/keystore/실기기 권한은 제공되지 않았다.
+
+## Android 렌더링 재검증
+
+- 2026-11-12: API 37에서 기존 GL Compatibility의 uniform 초과 검정 화면을 재현한 뒤, Android 모바일 렌더러를 Godot Mobile(Vulkan)로 전환했다. 새 APK는 API 37 AVD에서 메뉴/전투 화면 표시와 기본 터치 경로를 통과했다.
+- API 29 AVD는 Vulkan present error 5로 실패해 Android 10 실기기 인수는 열려 있다. 시작 구간 frame stats로 목표 FPS를 판정하지 않는다.
+- 다음 독립 단계: 편집기 GUI 실사용 및 status-effect OPEN 규칙 결정 필요성, 실기기/FPS 측정, release signing/Play 자료는 credential 및 장치 접근이 제공될 때 검증한다.

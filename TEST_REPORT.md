@@ -450,3 +450,13 @@
 - ISSUES/PROGRESS의 과거 문구 중 수성 승패, 진화 고정, 전투 중 수리를 여전히 미결정·미구현으로 표기한 항목을 최신 사용자 결정 및 구현 결과에 맞게 정정했다. 원본 기획 4종은 수정하지 않았다.
 - Godot 4.7.2 headless `tests/run.gd: 통과. `scripts/validate_content.gd`: 통과 (콘텐츠 Error 0). `git diff --check`: 통과.
 - 범위: 문서 상태 정합성만 수정. Android 산출물은 코드 변경이 없어 재생성하지 않았다.
+
+## 2026-11-12 Android Vulkan AVD 재검증
+
+- `project.godot`의 Android 모바일 전용 렌더러를 `mobile`(Vulkan)로 바꿨다. 데스크톱 기본 렌더러는 Compatibility로 유지했다.
+- Godot 4.7.2 Debug APK: 249,828,829 bytes. aapt: package `com.example.holotactics`, min API 29 / target API 36. apksigner v2 검증 통과.
+- Debug AAB: 86,236,623 bytes. Google bundletool 1.18.3 `validate` 통과. unsigned이며 Play 출시 서명 증거가 아니다.
+- API 37 AVD (1080×2400/density 420): APK 설치 및 foreground 실행, Vulkan 1.2 SwiftShader, 캠페인 메뉴 캡처, ADB 터치 후 M1 수성 보드 캡처 통과. 메뉴/보드 glyph가 보이고 치명 오류 없이 Activity가 유지됐다.
+- API 29 AVD: APK 설치/Activity 진입은 되지만 Vulkan present `VkResult error 5`가 발생해 화면 렌더 검증 실패. 이 에뮬레이터의 GPU 경로 결함일 수 있으므로 실기기 결론으로 일반화하지 않는다.
+- API 37의 첫 시작 구간 gfxinfo는 17 frames, 11 janky, p50 61ms/p90 300ms. 이는 짧고 시작 구간에 한정된 샘플이며 일반 전투 60FPS 또는 고부하 30FPS 성능 측정은 여전히 미실시.
+- 재검증: `tests/run.gd`, `tests/results_view.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`(8개 스테이지), `scripts/validate_content.gd` 모두 통과. main/battle/village/village_research/editor_preview headless smoke 통과.
