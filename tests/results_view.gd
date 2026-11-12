@@ -1,6 +1,7 @@
 extends SceneTree
 
 func _initialize() -> void:
+	root.size = Vector2i(360, 640)
 	root.set_meta("selected_stage_id", "stage.m1.frontier")
 	root.set_meta("editor_preview", true)
 	root.set_meta("editor_preview_id", "result-view-test-%s" % Time.get_ticks_usec())
