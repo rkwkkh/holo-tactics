@@ -533,3 +533,7 @@
 - Exported a temporary Android APK with `renderer/rendering_method.mobile="gl_compatibility"`; restored `project.godot` immediately after export. The production setting remains Godot Mobile/Vulkan.
 - Installed/launched on the API29 AVD. OpenGL selected (`renderingDevice: opengl3`) but the Android GL thread terminated with `_start_success` EGL startup failure; the app returned to the launcher. This fallback also fails on the current API29 emulator image.
 - No renderer change is justified by this emulator-only result. API29 hardware verification remains required.
+
+## Full CI-equivalent revalidation (2026-11-12)
+
+Passed Godot 4.7.2 headless editor import, `tests/run.gd`, `tests/editor_preview.gd`, `tests/results_view.gd`, `tests/campaign_playability.gd` (8/8 seeded wins), content validator (0 errors), and headless starts for main, battle, village, village_research, and editor_preview scenes. Re-exported official Mobile/Vulkan APK and test AAB; APK v2 signature and required AAB entries verified. Both AVDs reported offline after the API29 renderer experiment, so this export was not freshly installed. Physical Android 10+ performance, Play signing/upload, and M5 GUI remain pending.

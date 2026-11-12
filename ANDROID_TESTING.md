@@ -2,8 +2,8 @@
 
 ## Current artifact
 
-- Debug APK: `build/holo-debug.apk` (249,823,557 bytes; generated locally; ignored by Git; debug-signed).
-- Test AAB: `build/holo-test.aab` (86,231,323 bytes; generated locally; ignored by Git; unsigned packaging artifact, not uploadable to Play).
+- Debug APK: `build/holo-debug.apk` (249,834,691 bytes; SHA-256 `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC`; debug-signed).
+- Test AAB: `build/holo-test.aab` (86,242,634 bytes; SHA-256 `1E6F4981551B749BDCE3FE6CB25AD70539245DFAE196672149A8529146BE7389`; unsigned packaging artifact, not uploadable to Play).
 - Package ID: `com.example.holotactics` (placeholder; replace with the publisher's permanent ID before release).
 - Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
 - The APK is debug-signed. It is for device smoke tests, not Google Play upload.
@@ -108,3 +108,7 @@ A debug-only sampler logs `[PERF]` every 10 seconds during combat/preparation. O
 ## API29 compatibility-renderer probe (2026-11-12)
 
 A temporary APK exported with Godot Compatibility/OpenGL was installed on the API29 AVD. It selected `opengl3` but failed EGL startup (`_start_success`) on the GL thread and returned to the launcher. The project config was restored; the normal Android preset remains Mobile/Vulkan. Thus both Vulkan and Compatibility fail on this AVD. This does not establish behavior on physical Android 10 devices.
+
+## Current export revalidation (2026-11-12)
+
+Re-exported with the restored Mobile/Vulkan Android renderer after the temporary API29 Compatibility probe. APK v2 signature verification and AAB ZIP structure (`BundleConfig.pb`, base manifest, dex) pass. API29/API37 AVDs were offline at this check, so there is no fresh installation/render smoke result for these exact artifact hashes.

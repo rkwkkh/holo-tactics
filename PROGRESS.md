@@ -201,3 +201,5 @@ All headless core/results/campaign/editor-preview/content tests pass. The editor
 - 2026-11-12 M6: added debug-only battle frame sampling (10-second windows) with average FPS and p50/p95/max frame times; core tests cover the percentile calculation. Fresh Android APK/AAB exported. API37 SwiftShader AVD showed M1 gameplay at 25.9 and 25.4 average FPS (p95 41.67/41.31ms, max 50ms); this software-emulated result misses the numeric target and is not representative of physical hardware. Physical-device FPS remains unverified.
 
 - 2026-11-12 Android 10 renderer probe: a temporary Compatibility/OpenGL APK also failed EGL startup on the API29 AVD; `project.godot` was restored and the current Mobile/Vulkan setting retained. Both AVD renderer paths are documented in `ANDROID_TESTING.md`; physical hardware remains the decisive check.
+
+- 2026-11-12 current-source verification: full Godot CI-equivalent test set passed (8/8 seeded campaign stages; content Error 0; all five scene starts). Official Mobile/Vulkan APK/AAB re-exported; APK v2 signature and AAB structure verified. Current artifacts recorded in `ANDROID_TESTING.md`; AVDs were offline, so no fresh device smoke.
