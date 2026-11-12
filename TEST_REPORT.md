@@ -288,3 +288,5 @@
 - After the checkpoint restore fix, Android Debug APK was re-exported successfully from the updated source: `build/holo-debug.apk`, 249,871,658 bytes (2026-11-12 16:15 local). `aapt` confirmed min API 29/target API 36; `apksigner` confirmed v2=true and v3=false. This is a debug APK, not Play release evidence.
 
 - 추가 회귀: 직접 `ProgressStore.load_progress()`에 잘못된 JSON을 넣었을 때 로드 실패, 기존 메모리 재화 777 유지, 원본 파일 `{}` 보존을 확인했다. Godot 4.7.2 `tests/run.gd` 통과.
+
+- R-SAVE-006 보강: permanent research가 저장된 체크포인트에 대해 `content_version`, `schema_version`, `save_version` 각각을 독립적으로 증가시켜 복원 거부와 모델 무변경을 확인했다. malformed unit stat 거부도 함께 유지되며 `tests/run.gd` 통과.

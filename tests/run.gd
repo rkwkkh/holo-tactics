@@ -74,10 +74,11 @@ func _initialize() -> void:
 	assert(researched_restore.restore(researched_battle.to_dict()))
 	assert(researched_restore.permanent_research == ["research.swordsman.damage"])
 	var atomic_restore := BattleModel.new()
-	var incompatible_research_snapshot: Dictionary = researched_battle.to_dict()
-	incompatible_research_snapshot.schema_version += 1
-	assert(not atomic_restore.restore(incompatible_research_snapshot))
-	assert(atomic_restore.permanent_research.is_empty() and atomic_restore.balance_seed.swordsman.damage == atomic_restore.base_balance_seed.swordsman.damage)
+	for version_key in ["content_version", "schema_version", "save_version"]:
+		var incompatible_research_snapshot: Dictionary = researched_battle.to_dict()
+		incompatible_research_snapshot[version_key] += 1
+		assert(not atomic_restore.restore(incompatible_research_snapshot))
+		assert(atomic_restore.permanent_research.is_empty() and atomic_restore.balance_seed.swordsman.damage == atomic_restore.base_balance_seed.swordsman.damage)
 	var malformed_research_snapshot: Dictionary = researched_battle.to_dict()
 	malformed_research_snapshot.units[0].damage += 1
 	assert(not atomic_restore.restore(malformed_research_snapshot))
