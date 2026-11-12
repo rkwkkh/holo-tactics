@@ -406,3 +406,10 @@
 - `tests/run.gd`가 `.bak`만 있는 스테이지 체크포인트를 만들고 latest-stage 검색 시 primary 파일 복구 및 해당 stage 감지를 확인.
 - APK 249,824,589 bytes: min API 29/target 36, v2 signature true.
 - AAB 86,232,352 bytes: bundletool 1.18.3 validate 통과, manifest API 29/36 확인, unsigned.
+
+
+## 2026-11-12 세로 UI 크기 회귀
+
+- `tests/results_view.gd`의 SubViewport 시나리오: 320×568, 360×640, 412×915. 각 해상도에서 문맥 메뉴와 고정 pause 버튼이 화면 안에 있고 컨트롤 스크롤 영역이 보이는지 확인.
+- tests/run.gd, results_view.gd, editor_preview.gd, campaign_playability.gd, validate_content.gd 모두 통과. `git diff --check` 통과.
+- 화면 비율 headless 검사는 기기 픽셀 밀도, 시스템 안전 영역, 실제 터치 반응을 대신하지 않는다.

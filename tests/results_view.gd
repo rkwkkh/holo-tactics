@@ -80,6 +80,28 @@ func _run() -> void:
 	assert(view.result_reward_label.text == "보상 저장 실패")
 	view.queue_free()
 	await process_frame
+	for viewport_size in [Vector2i(320, 568), Vector2i(360, 640), Vector2i(412, 915)]:
+		var test_viewport := SubViewport.new()
+		test_viewport.size = viewport_size
+		test_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		root.add_child(test_viewport)
+		var responsive_view = load("res://scenes/battle.tscn").instantiate()
+		test_viewport.add_child(responsive_view)
+		await process_frame
+		await process_frame
+		assert(responsive_view.get_viewport_rect().size == Vector2(viewport_size))
+		assert(responsive_view.controls_scroll.size.y > 0.0 and responsive_view.pause_button.visible)
+		responsive_view._on_tile_pressed(Vector2i(0, 8))
+		responsive_view._on_tile_pressed(Vector2i(0, 8))
+		assert(responsive_view.context_panel.visible)
+		var responsive_menu := Rect2(responsive_view.context_panel.global_position, responsive_view.context_panel.get_combined_minimum_size())
+		var responsive_pause: Rect2 = responsive_view.pause_button.get_global_rect()
+		assert(responsive_menu.position.x >= 0.0 and responsive_menu.position.y >= 0.0)
+		assert(responsive_menu.end.x <= viewport_size.x and responsive_menu.end.y <= viewport_size.y)
+		assert(responsive_pause.position.y >= 0.0 and responsive_pause.end.y <= viewport_size.y)
+		responsive_view.queue_free()
+		test_viewport.queue_free()
+		await process_frame
 	set_meta("selected_stage_id", "stage.m2.crossroads")
 	set_meta("editor_preview", true)
 	set_meta("editor_preview_id", "obstacle-view-test-%s" % Time.get_ticks_usec())
