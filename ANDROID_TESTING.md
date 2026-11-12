@@ -84,3 +84,10 @@ On API 37 AVD, manual taps entered M1, placed two swordsmen (resource 160→60),
 - AAB: `bundletool 1.18.3 validate` passed; base manifest reports the same application ID and API levels. The AAB is unsigned and not Play-upload ready.
 - SHA-256: APK `60067B5D69CF2AD4B812BD3E1B00E68D2222C27D0B8836D4E492B2FE53096F3`; AAB `CE0EFCBA65218F42553F341CB794076E6089B9E7D4AA08D3651EFAC0D9AE7B66`.
 - adb currently reports both installed AVDs offline. No post-change device smoke or FPS measurement was possible; the prior API 29 Vulkan-render failure and physical-device verification remain open.
+
+## Latest emulator smoke after status-effect rebuild (2026-11-12)
+
+- ADB server restart recovered both existing AVDs. Installed the freshly exported APK on API 29 and API 37 emulator images.
+- API 37 (Android 17, 1080x2400, density 420): app resumed successfully; campaign menu and M1 defense board rendered. Latest M1 screenshot is `build/emulator-5556-status-effect-m1c.png` (local ignored artifact). No game script/render error appeared in the short smoke window.
+- API 29: install and launcher activity succeeded, but captured frame was fully black and Godot repeatedly logged `Couldn't present to Vulkan queue (VkResult error 5)`.
+- This is emulator-only and does not establish physical Android 10 compatibility, playthrough correctness for this APK, or FPS targets. API 29 Vulkan rendering is an active release risk requiring a physical Android 10 device or a validated renderer fallback.

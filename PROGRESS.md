@@ -179,3 +179,5 @@ User-confirmed rules: bleed/burn damage consumes shield first, then applies armo
 Verified with Godot 4.7.2 headless core, editor startup, results view, seeded 8-stage campaign, editor preview isolation, and content validator. See TEST_REPORT.md. Android export/device performance were not rerun for this logic-only change.
 
 - 2026-11-12 M6 follow-up: Rebuilt APK/AAB after status-effect fixes; API29/36, APK debug signature, and bundletool validation pass. AVDs currently offline; no post-change device/FPS result. Publisher key/package ID remain unavailable.
+
+- 2026-11-12 M6 device follow-up: ADB server recovery brought API29/API37 AVDs online. Latest APK smoke: API37 campaign/M1 screen displays, API29 black screen with Vulkan present error 5. This improves the previous stale-device state but leaves Android 10 rendering unresolved; see ANDROID_TESTING.md/ISSUES.md.

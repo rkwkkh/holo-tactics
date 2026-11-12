@@ -493,3 +493,9 @@
 - AAB remains unsigned; publisher signing key and permanent package ID are unavailable. Both AVDs report offline, so no device smoke/FPS run was possible. Detailed hashes and sizes are in ANDROID_TESTING.md.
 
 - 2026-11-12: M5 GUI 검증 재시도도 computer-use native pipe 부재로 실패. plugin headless 시작 및 자동 preview/data 검사만 통과했으므로 GUI 패널 완료로 간주하지 않는다.
+
+## Latest emulator smoke (2026-11-12)
+
+- API 37 AVD: installed current status-effect APK and verified campaign menu/M1 screen rendering.
+- API 29 AVD: installed and launched but captured a black frame with repeated Vulkan present error 5.
+- Android 10 emulator rendering is still a release risk; no physical device or FPS target is verified. Details and local screenshot path are recorded in ANDROID_TESTING.md.
