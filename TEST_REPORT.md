@@ -399,3 +399,10 @@
 - tests/run.gd, results_view.gd, editor_preview.gd, campaign_playability.gd, 콘텐츠 validator 및 main 씬 smoke 통과.
 - 런타임 변경 반영 APK 249,824,537 bytes (min API29/target36, v2 통과), AAB 86,232,303 bytes (bundletool validate 및 API29/36 manifest 통과, unsigned).
 - Main→Battle 실기기 화면/복원 카운트다운은 현재 AVD SwiftShader 화면 렌더 실패 때문에 검증 대기.
+
+
+## 2026-11-12 재시작 체크포인트 백업 보완
+
+- `tests/run.gd`가 `.bak`만 있는 스테이지 체크포인트를 만들고 latest-stage 검색 시 primary 파일 복구 및 해당 stage 감지를 확인.
+- APK 249,824,589 bytes: min API 29/target 36, v2 signature true.
+- AAB 86,232,352 bytes: bundletool 1.18.3 validate 통과, manifest API 29/36 확인, unsigned.

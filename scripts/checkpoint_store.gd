@@ -25,6 +25,8 @@ static func latest_stage_with_checkpoint(stages: Array, base_path: String = "use
 			continue
 		var stage_id: String = stage.id
 		var checkpoint_path := path_for_stage(stage_id, base_path)
+		if not FileAccess.file_exists(checkpoint_path) and FileAccess.file_exists(checkpoint_path + ".bak"):
+			CheckpointStore.new(checkpoint_path).load_checkpoint()
 		if not FileAccess.file_exists(checkpoint_path):
 			continue
 		var modified := FileAccess.get_modified_time(checkpoint_path)

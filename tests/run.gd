@@ -27,11 +27,12 @@ func _initialize() -> void:
 	var resume_checkpoint_path := CheckpointStore.path_for_stage(resume_stage_id, resume_test_dir)
 	assert(resume_checkpoint_path == resume_test_dir.path_join("battle_checkpoint_stage_m4_forest.json"))
 	assert(CheckpointStore.latest_stage_with_checkpoint([{"id": resume_stage_id}], resume_test_dir).is_empty())
-	var resume_checkpoint := FileAccess.open(resume_checkpoint_path, FileAccess.WRITE)
+	var resume_checkpoint := FileAccess.open(resume_checkpoint_path + ".bak", FileAccess.WRITE)
 	assert(resume_checkpoint != null)
 	resume_checkpoint.store_string("{}")
 	resume_checkpoint.close()
 	assert(CheckpointStore.latest_stage_with_checkpoint([{"id": resume_stage_id}], resume_test_dir) == resume_stage_id)
+	assert(FileAccess.file_exists(resume_checkpoint_path) and not FileAccess.file_exists(resume_checkpoint_path + ".bak"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(resume_checkpoint_path))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(resume_test_dir))
 	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "movement_type": "ground", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash", "skill.guard"], "dependencies": []}], "skills": [{"id": "skill.slash", "unit_kind": "swordsman", "mode": "automatic", "effect": "strike", "cooldown": 5.0, "cost": 0, "value": 10, "radius": 0, "label": "Strike", "references": [], "dependencies": []}, {"id": "skill.guard", "unit_kind": "swordsman", "mode": "manual", "effect": "shield", "cooldown": 5.0, "cost": 1, "value": 10, "radius": 1, "label": "Guard", "references": [], "dependencies": []}]}}
