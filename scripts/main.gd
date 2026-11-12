@@ -1,6 +1,10 @@
 extends Control
 
+var progress_label: Label
+
 func _ready() -> void:
+	var progress := ProgressStore.new()
+	var progress_ok := progress.load_progress()
 	var layout := VBoxContainer.new()
 	layout.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	layout.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -10,6 +14,10 @@ func _ready() -> void:
 	title.text = "HOLO TACTICS"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	layout.add_child(title)
+	progress_label = Label.new()
+	progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	progress_label.text = "영구 재화 %d" % progress.data.permanent_currency if progress_ok else "영구 진행 저장 오류 · 원본 데이터 보존 중"
+	layout.add_child(progress_label)
 	var start := Button.new()
 	start.text = "수성 전투 시작"
 	start.custom_minimum_size = Vector2(240, 64)

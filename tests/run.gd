@@ -14,6 +14,13 @@ func _initialize() -> void:
 	assert(not progress_test.grant_reward_once("clear.stage.1.first", 12))
 	var progress_restore := ProgressStore.new(progress_test_path)
 	assert(progress_restore.load_progress() and progress_restore.data.permanent_currency == 12)
+	assert(progress_restore.settle_run("attempt-1", "stage.m1.frontier", "victory", 2, 30, 10, 5) == 40)
+	assert(progress_restore.data.completed_stages.has("stage.m1.frontier"))
+	assert(progress_restore.settle_run("attempt-1", "stage.m1.frontier", "victory", 2, 30, 10, 5) == 40)
+	assert(progress_restore.settle_run("attempt-2", "stage.m1.frontier", "victory", 2, 30, 10, 5) == 10)
+	assert(progress_restore.settle_run("attempt-3", "stage.m2.siege", "abandoned", 2, 40, 12, 6) == 12)
+	assert(progress_restore.data.permanent_currency == 74)
+	assert(progress_restore.settle_run("attempt-4", "stage.m2.siege", "defeat", 0, 40, 12, 6) == 0)
 	progress_restore.data.permanent_currency = -1
 	assert(not progress_restore.save_progress())
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(progress_test_path))

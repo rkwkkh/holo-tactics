@@ -239,7 +239,7 @@ static func validate(catalog: Dictionary) -> Array[String]:
 					has_wave = true
 		if not has_wave:
 			errors.append("%s must reference at least one wave" % stage.get("id", "<missing-id>"))
-		if not _is_positive_number(stage.get("core_hp")) or not _is_nonnegative_integer(stage.get("start_resource")) or not _is_nonnegative_integer(stage.get("kill_reward")) or not _is_nonnegative_integer(stage.get("wave_reward")) or not _is_positive_integer(stage.get("intermission_seconds")):
+		if not _is_positive_number(stage.get("core_hp")) or not _is_nonnegative_integer(stage.get("start_resource")) or not _is_nonnegative_integer(stage.get("kill_reward")) or not _is_nonnegative_integer(stage.get("wave_reward")) or not _is_nonnegative_integer(stage.get("permanent_first_bonus")) or not _is_nonnegative_integer(stage.get("permanent_repeat_reward")) or not _is_nonnegative_integer(stage.get("permanent_partial_per_wave")) or not _is_positive_integer(stage.get("intermission_seconds")):
 			errors.append("%s has invalid core or resource values" % stage.get("id", "<missing-id>"))
 	var cycle_nodes := _find_dependency_cycles(categories)
 	for id in cycle_nodes:

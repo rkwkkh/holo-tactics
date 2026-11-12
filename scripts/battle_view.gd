@@ -4,6 +4,7 @@ const TILE_SIZE := Vector2(40, 39)
 
 var battle: BattleModel
 var store: CheckpointStore
+var progress: ProgressStore
 var stage_title := ""
 var tiles: Array[Button] = []
 var status: Label
@@ -16,6 +17,7 @@ var timer: Timer
 var rest_timer: Timer
 var rest_seconds := 0
 var wave_button: Button
+var back_button: Button
 var deploy_buttons: Array[Button] = []
 var upgrade_controls: GridContainer
 var upgrade_buttons: Array[Button] = []
@@ -23,12 +25,18 @@ var upgrade_controls_unit := -1
 var skill_buttons: Array[Button] = []
 var skill_controls_unit := -1
 var status_override := ""
+var result_reward := -1
+var progress_available := false
 
 func _ready() -> void:
 	var selected_stage_id: String = get_tree().get_meta("selected_stage_id", BattleModel.STAGE_ID)
 	battle = BattleModel.new(selected_stage_id)
 	var checkpoint_path := "user://battle_checkpoint.json" if selected_stage_id == BattleModel.STAGE_ID else "user://battle_checkpoint_%s.json" % selected_stage_id.replace(".", "_")
 	store = CheckpointStore.new(checkpoint_path)
+	progress = ProgressStore.new()
+	progress_available = progress.load_progress()
+	if not progress_available:
+		status_override = "영구 진행 저장을 읽지 못했습니다. 원본 데이터를 보존하고 보상 정산을 중단했습니다."
 	stage_title = "수성" if battle.stage.get("mode") == "defense" else "공성"
 	var saved := store.load_checkpoint()
 	var resume := FileAccess.file_exists(store.path)
@@ -109,11 +117,16 @@ func _ready() -> void:
 	status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	status.custom_minimum_size.y = 72
 	layout.add_child(status)
-	var back := Button.new()
-	back.text = "메인 화면"
-	back.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main.tscn"))
-	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	layout.add_child(back)
+	back_button = Button.new()
+	back_button.text = "전투 포기"
+	back_button.pressed.connect(_on_back_pressed)
+	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	layout.add_child(back_button)
+	var abandon_dialog := ConfirmationDialog.new()
+	abandon_dialog.dialog_text = "전투를 포기하고 돌아가시겠습니까? 완료한 웨이브 수만큼 부분 보상을 받습니다."
+	abandon_dialog.confirmed.connect(_abandon_battle)
+	add_child(abandon_dialog)
+	set_meta("abandon_dialog", abandon_dialog)
 	timer = Timer.new()
 	timer.wait_time = 0.2
 	timer.timeout.connect(_tick)
@@ -189,6 +202,33 @@ func _cast_skill(unit_id: int, skill_id: String) -> void:
 	status_override = "" if battle.cast_skill(unit_id, skill_id) else "스킬을 사용할 수 없습니다"
 	_refresh()
 
+func _on_back_pressed() -> void:
+	if battle.phase == "finished":
+		get_tree().change_scene_to_file("res://scenes/main.tscn")
+	else:
+		(get_meta("abandon_dialog") as ConfirmationDialog).popup_centered()
+
+func _abandon_battle() -> void:
+	if battle.phase in ["preparation", "combat"]:
+		battle.phase = "finished"
+		battle.battle_result = "abandoned"
+		_process_result()
+		_refresh()
+
+func _process_result() -> void:
+	if battle.battle_result == "safe_abort" or result_reward >= 0:
+		return
+	if not progress_available:
+		status_override = "영구 진행 저장을 읽지 못해 보상 정산을 중단했습니다."
+		return
+	var amount := progress.settle_run(battle.run_id, battle.stage_id, battle.battle_result, battle.wave - 1, int(battle.stage.permanent_first_bonus), int(battle.stage.permanent_repeat_reward), int(battle.stage.permanent_partial_per_wave))
+	if amount < 0:
+		status_override = "보상 저장에 실패했습니다. 체크포인트를 보존하고 다시 저장을 시도합니다."
+		return
+	result_reward = amount
+	store.clear_checkpoint()
+	status_override = "%s · 영구 재화 +%d · 보유 %d" % ["승리" if battle.battle_result == "victory" else "패배" if battle.battle_result == "defeat" else "포기", amount, progress.data.permanent_currency]
+
 func _tick() -> void:
 	var previous_phase := battle.phase
 	battle.tick(timer.wait_time)
@@ -197,8 +237,7 @@ func _tick() -> void:
 		rest_timer.start()
 	if battle.phase == "finished":
 		rest_timer.stop()
-		if battle.battle_result != "safe_abort":
-			store.clear_checkpoint()
+		_process_result()
 	_refresh()
 
 func _on_rest_tick() -> void:
@@ -227,6 +266,7 @@ func _refresh() -> void:
 	hud.text = "%s · 웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [stage_title, battle.wave, battle.core_hp, battle.combat_gold]
 	wave_button.text = "웨이브 시작 (%d)" % rest_seconds if rest_seconds > 0 else "웨이브 시작"
 	wave_button.disabled = battle.phase != "preparation"
+	back_button.text = "마을로 돌아가기" if battle.phase == "finished" else "전투 포기"
 	for button in deploy_buttons:
 		button.disabled = battle.phase != "preparation"
 	_refresh_upgrade_controls()

@@ -6,6 +6,7 @@ const ROWS := 10
 const STAGE_ID := "stage.m1.frontier"
 
 var stage_id := STAGE_ID
+var run_id := ""
 var content: Dictionary = {}
 var stage: Dictionary = {}
 var balance_seed: Dictionary = {}
@@ -34,6 +35,7 @@ var pending_reinforcements: Array[Dictionary] = []
 
 func _init(selected_stage_id: String = STAGE_ID) -> void:
 	stage_id = selected_stage_id
+	run_id = "%s-%s-%s" % [Time.get_unix_time_from_system(), Time.get_ticks_usec(), randi()]
 	var file := FileAccess.open("res://data/catalog.json", FileAccess.READ)
 	if file == null:
 		push_error("Cannot load bundled content")
@@ -407,10 +409,10 @@ func to_dict() -> Dictionary:
 		var cell := Vector2i(definition.cell[0], definition.cell[1])
 		var wall_index := _wall_at(cell)
 		saved_walls.append({"cell": [cell.x, cell.y], "hp": walls[wall_index].hp if wall_index >= 0 else 0.0})
-	return {"stage_id": stage_id, "mode": stage.get("mode", "defense"), "content_version": ProjectVersions.CONTENT_VERSION, "schema_version": ProjectVersions.SCHEMA_VERSION, "save_version": ProjectVersions.SAVE_VERSION, "wave": wave, "phase": phase, "core_hp": core_hp, "combat_gold": combat_gold, "next_id": next_id, "units": saved_units, "facilities": saved_facilities, "walls": saved_walls, "rewarded_waves": rewarded_waves}
+	return {"stage_id": stage_id, "run_id": run_id, "mode": stage.get("mode", "defense"), "content_version": ProjectVersions.CONTENT_VERSION, "schema_version": ProjectVersions.SCHEMA_VERSION, "save_version": ProjectVersions.SAVE_VERSION, "wave": wave, "phase": phase, "core_hp": core_hp, "combat_gold": combat_gold, "next_id": next_id, "units": saved_units, "facilities": saved_facilities, "walls": saved_walls, "rewarded_waves": rewarded_waves}
 
 func restore(snapshot: Dictionary) -> bool:
-	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _version_matches(snapshot.get("save_version"), ProjectVersions.SAVE_VERSION) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array or (snapshot.has("walls") and not snapshot.walls is Array) or (snapshot.has("facilities") and not snapshot.facilities is Array):
+	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or (snapshot.has("run_id") and (not snapshot.run_id is String or snapshot.run_id.is_empty())) or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _version_matches(snapshot.get("save_version"), ProjectVersions.SAVE_VERSION) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array or (snapshot.has("walls") and not snapshot.walls is Array) or (snapshot.has("facilities") and not snapshot.facilities is Array):
 		return false
 	var restored_core := float(snapshot.get("core_hp", 0.0))
 	var restored_gold := int(snapshot.get("combat_gold", -1))
@@ -493,6 +495,7 @@ func restore(snapshot: Dictionary) -> bool:
 	if restored_next_id <= max_id:
 		return false
 	wave = int(snapshot.wave)
+	run_id = snapshot.get("run_id", run_id)
 	phase = "preparation"
 	core_hp = restored_core
 	combat_gold = restored_gold

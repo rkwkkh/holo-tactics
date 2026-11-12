@@ -64,6 +64,26 @@ func grant_reward_once(event_id: String, amount: int) -> bool:
 	data.reward_events.erase(event_id)
 	return false
 
+func settle_run(run_id: String, stage_id: String, result: String, completed_waves: int, first_clear_bonus: int, repeat_reward: int, partial_reward_per_wave: int) -> int:
+	if run_id.is_empty() or stage_id.is_empty() or result not in ["victory", "defeat", "abandoned"] or completed_waves < 0 or first_clear_bonus < 0 or repeat_reward < 0 or partial_reward_per_wave < 0:
+		return -1
+	var event_id := "battle.%s" % run_id
+	if data.reward_events.has(event_id):
+		return int(data.reward_events[event_id])
+	var first_clear: bool = result == "victory" and not data.completed_stages.has(stage_id)
+	var amount: int = repeat_reward + (first_clear_bonus if first_clear else 0) if result == "victory" else partial_reward_per_wave * completed_waves
+	data.permanent_currency += amount
+	data.reward_events[event_id] = amount
+	if result == "victory" and not data.completed_stages.has(stage_id):
+		data.completed_stages.append(stage_id)
+	if save_progress():
+		return amount
+	data.reward_events.erase(event_id)
+	data.permanent_currency -= amount
+	if result == "victory" and first_clear:
+		data.completed_stages.erase(stage_id)
+	return -1
+
 func _is_valid(candidate: Dictionary) -> bool:
 	if candidate.get("progress_version") != ProjectVersions.PROGRESS_VERSION or not _is_nonnegative_integer(candidate.get("permanent_currency")):
 		return false
