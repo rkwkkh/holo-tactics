@@ -3,6 +3,7 @@
 ## OPEN_DECISION
 
 - **GAP-P0-01 — 해결:** 2026-11-12 사용자 결정: 수성은 아군 유닛이 모두 전멸해도 핵심이 생존하면 계속 진행한다. 자동 패배시키지 않으며 core HP가 0이 되면 패배한다.
+- **R-FAC-003 / R-UI-002 — 시설 전투 강화 시점 (OPEN):** 시설 강화 UI/런타임은 미구현. 재정비와 전투 양쪽 허용 여부, 재정비만 허용, MVP 제외 중 정책 결정 대기. 기존 사용자 결정인 전투 중 시설 수리는 확정됐으며 강화와 혼동하지 않는다.
 
 ## 사용자 결정 기록
 
@@ -15,6 +16,7 @@
 - 보급형 Android 테스트 기기 모델이 미선정이다. 실제 성능 목표 인수 전에 기기가 필요하다.
 - 최신 APK 재확인: API37 AVD에서 캠페인 메뉴 렌더링, API29 AVD에서 Vulkan present error 5 재현. 이번 headless AVD 실행은 ADB 터치로 M1 진입을 재현하지 못했으며 실기기 검증도 아직 없다.
 - M5 EditorPlugin은 headless 구조 검증에 통과했으나 실제 Godot GUI에서 dock/Inspector 편집·미리보기 버튼을 조작하지 못했다. UI 연결이 복구되면 편집 저장/오류 이동/미리보기까지 수동 확인한다.
+- 시설 전투 강화 시점은 별도 정책 결정 대기. 시설 수리 시점(전투 중 허용)은 이미 확정되어 구현됐다.
 
 ## 임시 초기값
 
@@ -41,7 +43,7 @@
 
 - M4 초기 방어 전술 진단: 시작 재화 220으로 기본 유닛만 배치한 시험은 W4에서 패배했다. 검사/궁수/창병 3종과 핵심 앞 화살탑(5,8)을 사용하는 전술은 260 자원에서 4개 웨이브 모두 이겼다. `start_resource`를 220→260으로 조정하고 해당 전술을 자동 회귀 테스트에 고정했다. 이는 한 유효 전략을 입증하지만 전체 밸런스 승인이나 모든 전술의 승리를 뜻하지 않는다.
 
-- 로컬 Godot 4.7.2와 Android SDK가 설치되어 있다. Godot·ADB는 PATH에 없어 전체 경로로 실행하며, ADB는 `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe`에서 확인했다. API29/API37 AVD는 현재 online이다.
+- 로컬 Godot 4.7.2와 Android SDK가 설치되어 있다. Godot·ADB는 PATH에 없어 전체 경로로 실행하며, ADB는 `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe`에서 확인했다. 2026-11-12 현재 ADB에는 연결 장치가 없고 API29/API37 AVD도 offline이다. 이전 AVD 결과는 역사적 검증 기록으로만 유지한다.
 - 로컬 Git remote가 없고 연결된 GitHub 저장소 목록에도 이 Godot 프로젝트가 없다. hosted Actions 결과를 확인할 저장소 식별정보가 없으며, 실기기 연결·Google Play 계정·서명 키도 확인되지 않았다. 외부 상태를 완료로 표시하지 않는다.
 - 최신 APK는 API37 AVD에서 캠페인 메뉴를 렌더링하지만, 현재 headless AVD ADB touch 입력으로는 화면 전환이 재현되지 않았다. API29 Android 10 AVD는 Vulkan 초기화 후 queue present error 5가 반복된다. 과거 GLES 호환 렌더러 실패도 기록했으나 물리 Android 10 호환성 판단 근거는 아니다.
 
