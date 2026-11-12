@@ -460,3 +460,10 @@
 - API 29 AVD: APK 설치/Activity 진입은 되지만 Vulkan present `VkResult error 5`가 발생해 화면 렌더 검증 실패. 이 에뮬레이터의 GPU 경로 결함일 수 있으므로 실기기 결론으로 일반화하지 않는다.
 - API 37의 첫 시작 구간 gfxinfo는 17 frames, 11 janky, p50 61ms/p90 300ms. 이는 짧고 시작 구간에 한정된 샘플이며 일반 전투 60FPS 또는 고부하 30FPS 성능 측정은 여전히 미실시.
 - 재검증: `tests/run.gd`, `tests/results_view.gd`, `tests/editor_preview.gd`, `tests/campaign_playability.gd`(8개 스테이지), `scripts/validate_content.gd` 모두 통과. main/battle/village/village_research/editor_preview headless smoke 통과.
+
+## API 37 AVD 수성 수동 전투 흐름 (2026-11-12)
+
+- 실제 Android 화면 터치로 캠페인→M1, 검사 2기 배치(전투 자원 160→60), 웨이브 시작을 수행했다.
+- 1웨이브 뒤 유닛이 모두 사라진 상태에서도 핵심 HP 300으로 2웨이브 재정비 단계에 진입했다. 2웨이브 중 핵심 HP가 188, 76으로 감소하는 동안에도 전투 상태가 유지됐다. 핵심 HP가 0이 된 뒤에만 패배 결과가 나타났다. 최신 사용자 결정 “수성은 핵심 생존 시 계속 진행”의 실제 화면 회귀 증거다.
+- 결과 패널은 완료 웨이브 1/2, 부분 보상 +5, 잔액 105를 표시했다. 이 결과는 실패 정산 정책 및 결과 UI 표시까지 확인하지만 승리·마을 복귀 전체 흐름의 실기기 인수는 아니다.
+- 테스트 장치는 API 37 Android Emulator / Vulkan SwiftShader이며 물리기기가 아니다. 터치 시나리오와 렌더 표시만 검증했고 FPS 목표는 검증하지 않았다.

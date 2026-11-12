@@ -167,3 +167,5 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - API 37 AVD (1080×2400, density 420): Vulkan SwiftShader 초기화, 캠페인 메뉴/수성 보드 화면 렌더링, 터치로 M1 진입, 검사 2기 배치 및 전투 자원 160→60 차감까지 확인. AVD 시작 구간 `gfxinfo`는 17 frames / 11 janky / p50 61ms / p90 300ms였으며 시작 프레임만 포함한 짧은 샘플이라 60FPS 인수로 사용하지 않는다.
 - API 29 AVD: 앱은 foreground까지 열렸으나 Vulkan present가 `VkResult error 5`를 기록하고 정상 화면 검증은 통과하지 못했다. Android 10 실기기 검증과 FPS 측정은 대기.
 - 전체 headless core/UI/editor-preview/campaign/content validator 및 5개 주요 씬 smoke 통과. APK API29/36, v2 서명; AAB bundletool 1.18.3 구조 검증 통과, unsigned.
+
+- API 37 AVD 수동 전투 추가 검증: 터치로 M1 진입·유닛 2기 배치/자원 차감·웨이브 시작. 유닛 전멸 후 핵심 HP가 생존한 채 2웨이브로 진행했고, 핵심 HP 0에서만 패배/부분 보상 화면을 확인했다. 수성 생존 결정은 에뮬레이터 화면에서도 검증됐다. 실기기/FPS는 미검증.

@@ -70,3 +70,7 @@ Local Gradle Android debug APK export, API 29 manifest, and v2 signature verific
 
 
 Latest local exports (2026-11-12): Debug APK 249,828,829 bytes; unsigned test AAB 86,236,623 bytes. Both use min API 29 / target API 36. APK v2 signature and AAB bundletool 1.18.3 validation pass. The API 37 AVD visual check is only an emulator smoke test, not a physical-device performance result.
+
+## Latest emulator gameplay evidence
+
+On API 37 AVD, manual taps entered M1, placed two swordsmen (resource 160→60), and started the wave. After all allies were gone, the game advanced into wave 2 while core HP remained 300, continued combat as core HP fell (188, then 76), and showed defeat only at core HP 0. The result panel showed 1/2 completed waves and +5 partial reward (balance 105). This verifies the core-survival rule and basic defense UI on an emulator; it does not establish physical-device compatibility, victory flow, or FPS.
