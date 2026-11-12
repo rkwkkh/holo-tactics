@@ -39,6 +39,9 @@ func _initialize() -> void:
 	assert(ContentValidator.validate(wall_catalog).is_empty())
 	wall_catalog.categories.stages[0].walls[0].cell = [4, 9]
 	assert(ContentValidator.validate(wall_catalog).any(func(error): return error.contains("conflicting wall cell")))
+	var invalid_facility_catalog: Dictionary = seeded_catalog.duplicate(true)
+	invalid_facility_catalog.categories.facilities[0].hp = 0
+	assert(ContentValidator.validate(invalid_facility_catalog).any(func(error): return error.contains("invalid facility data")))
 	var wall_restore_source := BattleModel.new()
 	wall_restore_source.walls[0].hp = 20.0
 	var wall_snapshot: Dictionary = wall_restore_source.to_dict()
@@ -116,6 +119,60 @@ func _initialize() -> void:
 	wall_detour_choice.phase = "combat"
 	wall_detour_choice.enemies.append({"id": 302, "kind": "goblin", "cell": Vector2i(3, 4), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"objective": 1.0}, "alive": true})
 	assert(wall_detour_choice._choose_enemy_action(wall_detour_choice.enemies[0]).kind == "advance")
+	var facility_test := BattleModel.new()
+	assert(facility_test.build_facility("facility.arrow_tower", Vector2i(1, 8)))
+	assert(facility_test.combat_gold == 80 and not facility_test.build_facility("facility.arrow_tower", Vector2i(1, 8)) and facility_test.combat_gold == 80)
+	var facility_instance_id: int = facility_test.facilities[0].id
+	assert(facility_test.move_facility(facility_instance_id, Vector2i(2, 8)) and facility_test.combat_gold == 80)
+	assert(not facility_test.move_facility(facility_instance_id, Vector2i(4, 9)))
+	facility_test.enemies.append({"id": facility_test.next_id, "kind": "goblin", "cell": Vector2i(2, 5), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})
+	facility_test.next_id += 1
+	facility_test.phase = "combat"
+	assert(not facility_test.move_facility(facility_instance_id, Vector2i(1, 8)))
+	facility_test.tick(0.2)
+	assert(facility_test.enemies[0].hp == 49.0)
+	assert(facility_test.build_facility("facility.defense_wall", Vector2i(3, 8)))
+	var facility_wall_test := BattleModel.new()
+	assert(facility_wall_test.build_facility("facility.defense_wall", Vector2i(5, 5)))
+	var facility_corridor: Array[Vector2i] = [Vector2i(5, 4), Vector2i(5, 5), Vector2i(5, 6), Vector2i(5, 7), Vector2i(5, 8), Vector2i(4, 8), Vector2i(4, 9)]
+	for y in BattleModel.ROWS:
+		for x in BattleModel.COLUMNS:
+			var cell := Vector2i(x, y)
+			if not facility_corridor.has(cell):
+				facility_wall_test.blocked_cells[cell] = true
+	facility_wall_test.phase = "combat"
+	facility_wall_test.enemies.append({"id": 350, "kind": "goblin", "cell": Vector2i(5, 4), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"objective": 1.0}, "alive": true})
+	assert(facility_wall_test._path_to_core(facility_wall_test.enemies[0]).is_empty())
+	facility_wall_test.tick(0.2)
+	assert(facility_wall_test.facilities[0].hp == 50.0)
+	var facility_snapshot_source := BattleModel.new()
+	assert(facility_snapshot_source.build_facility("facility.arrow_tower", Vector2i(2, 8)))
+	facility_snapshot_source.facilities[0].hp = 35.0
+	var facility_snapshot: Dictionary = facility_snapshot_source.to_dict()
+	var facility_snapshot_target := BattleModel.new()
+	assert(facility_snapshot_target.restore(facility_snapshot) and facility_snapshot_target.facilities[0].hp == 35.0)
+	var rebuilt_cell_model := BattleModel.new()
+	assert(rebuilt_cell_model.deploy("swordsman", Vector2i(3, 8)))
+	rebuilt_cell_model.units[0].alive = false
+	rebuilt_cell_model.units[0].hp = 0.0
+	assert(rebuilt_cell_model.build_facility("facility.arrow_tower", Vector2i(3, 8)))
+	var rebuilt_cell_restore := BattleModel.new()
+	assert(rebuilt_cell_restore.restore(rebuilt_cell_model.to_dict()) and rebuilt_cell_restore.facilities[0].alive)
+	var facility_targeting := BattleModel.new()
+	facility_targeting.phase = "combat"
+	assert(facility_targeting.build_facility("facility.arrow_tower", Vector2i(2, 8)))
+	facility_targeting.enemies.append({"id": 400, "kind": "goblin", "cell": Vector2i(2, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})
+	facility_targeting.tick(0.2)
+	assert(facility_targeting.facilities[0].hp == 110.0)
+	facility_targeting.facilities[0].hp = 5.0
+	facility_targeting.enemies[0].cooldown = 0.0
+	facility_targeting.tick(0.2)
+	assert(not facility_targeting.facilities[0].alive and facility_targeting.facilities[0].hp == 0.0)
+	facility_targeting.phase = "preparation"
+	assert(facility_targeting.build_facility("facility.arrow_tower", Vector2i(2, 8)))
+	var destroyed_facility_snapshot: Dictionary = facility_targeting.to_dict()
+	var destroyed_facility_restore := BattleModel.new()
+	assert(destroyed_facility_restore.restore(destroyed_facility_snapshot) and not destroyed_facility_restore.facilities[0].alive and destroyed_facility_restore.facilities[1].alive)
 	var battle := BattleModel.new()
 	assert(battle.deploy("swordsman", Vector2i(3, 8)))
 	assert(not battle.deploy("swordsman", Vector2i(3, 5)))

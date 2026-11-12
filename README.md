@@ -15,7 +15,7 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
   ```
 
 - Open `project.godot` in the Godot editor to run the portrait project.
-- The main menu exposes the M1 defense slice and an M2 siege test entry; the siege button is a development path, not a campaign unlock.
+- The main menu exposes the M1 defense slice and an M2 siege test entry; the siege button is a development path, not a campaign unlock. Battle controls include unit deployment and four facility build buttons; select a facility tile during preparation and tap a destination to move it.
 - Android SDK and OpenJDK 17 are installed and configured in the local Godot editor settings. Export templates are installed. The local debug preset exports with `--export-debug "Android Debug APK" build/holo-debug.apk` (create the ignored `build/` directory first).
 - `assets/icon.svg` is temporary project art; replace it before store publication. No release keystore or store credentials belong in this repository.
 

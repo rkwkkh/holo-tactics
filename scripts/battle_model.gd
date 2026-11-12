@@ -9,6 +9,7 @@ var stage_id := STAGE_ID
 var content: Dictionary = {}
 var stage: Dictionary = {}
 var balance_seed: Dictionary = {}
+var facility_definitions: Dictionary = {}
 var ai_profiles: Dictionary = {}
 var waves: Array = []
 var core_cell := Vector2i(4, 9)
@@ -20,6 +21,7 @@ var combat_gold := 0
 var next_id := 1
 var units: Array[Dictionary] = []
 var enemies: Array[Dictionary] = []
+var facilities: Array[Dictionary] = []
 var rewarded_waves: Array[int] = []
 var blocked_cells: Dictionary = {}
 var walls: Array[Dictionary] = []
@@ -39,6 +41,8 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 	content = parsed
 	for unit in content.categories.units:
 		balance_seed[unit.kind] = unit
+	for facility in content.categories.facilities:
+		facility_definitions[facility.id] = facility
 	for profile in content.categories.ai_profiles:
 		ai_profiles[profile.id] = profile
 	for definition in content.categories.stages:
@@ -78,6 +82,27 @@ func move_unit(unit_id: int, destination: Vector2i) -> bool:
 		return false
 	unit.destination = destination
 	unit.cooldown = maxf(unit.cooldown, 0.5)
+	return true
+
+func build_facility(facility_id: String, cell: Vector2i) -> bool:
+	if phase not in ["preparation", "combat"] or not facility_definitions.has(facility_id) or not _is_inside(cell) or cell.y < 5 or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied(cell):
+		return false
+	var definition: Dictionary = facility_definitions[facility_id]
+	if definition.team != "ally" or combat_gold < definition.cost:
+		return false
+	combat_gold -= definition.cost
+	facilities.append({"id": next_id, "facility_id": facility_id, "kind": definition.kind, "cell": cell, "hp": definition.hp, "damage": definition.damage, "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": 0.0, "alive": true})
+	next_id += 1
+	return true
+
+func move_facility(facility_instance_id: int, destination: Vector2i) -> bool:
+	var facility := _facility_by_id(facility_instance_id)
+	if facility.is_empty() or phase != "preparation" or not _is_inside(destination) or destination.y < 5 or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or destination == facility.cell:
+		return false
+	for item in units + enemies + facilities:
+		if item.alive and item.id != facility_instance_id and item.cell == destination:
+			return false
+	facility.cell = destination
 	return true
 
 func start_wave(store: CheckpointStore) -> bool:
@@ -129,6 +154,13 @@ func tick(delta: float) -> void:
 				var route := _find_path(unit, core_cell)
 				if not route.is_empty() and route[0] != core_cell:
 					unit.cell = route[0]
+	for facility in facilities:
+		if not facility.alive or facility.damage <= 0:
+			continue
+		facility.cooldown = maxf(0.0, facility.cooldown - delta)
+		var target_index := _closest_target(facility.cell, enemies, facility.range)
+		if target_index >= 0:
+			_strike(facility, enemies[target_index])
 	for enemy in enemies:
 		if not enemy.alive:
 			continue
@@ -136,6 +168,8 @@ func tick(delta: float) -> void:
 		var decision := _choose_enemy_action(enemy)
 		match decision.kind:
 			"attack_unit": _strike(enemy, units[decision.target_index])
+			"attack_facility": _strike(enemy, facilities[decision.target_index])
+			"advance_facility_wall": enemy.cell = decision.route[0]
 			"attack_wall":
 				walls[decision.wall_index].hp = maxf(0.0, walls[decision.wall_index].hp - enemy.damage)
 				enemy.cooldown = balance_seed[enemy.kind].attack_time
@@ -175,6 +209,7 @@ func tick(delta: float) -> void:
 
 func to_dict() -> Dictionary:
 	var saved_units: Array[Dictionary] = []
+	var saved_facilities: Array[Dictionary] = []
 	var saved_walls: Array[Dictionary] = []
 	for unit in units:
 		var saved_unit := unit.duplicate(true)
@@ -182,14 +217,18 @@ func to_dict() -> Dictionary:
 		if unit.has("destination"):
 			saved_unit.destination = [unit.destination.x, unit.destination.y]
 		saved_units.append(saved_unit)
+	for facility in facilities:
+		var saved_facility := facility.duplicate(true)
+		saved_facility.cell = [facility.cell.x, facility.cell.y]
+		saved_facilities.append(saved_facility)
 	for definition in stage.get("walls", []):
 		var cell := Vector2i(definition.cell[0], definition.cell[1])
 		var wall_index := _wall_at(cell)
 		saved_walls.append({"cell": [cell.x, cell.y], "hp": walls[wall_index].hp if wall_index >= 0 else 0.0})
-	return {"stage_id": stage_id, "mode": stage.get("mode", "defense"), "content_version": ProjectVersions.CONTENT_VERSION, "schema_version": ProjectVersions.SCHEMA_VERSION, "save_version": ProjectVersions.SAVE_VERSION, "wave": wave, "phase": phase, "core_hp": core_hp, "combat_gold": combat_gold, "next_id": next_id, "units": saved_units, "walls": saved_walls, "rewarded_waves": rewarded_waves}
+	return {"stage_id": stage_id, "mode": stage.get("mode", "defense"), "content_version": ProjectVersions.CONTENT_VERSION, "schema_version": ProjectVersions.SCHEMA_VERSION, "save_version": ProjectVersions.SAVE_VERSION, "wave": wave, "phase": phase, "core_hp": core_hp, "combat_gold": combat_gold, "next_id": next_id, "units": saved_units, "facilities": saved_facilities, "walls": saved_walls, "rewarded_waves": rewarded_waves}
 
 func restore(snapshot: Dictionary) -> bool:
-	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _version_matches(snapshot.get("save_version"), ProjectVersions.SAVE_VERSION) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array or (snapshot.has("walls") and not snapshot.walls is Array):
+	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _version_matches(snapshot.get("save_version"), ProjectVersions.SAVE_VERSION) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array or (snapshot.has("walls") and not snapshot.walls is Array) or (snapshot.has("facilities") and not snapshot.facilities is Array):
 		return false
 	var restored_core := float(snapshot.get("core_hp", 0.0))
 	var restored_gold := int(snapshot.get("combat_gold", -1))
@@ -197,6 +236,7 @@ func restore(snapshot: Dictionary) -> bool:
 	if snapshot.get("phase") != "preparation" or not is_finite(restored_core) or restored_core <= 0.0 or restored_core > stage.core_hp or restored_gold < 0 or restored_next_id < 1:
 		return false
 	var restored_units: Array[Dictionary] = []
+	var restored_facilities: Array[Dictionary] = []
 	var ids: Dictionary = {}
 	var occupied: Dictionary = {}
 	var max_id := 0
@@ -219,9 +259,24 @@ func restore(snapshot: Dictionary) -> bool:
 			return false
 		unit.cell = cell
 		ids[id] = true
-		occupied[cell] = true
+		if unit.alive:
+			occupied[cell] = true
 		max_id = maxi(max_id, id)
 		restored_units.append(unit)
+	for saved_facility in snapshot.get("facilities", []):
+		if not saved_facility is Dictionary or not _is_integer_value(saved_facility.get("id")) or not _is_valid_cell(saved_facility.get("cell")) or not facility_definitions.has(saved_facility.get("facility_id")) or not saved_facility.get("alive") is bool:
+			return false
+		var definition: Dictionary = facility_definitions[saved_facility.facility_id]
+		var id := int(saved_facility.id)
+		var cell := Vector2i(int(saved_facility.cell[0]), int(saved_facility.cell[1]))
+		if definition.team != "ally" or ids.has(id) or cell.y < 5 or (saved_facility.alive and (cell == core_cell or occupied.has(cell) or blocked_cells.has(cell) or _wall_at(cell) >= 0)) or not _is_finite_nonnegative(saved_facility.get("hp")) or float(saved_facility.hp) > float(definition.hp) or not _is_finite_nonnegative(saved_facility.get("cooldown")) or (saved_facility.alive and saved_facility.hp <= 0.0) or (not saved_facility.alive and saved_facility.hp > 0.0):
+			return false
+		var facility: Dictionary = {"id": id, "facility_id": saved_facility.facility_id, "kind": definition.kind, "cell": cell, "hp": float(saved_facility.hp), "damage": definition.damage, "range": definition.range, "attack_time": definition.attack_time, "blocks_path": definition.blocks_path, "cooldown": float(saved_facility.cooldown), "alive": saved_facility.alive}
+		ids[id] = true
+		if facility.alive:
+			occupied[cell] = true
+		max_id = maxi(max_id, id)
+		restored_facilities.append(facility)
 	for rewarded_wave in snapshot.get("rewarded_waves", []):
 		if not _is_integer_value(rewarded_wave) or int(rewarded_wave) < 1 or int(rewarded_wave) >= int(snapshot.wave):
 			return false
@@ -252,6 +307,7 @@ func restore(snapshot: Dictionary) -> bool:
 	combat_gold = restored_gold
 	next_id = restored_next_id
 	units.assign(restored_units)
+	facilities.assign(restored_facilities)
 	walls.assign(restored_walls)
 	rewarded_waves.assign(snapshot.get("rewarded_waves", []))
 	enemies.clear()
@@ -286,7 +342,7 @@ func _strike(attacker: Dictionary, target: Dictionary) -> void:
 	if attacker.cooldown > 0.0:
 		return
 	target.hp -= attacker.damage
-	attacker.cooldown = balance_seed[attacker.kind].attack_time
+	attacker.cooldown = float(attacker.attack_time) if attacker.has("attack_time") else float(balance_seed[attacker.kind].attack_time)
 	if target.hp <= 0.0:
 		target.hp = 0.0
 		target.alive = false
@@ -303,6 +359,12 @@ func _unit_by_content_id(content_id: String) -> Dictionary:
 	for unit in content.categories.units:
 		if unit.id == content_id:
 			return unit
+	return {}
+
+func _facility_by_id(facility_instance_id: int) -> Dictionary:
+	for facility in facilities:
+		if facility.id == facility_instance_id and facility.alive:
+			return facility
 	return {}
 
 func _spawn_enemy(content_id: String, cell: Vector2i, wave_definition: Dictionary) -> bool:
@@ -352,7 +414,7 @@ func _advance_reinforcements() -> bool:
 	return true
 
 func _occupied(cell: Vector2i) -> bool:
-	for item in units + enemies:
+	for item in units + enemies + facilities:
 		if item.alive and item.cell == cell:
 			return true
 	return false
@@ -382,12 +444,14 @@ func _choose_enemy_action(enemy: Dictionary) -> Dictionary:
 		return {"kind": "wait"}
 	var options: Array[Dictionary] = []
 	var weights: Dictionary = enemy.get("ai_weights", {"attack": 1.2, "objective": 1.0})
-	var target_index := _closest_target(enemy.cell, units, enemy.range)
+	var targets: Array[Dictionary] = units.duplicate()
+	targets.append_array(facilities)
+	var target_index := _closest_target(enemy.cell, targets, enemy.range)
 	if target_index >= 0:
-		var target: Dictionary = units[target_index]
+		var target: Dictionary = targets[target_index]
 		var distance := absi(enemy.cell.x - target.cell.x) + absi(enemy.cell.y - target.cell.y)
 		var attack_score: float = weights.get("attack", 1.2) * (1.0 + 0.5 * (1.0 - float(distance) / float(enemy.range + 1)))
-		options.append({"kind": "attack_unit", "target_index": target_index, "score": attack_score})
+		options.append({"kind": "attack_facility" if target.has("facility_id") else "attack_unit", "target_index": target_index - units.size() if target.has("facility_id") else target_index, "score": attack_score})
 	if stage.mode == "siege":
 		if options.is_empty():
 			enemy.fsm_state = "guard"
@@ -410,6 +474,20 @@ func _choose_enemy_action(enemy: Dictionary) -> Dictionary:
 		var breach_score: float = float(weights.get("objective", 1.0)) / float(breach_cost + 1)
 		if route.is_empty() or breach_cost < detour_cost:
 			options.append({"kind": "attack_wall" if wall_route.path.is_empty() else "advance_wall", "wall_index": wall_index, "route": wall_route.path, "score": breach_score})
+	for facility_index in facilities.size():
+		var facility: Dictionary = facilities[facility_index]
+		if not facility.alive or not facility.blocks_path:
+			continue
+		var facility_route: Variant = _path_to_wall(enemy, facility.cell)
+		if facility_route == null:
+			continue
+		var facility_after_route: Array[Vector2i] = _path_to_core_after_facility(enemy, facility_route.target, facility_index)
+		var facility_break_turns := ceili(float(facility.hp) / float(enemy.damage))
+		var facility_breach_cost: int = facility_route.path.size() + facility_break_turns + facility_after_route.size()
+		var facility_detour_cost: int = route.size() if not route.is_empty() else 1000
+		if route.is_empty() or facility_breach_cost < facility_detour_cost:
+			var action_kind := "attack_facility" if facility_route.path.is_empty() else "advance_facility_wall"
+			options.append({"kind": action_kind, "target_index": facility_index, "route": facility_route.path, "score": float(weights.get("objective", 1.0)) / float(facility_breach_cost + 1)})
 	if options.is_empty():
 		enemy.fsm_state = "blocked"
 		return {"kind": "wait"}
@@ -417,13 +495,16 @@ func _choose_enemy_action(enemy: Dictionary) -> Dictionary:
 	for option in options.slice(1):
 		if option.score > best.score:
 			best = option
-	enemy.fsm_state = "attack" if best.kind in ["attack_unit", "attack_core", "attack_wall"] else "advance"
+	enemy.fsm_state = "attack" if best.kind in ["attack_unit", "attack_facility", "attack_core", "attack_wall"] else "advance"
 	return best
 
 func _find_path(mover: Dictionary, goal: Vector2i) -> Array[Vector2i]:
 	var blocked := blocked_cells.duplicate()
 	for wall in walls:
 		blocked[wall.cell] = true
+	for facility in facilities:
+		if facility.alive and facility.blocks_path:
+			blocked[facility.cell] = true
 	for item in units + enemies:
 		if item.alive and item.id != mover.id:
 			blocked[item.cell] = true
@@ -451,6 +532,21 @@ func _path_to_core_after_wall(mover: Dictionary, start: Vector2i, removed_wall: 
 	for index in walls.size():
 		if index != removed_wall:
 			blocked[walls[index].cell] = true
+	for facility in facilities:
+		if facility.alive and facility.blocks_path:
+			blocked[facility.cell] = true
+	for item in units + enemies:
+		if item.alive and item.id != mover.id and item.cell != start:
+			blocked[item.cell] = true
+	return GridPathfinder.find_path(start, core_cell, COLUMNS, ROWS, blocked)
+
+func _path_to_core_after_facility(mover: Dictionary, start: Vector2i, removed_facility: int) -> Array[Vector2i]:
+	var blocked := blocked_cells.duplicate()
+	for wall in walls:
+		blocked[wall.cell] = true
+	for index in facilities.size():
+		if index != removed_facility and facilities[index].alive and facilities[index].blocks_path:
+			blocked[facilities[index].cell] = true
 	for item in units + enemies:
 		if item.alive and item.id != mover.id and item.cell != start:
 			blocked[item.cell] = true

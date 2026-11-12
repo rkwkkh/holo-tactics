@@ -9,6 +9,8 @@ var tiles: Array[Button] = []
 var status: Label
 var hud: Label
 var selected_kind := "swordsman"
+var selected_facility_id := ""
+var selected_facility_instance := -1
 var selected_unit := -1
 var timer: Timer
 var rest_timer: Timer
@@ -69,6 +71,15 @@ func _ready() -> void:
 		deploy_button.pressed.connect(_select_unit_kind.bind(kind))
 		controls.add_child(deploy_button)
 		deploy_buttons.append(deploy_button)
+	var facility_controls := HBoxContainer.new()
+	facility_controls.alignment = BoxContainer.ALIGNMENT_CENTER
+	layout.add_child(facility_controls)
+	for facility_id in ["facility.arrow_tower", "facility.magic_tower", "facility.support_outpost", "facility.defense_wall"]:
+		var definition: Dictionary = battle.facility_definitions[facility_id]
+		var facility_button := Button.new()
+		facility_button.text = "%s %d" % ["화살탑" if definition.kind == "arrow_tower" else "마법탑" if definition.kind == "magic_tower" else "지원" if definition.kind == "support_outpost" else "방벽", definition.cost]
+		facility_button.pressed.connect(_select_facility.bind(facility_id))
+		facility_controls.add_child(facility_button)
 	wave_button = Button.new()
 	wave_button.text = "웨이브 시작"
 	wave_button.pressed.connect(_start_wave)
@@ -103,10 +114,24 @@ func _on_tile_pressed(cell: Vector2i) -> void:
 	var unit := _unit_at(cell)
 	if not unit.is_empty():
 		selected_unit = unit.id
+		selected_facility_instance = -1
 		selected_kind = ""
+		selected_facility_id = ""
+	elif not _facility_at(cell).is_empty():
+		selected_facility_instance = _facility_at(cell).id
+		selected_unit = -1
+		selected_kind = ""
+		selected_facility_id = ""
+	elif selected_facility_instance >= 0:
+		if not battle.move_facility(selected_facility_instance, cell):
+			status_override = "시설은 재정비 중에만 이동할 수 있습니다"
+		selected_facility_instance = -1
 	elif selected_unit >= 0:
 		if not battle.move_unit(selected_unit, cell):
 			status_override = "이동할 수 없는 칸입니다"
+	elif not selected_facility_id.is_empty():
+		if not battle.build_facility(selected_facility_id, cell):
+			status_override = "시설 위치 또는 전투 자원을 확인하세요"
 	elif battle.phase == "preparation" and not selected_kind.is_empty():
 		if not battle.deploy(selected_kind, cell):
 			status_override = "배치 위치 또는 전투 자원을 확인하세요"
@@ -114,8 +139,18 @@ func _on_tile_pressed(cell: Vector2i) -> void:
 
 func _select_unit_kind(kind: String) -> void:
 	selected_kind = kind
+	selected_facility_id = ""
+	selected_facility_instance = -1
 	selected_unit = -1
 	status_override = ""
+	_refresh()
+
+func _select_facility(facility_id: String) -> void:
+	selected_facility_id = facility_id
+	selected_facility_instance = -1
+	selected_kind = ""
+	selected_unit = -1
+	status_override = "시설을 배치할 타일을 선택하세요"
 	_refresh()
 
 func _start_wave() -> void:
@@ -152,6 +187,12 @@ func _unit_at(cell: Vector2i) -> Dictionary:
 			return unit
 	return {}
 
+func _facility_at(cell: Vector2i) -> Dictionary:
+	for facility in battle.facilities:
+		if facility.alive and facility.cell == cell:
+			return facility
+	return {}
+
 func _refresh() -> void:
 	hud.text = "%s · 웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [stage_title, battle.wave, battle.core_hp, battle.combat_gold]
 	wave_button.text = "웨이브 시작 (%d)" % rest_seconds if rest_seconds > 0 else "웨이브 시작"
@@ -168,6 +209,11 @@ func _refresh() -> void:
 				if unit.alive and unit.cell == cell:
 					tile.text = "검" if unit.kind == "swordsman" else "궁"
 					if unit.id == selected_unit:
+						tile.text = "[" + tile.text + "]"
+			for facility in battle.facilities:
+				if facility.alive and facility.cell == cell:
+					tile.text = "화" if facility.kind == "arrow_tower" else "마" if facility.kind == "magic_tower" else "지" if facility.kind == "support_outpost" else "방"
+					if facility.id == selected_facility_instance:
 						tile.text = "[" + tile.text + "]"
 			for enemy in battle.enemies:
 				if enemy.alive and enemy.cell == cell:
