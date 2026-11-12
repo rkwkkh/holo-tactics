@@ -138,3 +138,4 @@ Re-exported with the restored Mobile/Vulkan Android renderer after the temporary
 - After correcting for the screenshot viewer's downscaled coordinates, ADB touch entered M1 and deployed a swordsman on the board. On Emulator 37.2.13/API37, HUD resource changed 160→110 after the 50-cost deployment.
 - Started wave 1; the game changed to combat state, enemies moved into the defense area, and core HP changed 300→280 after an enemy attack. Battle board, sprites, core HUD, build controls, and combat controls rendered in the 1080x2400 capture (`build/mvp-followup-api37-wave.png`, ignored artifact).
 - This is a short SwiftShader AVD gameplay smoke. It does not verify full stage completion, Android 10 physical compatibility, or FPS targets.
+- Exact installed APK SHA-256: `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC`.
