@@ -12,6 +12,7 @@ var stage: Dictionary = {}
 var balance_seed: Dictionary = {}
 var base_balance_seed: Dictionary = {}
 var research_definitions: Dictionary = {}
+var evolution_definitions: Dictionary = {}
 var permanent_research: Array[String] = []
 var unlocked_evolutions: Array[String] = []
 var upgrade_definitions: Dictionary = {}
@@ -60,6 +61,8 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 		upgrade_definitions[upgrade.id] = upgrade
 	for skill in content.categories.skills:
 		skill_definitions[skill.id] = skill
+	for evolution in content.categories.evolutions:
+		evolution_definitions[evolution.id] = evolution
 	for facility in content.categories.facilities:
 		facility_definitions[facility.id] = facility
 	for obstacle in content.categories.obstacles:
@@ -94,6 +97,35 @@ func set_permanent_research(research_ids: Array) -> bool:
 	unlocked_evolutions = research_state.evolutions
 	balance_seed = research_state.balance
 	return true
+
+func can_evolve_unit(unit_id: int, evolution_id: String) -> bool:
+	var unit := _unit_by_id(unit_id)
+	return phase in ["preparation", "combat"] and not unit.is_empty() and not unit.has("evolution_id") and _evolution_requirements_met(unit, evolution_id, unlocked_evolutions) and combat_gold >= int(evolution_definitions[evolution_id].combat_cost)
+
+func evolve_unit(unit_id: int, evolution_id: String) -> bool:
+	if not can_evolve_unit(unit_id, evolution_id):
+		return false
+	var unit := _unit_by_id(unit_id)
+	unit.evolution_id = evolution_id
+	combat_gold -= int(evolution_definitions[evolution_id].combat_cost)
+	return true
+
+func _evolution_requirements_met(unit: Dictionary, evolution_id: String, unlocked: Array) -> bool:
+	var evolution: Dictionary = evolution_definitions.get(evolution_id, {})
+	if evolution.is_empty() or evolution.unit_kind != unit.get("kind") or not unlocked.has(evolution_id):
+		return false
+	var total_levels := 0
+	for level in unit.get("upgrades", {}).values():
+		total_levels += int(level)
+	if total_levels < int(evolution.total_upgrade_levels):
+		return false
+	for upgrade_id in evolution.required_upgrades:
+		if int(unit.get("upgrades", {}).get(upgrade_id, 0)) < int(evolution.required_upgrades[upgrade_id]):
+			return false
+	return true
+
+func _evolution_skill_id(evolution_id: String) -> String:
+	return "%s.special" % evolution_id
 
 func _build_research_state(research_ids: Array) -> Dictionary:
 	var selected: Array[String] = []
@@ -164,9 +196,12 @@ func purchase_upgrade(unit_id: int, upgrade_id: String) -> bool:
 
 func cast_skill(unit_id: int, skill_id: String) -> bool:
 	var unit := _unit_by_id(unit_id)
-	if unit.is_empty() or phase != "combat" or unit.has("destination") or not skill_definitions.has(skill_id):
+	if unit.is_empty() or phase != "combat" or unit.has("destination"):
 		return false
-	var skill: Dictionary = skill_definitions[skill_id]
+	var skill: Dictionary = skill_definitions.get(skill_id, {})
+	if skill.is_empty() and unit.has("evolution_id") and skill_id == _evolution_skill_id(unit.evolution_id):
+		skill = evolution_definitions[unit.evolution_id].special_skill.duplicate(true)
+		skill.unit_kind = unit.kind
 	if skill.unit_kind != unit.kind or skill.mode != "manual" or float(unit.skill_cooldowns.get(skill_id, 0.0)) > 0.0 or combat_gold < int(skill.cost):
 		return false
 	if not _execute_skill(unit, skill):
@@ -184,6 +219,11 @@ func _tick_skills(unit: Dictionary, delta: float) -> void:
 	for skill in content.categories.skills:
 		if skill.unit_kind == unit.kind and skill.mode == "automatic" and float(unit.skill_cooldowns.get(skill.id, 0.0)) <= 0.0 and _execute_skill(unit, skill):
 			unit.skill_cooldowns[skill.id] = float(skill.cooldown)
+	if unit.has("evolution_id"):
+		var skill: Dictionary = evolution_definitions[unit.evolution_id].special_skill
+		var skill_id := _evolution_skill_id(unit.evolution_id)
+		if skill.mode == "automatic" and float(unit.skill_cooldowns.get(skill_id, 0.0)) <= 0.0 and _execute_skill(unit, skill):
+			unit.skill_cooldowns[skill_id] = float(skill.cooldown)
 
 func _execute_skill(unit: Dictionary, skill: Dictionary) -> bool:
 	var enemies_in_range := (enemies + enemy_facilities).filter(func(target: Dictionary): return target.alive and target.get("active", true) and _distance(unit.cell, target.cell) <= 5)
@@ -532,7 +572,7 @@ func restore(snapshot: Dictionary) -> bool:
 	var research_state := _build_research_state(saved_research)
 	if research_state.is_empty():
 		return false
-	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or (snapshot.has("run_id") and (not snapshot.run_id is String or snapshot.run_id.is_empty())) or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _version_matches(snapshot.get("save_version"), ProjectVersions.SAVE_VERSION) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array or (snapshot.has("walls") and not snapshot.walls is Array) or (snapshot.has("facilities") and not snapshot.facilities is Array) or (snapshot.has("obstacles") and not snapshot.obstacles is Array):
+	if snapshot.get("stage_id") != stage_id or snapshot.get("mode") != stage.get("mode") or (snapshot.has("run_id") and (not snapshot.run_id is String or snapshot.run_id.is_empty())) or not _version_matches(snapshot.get("content_version"), ProjectVersions.CONTENT_VERSION) or not _version_matches(snapshot.get("schema_version"), ProjectVersions.SCHEMA_VERSION) or not _save_version_supported(snapshot) or not _version_matches(snapshot.get("wave"), int(snapshot.get("wave", 0))) or int(snapshot.get("wave", 0)) < 1 or int(snapshot.get("wave", 0)) > waves.size() or not snapshot.get("units") is Array or not snapshot.get("rewarded_waves", []) is Array or (snapshot.has("walls") and not snapshot.walls is Array) or (snapshot.has("facilities") and not snapshot.facilities is Array) or (snapshot.has("obstacles") and not snapshot.obstacles is Array):
 		return false
 	var restored_core := float(snapshot.get("core_hp", 0.0))
 	var restored_gold := int(snapshot.get("combat_gold", -1))
@@ -555,7 +595,8 @@ func restore(snapshot: Dictionary) -> bool:
 		if saved_unit.has("movement_type") and saved_unit.movement_type != stats.movement_type:
 			return false
 		unit.movement_type = stats.movement_type
-		if not _valid_saved_upgrades(saved_unit.get("upgrades", {}), saved_unit.kind) or not _valid_saved_skill_cooldowns(saved_unit.get("skill_cooldowns", {}), saved_unit.kind):
+		var evolution_id: Variant = saved_unit.get("evolution_id", "")
+		if not evolution_id is String or (not evolution_id.is_empty() and not _evolution_requirements_met(saved_unit, evolution_id, research_state.evolutions)) or not _valid_saved_upgrades(saved_unit.get("upgrades", {}), saved_unit.kind) or not _valid_saved_skill_cooldowns(saved_unit.get("skill_cooldowns", {}), saved_unit.kind, evolution_id):
 			return false
 		if not _is_integer_value(saved_unit.get("attack_count", 0)) or int(saved_unit.get("attack_count", 0)) < 0:
 			return false
@@ -661,6 +702,20 @@ func restore(snapshot: Dictionary) -> bool:
 func _version_matches(value: Variant, expected: int) -> bool:
 	return (value is int or value is float) and float(value) == float(expected)
 
+func _save_version_supported(snapshot: Dictionary) -> bool:
+	var version: Variant = snapshot.get("save_version")
+	if _version_matches(version, ProjectVersions.SAVE_VERSION):
+		return true
+	if ProjectVersions.SAVE_VERSION != 2 or not _version_matches(version, 1) or not snapshot.get("units") is Array:
+		return false
+	for unit in snapshot.units:
+		if not unit is Dictionary or unit.has("evolution_id"):
+			return false
+		var cooldowns: Variant = unit.get("skill_cooldowns", {})
+		if not cooldowns is Dictionary or cooldowns.keys().any(func(skill_id): return str(skill_id).ends_with(".special")):
+			return false
+	return true
+
 func _valid_saved_upgrades(saved_upgrades: Variant, unit_kind: String) -> bool:
 	if not saved_upgrades is Dictionary:
 		return false
@@ -671,11 +726,14 @@ func _valid_saved_upgrades(saved_upgrades: Variant, unit_kind: String) -> bool:
 			return false
 	return true
 
-func _valid_saved_skill_cooldowns(saved_cooldowns: Variant, unit_kind: String) -> bool:
+func _valid_saved_skill_cooldowns(saved_cooldowns: Variant, unit_kind: String, evolution_id: String = "") -> bool:
 	if not saved_cooldowns is Dictionary:
 		return false
 	for skill_id in saved_cooldowns:
 		var skill: Dictionary = skill_definitions.get(skill_id, {})
+		if skill.is_empty() and not evolution_id.is_empty() and skill_id == _evolution_skill_id(evolution_id) and evolution_definitions.has(evolution_id):
+			skill = evolution_definitions[evolution_id].special_skill.duplicate(true)
+			skill.unit_kind = unit_kind
 		if skill.get("unit_kind") != unit_kind or not _is_finite_nonnegative(saved_cooldowns[skill_id]) or float(saved_cooldowns[skill_id]) > float(skill.get("cooldown", 0.0)):
 			return false
 	return true

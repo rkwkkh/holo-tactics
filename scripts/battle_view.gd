@@ -38,6 +38,10 @@ var upgrade_buttons: Array[Button] = []
 var upgrade_controls_unit := -1
 var skill_buttons: Array[Button] = []
 var skill_controls_unit := -1
+var skill_controls_evolution := ""
+var evolution_controls: GridContainer
+var evolution_buttons: Array[Button] = []
+var evolution_controls_unit := -1
 var context_panel: PanelContainer
 var context_box: VBoxContainer
 var context_info: Label
@@ -153,6 +157,10 @@ func _ready() -> void:
 	skill_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	context_box.add_child(skill_controls)
 	set_meta("skill_controls", skill_controls)
+	evolution_controls = GridContainer.new()
+	evolution_controls.columns = 2
+	evolution_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	context_box.add_child(evolution_controls)
 	var facility_controls := GridContainer.new()
 	facility_controls.columns = 2
 	facility_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -364,6 +372,11 @@ func _cast_skill(unit_id: int, skill_id: String) -> void:
 	status_override = "" if battle.cast_skill(unit_id, skill_id) else "스킬을 사용할 수 없습니다"
 	_refresh()
 
+func _evolve_unit(unit_id: int, evolution_id: String) -> void:
+	if paused: return
+	status_override = "" if battle.evolve_unit(unit_id, evolution_id) else "진화 조건 또는 전투 자원을 확인하세요"
+	_refresh()
+
 func _repair_selected_facility() -> void:
 	if paused: return
 	status_override = "" if battle.repair_facility(selected_facility_instance) else "시설 수리 자원 또는 상태를 확인하세요"
@@ -455,6 +468,7 @@ func _refresh() -> void:
 		button.disabled = battle.phase != "preparation"
 	_refresh_upgrade_controls()
 	_refresh_skill_controls()
+	_refresh_evolution_controls()
 	_refresh_obstacle_controls()
 	_refresh_context_panel()
 	if paused:
@@ -549,7 +563,10 @@ func _refresh_context_panel() -> void:
 	if not context_panel.visible:
 		return
 	if not unit.is_empty():
-		context_info.text = "%s · HP %.0f/%.0f" % [_unit_name(unit.kind), unit.hp, battle.balance_seed[unit.kind].hp]
+		var unit_label := _unit_name(unit.kind)
+		if unit.has("evolution_id"):
+			unit_label = battle.evolution_definitions[unit.evolution_id].label
+		context_info.text = "%s · HP %.0f/%.0f" % [unit_label, unit.hp, battle.balance_seed[unit.kind].hp]
 		repair_button.visible = false
 	else:
 		var move_hint := "다른 타일을 눌러 이동" if battle.phase == "preparation" else "전투 중 이동 불가"
@@ -675,12 +692,21 @@ func _refresh_skill_controls() -> void:
 		for button in skill_buttons: button.queue_free()
 		skill_buttons.clear()
 		skill_controls_unit = -1
+		skill_controls_evolution = ""
 		return
 	var definitions: Array = battle.content.categories.skills.filter(func(item): return item.unit_kind == unit.kind and item.mode == "manual")
-	if skill_controls_unit != unit.id:
+	var evolution_id: String = unit.get("evolution_id", "")
+	if not evolution_id.is_empty():
+		var evolved_skill: Dictionary = battle.evolution_definitions[evolution_id].special_skill.duplicate(true)
+		if evolved_skill.mode == "manual":
+			evolved_skill.id = "%s.special" % evolution_id
+			evolved_skill.unit_kind = unit.kind
+			definitions.append(evolved_skill)
+	if skill_controls_unit != unit.id or skill_controls_evolution != evolution_id:
 		for button in skill_buttons: button.queue_free()
 		skill_buttons.clear()
 		skill_controls_unit = unit.id
+		skill_controls_evolution = evolution_id
 		for skill in definitions:
 			var button := Button.new()
 			button.custom_minimum_size = Vector2(120, 36)
@@ -694,3 +720,30 @@ func _refresh_skill_controls() -> void:
 		var button := skill_buttons[index]
 		button.text = "%s · %.0f" % [skill.label, remaining] if remaining > 0.0 else "%s · %d" % [skill.label, skill.cost]
 		button.disabled = battle.phase != "combat" or unit.has("destination") or remaining > 0.0 or battle.combat_gold < int(skill.cost)
+
+func _refresh_evolution_controls() -> void:
+	var unit := battle._unit_by_id(selected_unit)
+	if unit.is_empty() or unit.has("evolution_id"):
+		evolution_controls.visible = false
+		for button in evolution_buttons: button.queue_free()
+		evolution_buttons.clear()
+		evolution_controls_unit = -1
+		return
+	var definitions: Array = battle.content.categories.evolutions.filter(func(item): return item.unit_kind == unit.kind and battle.unlocked_evolutions.has(item.id))
+	evolution_controls.visible = not definitions.is_empty()
+	if evolution_controls_unit != unit.id:
+		for button in evolution_buttons: button.queue_free()
+		evolution_buttons.clear()
+		evolution_controls_unit = unit.id
+		for evolution in definitions:
+			var button := Button.new()
+			button.custom_minimum_size = Vector2(120, 36)
+			button.pressed.connect(_evolve_unit.bind(unit.id, evolution.id))
+			button.add_to_group("battle_commands")
+			evolution_controls.add_child(button)
+			evolution_buttons.append(button)
+	for index in evolution_buttons.size():
+		var evolution: Dictionary = definitions[index]
+		var button := evolution_buttons[index]
+		button.text = "%s · %d" % [evolution.label, evolution.combat_cost]
+		button.disabled = not battle.can_evolve_unit(unit.id, evolution.id)

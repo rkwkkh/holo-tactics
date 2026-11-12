@@ -123,6 +123,52 @@ func _initialize() -> void:
 	var all_evolutions_model := BattleModel.new()
 	assert(all_evolutions_model.set_permanent_research(evolution_research_ids))
 	assert(all_evolutions_model.unlocked_evolutions.size() == 6)
+	var evolved_battle := BattleModel.new()
+	assert(evolved_battle.set_permanent_research(["research.evolution.swordsman.knight"]))
+	assert(evolved_battle.deploy("swordsman", Vector2i(3, 6)))
+	var evolved_unit: Dictionary = evolved_battle.units[0]
+	evolved_unit.upgrades = {"upgrade.swordsman.charge": 2, "upgrade.swordsman.combo": 3}
+	evolved_battle._apply_unit_upgrades(evolved_unit)
+	evolved_battle.combat_gold = 200
+	var evolved_unit_id: int = evolved_unit.id
+	assert(evolved_battle.can_evolve_unit(evolved_unit_id, "evolution.swordsman.knight"))
+	assert(evolved_battle.evolve_unit(evolved_unit_id, "evolution.swordsman.knight"))
+	assert(evolved_unit.id == evolved_unit_id and evolved_unit.cell == Vector2i(3, 6) and evolved_unit.upgrades["upgrade.swordsman.charge"] == 2 and evolved_battle.combat_gold == 115)
+	assert(not evolved_battle.can_evolve_unit(evolved_unit_id, "evolution.swordsman.knight"))
+	evolved_battle.phase = "combat"
+	evolved_battle.enemies.append({"id": 400, "kind": "goblin", "cell": Vector2i(3, 5), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 10.0, "alive": true})
+	assert(evolved_battle.cast_skill(evolved_unit_id, "evolution.swordsman.knight.special"))
+	evolved_battle.phase = "preparation"
+	var evolved_snapshot := evolved_battle.to_dict()
+	var evolved_restore := BattleModel.new()
+	assert(evolved_restore.restore(evolved_snapshot))
+	assert(evolved_restore.units[0].evolution_id == "evolution.swordsman.knight" and evolved_restore.units[0].skill_cooldowns["evolution.swordsman.knight.special"] == 14.0)
+	var invalid_evolution_snapshot: Dictionary = evolved_snapshot.duplicate(true)
+	invalid_evolution_snapshot.units[0].evolution_id = "evolution.archer.bomber"
+	var rejected_evolution_restore := BattleModel.new()
+	assert(not rejected_evolution_restore.restore(invalid_evolution_snapshot) and rejected_evolution_restore.units.is_empty() and rejected_evolution_restore.unlocked_evolutions.is_empty())
+	var legacy_save := researched_battle.to_dict()
+	legacy_save.save_version = 1
+	assert(BattleModel.new().restore(legacy_save))
+	var automatic_evolution := BattleModel.new("stage.m2.crossroads")
+	assert(automatic_evolution.set_permanent_research(["research.evolution.spearman.guardian"]))
+	assert(automatic_evolution.deploy("spearman", Vector2i(2, 8)))
+	automatic_evolution.units[0].upgrades = {"upgrade.spearman.shield": 2, "upgrade.spearman.taunt": 3}
+	automatic_evolution.combat_gold = 200
+	assert(automatic_evolution.evolve_unit(automatic_evolution.units[0].id, "evolution.spearman.guardian"))
+	automatic_evolution.phase = "combat"
+	automatic_evolution.units[0].skill_cooldowns["skill.spearman.guard"] = 12.0
+	automatic_evolution.pending_reinforcements.append({"enemy_id": "enemy.goblin", "remaining": 1, "spawn": Vector2i(0, 0), "at": 10.0, "attempts": 0})
+	automatic_evolution.tick(0.2)
+	assert(automatic_evolution.units[0].shield == 15.0 and automatic_evolution.units[0].skill_cooldowns["evolution.spearman.guardian.special"] == 14.0)
+	var archer_branches := BattleModel.new()
+	assert(archer_branches.set_permanent_research(["research.evolution.archer.ice", "research.evolution.archer.bomber"]))
+	assert(archer_branches.deploy("archer", Vector2i(2, 6)))
+	archer_branches.units[0].upgrades = {"upgrade.archer.freeze": 3, "upgrade.archer.explosive": 2, "upgrade.archer.multi": 2}
+	archer_branches.combat_gold = 300
+	assert(archer_branches.can_evolve_unit(archer_branches.units[0].id, "evolution.archer.ice") and archer_branches.can_evolve_unit(archer_branches.units[0].id, "evolution.archer.bomber"))
+	assert(archer_branches.evolve_unit(archer_branches.units[0].id, "evolution.archer.ice"))
+	assert(not archer_branches.can_evolve_unit(archer_branches.units[0].id, "evolution.archer.bomber"))
 	var atomic_restore := BattleModel.new()
 	for version_key in ["content_version", "schema_version", "save_version"]:
 		var incompatible_research_snapshot: Dictionary = researched_battle.to_dict()
@@ -564,7 +610,7 @@ func _initialize() -> void:
 	assert(ContentValidator.validate(core_block_catalog).any(func(error): return error.contains("blocks its core cell")))
 	var cyclic := {"content_version": 1, "schema_version": 1, "categories": {"research": [{"id": "research.a", "dependencies": ["research.b"]}, {"id": "research.b", "dependencies": ["research.a"]}]}}
 	assert(ContentValidator.validate(cyclic).any(func(error): return error.contains("cyclic dependency")))
-	assert(ProjectVersions.CONTENT_VERSION == 1 and ProjectVersions.SCHEMA_VERSION == 1 and ProjectVersions.SAVE_VERSION == 1)
+	assert(ProjectVersions.CONTENT_VERSION == 1 and ProjectVersions.SCHEMA_VERSION == 1 and ProjectVersions.SAVE_VERSION == 2)
 	var reinforcement_test := BattleModel.new()
 	reinforcement_test.waves[0].count = 1
 	reinforcement_test.waves[0].reinforcements = [{"enemy_id": "enemy.goblin", "count": 2, "at": 1.0, "spawn": [2, 0]}]

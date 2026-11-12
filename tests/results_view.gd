@@ -137,6 +137,32 @@ func _run() -> void:
 	assert(obstacle_view.status.text.begins_with("아군 시설 · HP"))
 	obstacle_view.queue_free()
 	await process_frame
+	set_meta("selected_stage_id", "stage.m1.frontier")
+	set_meta("editor_preview_id", "evolution-view-test-%s" % Time.get_ticks_usec())
+	var evolution_view = load("res://scenes/battle.tscn").instantiate()
+	root.add_child(evolution_view)
+	await process_frame
+	assert(evolution_view.battle.set_permanent_research(["research.evolution.swordsman.knight"]))
+	assert(evolution_view.battle.deploy("swordsman", Vector2i(3, 6)))
+	var evolution_unit: Dictionary = evolution_view.battle.units[0]
+	evolution_unit.upgrades = {"upgrade.swordsman.charge": 2, "upgrade.swordsman.combo": 3}
+	evolution_view.battle._apply_unit_upgrades(evolution_unit)
+	evolution_view.battle.combat_gold = 200
+	evolution_view.selected_unit = evolution_unit.id
+	evolution_view._refresh()
+	assert(evolution_view.evolution_buttons.size() == 1 and not evolution_view.evolution_buttons[0].disabled)
+	evolution_view._evolve_unit(evolution_unit.id, "evolution.swordsman.knight")
+	assert(evolution_unit.has("evolution_id") and evolution_view.context_info.text.begins_with("기사"))
+	assert(evolution_view.skill_buttons.any(func(button: Button): return button.text.begins_with("영웅 돌격")))
+	evolution_view.battle.phase = "combat"
+	evolution_view.battle.enemies.append({"id": 400, "kind": "goblin", "cell": Vector2i(3, 5), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 10.0, "alive": true})
+	evolution_view._refresh()
+	var special_button: Button = evolution_view.skill_buttons.back()
+	assert(not special_button.disabled)
+	special_button.pressed.emit()
+	assert(evolution_unit.skill_cooldowns.has("evolution.swordsman.knight.special"))
+	evolution_view.queue_free()
+	await process_frame
 	var research_view = load("res://scenes/village_research.tscn").instantiate()
 	root.add_child(research_view)
 	await process_frame

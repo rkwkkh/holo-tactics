@@ -432,3 +432,15 @@
 - 통과: tests/run.gd — 수성 아군 0명/core 생존 계속 진행; 전투 중 시설 수리 비용 차감, HP 복구, 중복 수리 차단.
 - 통과: tests/results_view.gd — 손상된 시설 선택 시 전투 중 수리 버튼 활성화 및 HP 복구.
 - Android AVD: API29에서 APK 설치 후 GLES3 EGL 시작 실패, 앱 Activity 미유지. API37에서 설치/foreground 성공이나 캡처 화면 검정, CanvasShaderGLES3 GL_MAX_FRAGMENT_UNIFORM_VECTORS (261) 오류 재현. 실기기 호환성/렌더 합격으로 취급하지 않음.
+## 2026-11-12 진화 전투 적용 회귀
+
+- 통과: tests/run.gd — 연구 해금·강화 조건·비용 검증, 개체 ID/위치/강화 보존, 재진화 및 궁수 분기 교체 차단, 자동/수동 특수 스킬, 쿨타임과 진화 체크포인트 복원, 잘못된 진화 상태의 원자적 거부, SaveVersion 1 비진화 저장 호환.
+- 통과: tests/results_view.gd — 진화 버튼, 형태 표시, 특수 스킬 UI 실행.
+- 통과: editor_preview.gd, campaign_playability.gd (8개 스테이지 승리), validate_content.gd, main/battle/village 씬 smoke, git diff --check.
+- 실행 환경: Godot 4.7.2 stable, Windows headless. 런타임 변경 후 Android APK/AAB export 예정.
+## 2026-11-12 진화 반영 Android 산출물
+
+- Android Debug APK: 249,828,753 bytes. API 29 minimum / API 36 target manifest 확인, apksigner v2 signature pass.
+- Android test AAB: 86,236,526 bytes. Google bundletool 1.18.3 validate 통과, base manifest API 29 / target 36 확인. 테스트 AAB는 unsigned.
+- API 37 AVD: 최신 APK 설치 성공, Godot Activity foreground 유지. 화면 캡처는 검정이며 CanvasShaderGLES3 fragment uniform 261 오류 반복. 플레이/렌더 검증 실패.
+- 실제 Android 기기 실행/FPS, release keystore 서명, Google Play 비공개 테스트는 여전히 미검증.- 추가 smoke: village_research.tscn, editor_preview.tscn headless 실행 통과.
