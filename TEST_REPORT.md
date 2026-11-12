@@ -566,3 +566,8 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 
 - Using the installed SDK ADB, reconnected and installed the current APK (SHA-256 `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC`) on API29 and API37 AVDs. API37 displayed the campaign menu and initialized Vulkan/SwiftShader. API29 resumed its activity but logged repeated Vulkan queue present error 5.
 - ADB touch injection did not change the API37 menu in this run; M1 entry is not claimed from this check. This does not validate physical Android compatibility or FPS.
+
+## Windows headless process cleanup (2026-11-12)
+
+- Found and stopped 49 stale Godot headless processes with `tests/run.gd` or AAB export command lines; these were hours old and no active exec sessions remained. Updated the documented local test commands and CI's synchronous test/validator invocations with `--quit-after 2`.
+- Re-ran `tests/run.gd` and the content validator under that cap: both passed and a process query found zero matching leftovers. Workflow lint and `git diff --check` were also run after the workflow edit.

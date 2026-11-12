@@ -8,10 +8,10 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
 
   ```powershell
   $godot = "$env:LOCALAPPDATA\Programs\Godot\Godot_v4.7.2-stable_win64_console.exe"
-  $test_output = & $godot --headless --path . --script res://tests/run.gd
+  $test_output = & $godot --headless --path . --script res://tests/run.gd --quit-after 2
   $test_output
   if ($test_output -notmatch "All headless project tests passed") { throw "Godot tests failed" }
-  & $godot --headless --path . --script res://scripts/validate_content.gd
+  & $godot --headless --path . --script res://scripts/validate_content.gd --quit-after 2
   ```
 
 - Open `project.godot` in the Godot editor to run the portrait project.

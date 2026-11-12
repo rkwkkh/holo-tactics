@@ -20,7 +20,7 @@ jobs:
         run: godot --headless --editor --path . --quit
       - name: Run unit tests
         run: |
-          output="$(godot --headless --path . --script res://tests/run.gd 2>&1)"
+          output="$(godot --headless --path . --script res://tests/run.gd --quit-after 2 2>&1)"
           echo "$output"
           grep -q "All headless project tests passed" <<< "$output"
       - name: Verify editor preview isolation
@@ -44,7 +44,7 @@ jobs:
           echo "$output"
           grep -q "All 8 campaign stages won in the seeded playability simulation" <<< "$output"
       - name: Validate content (errors block CI)
-        run: godot --headless --path . --script res://scripts/validate_content.gd
+        run: godot --headless --path . --script res://scripts/validate_content.gd --quit-after 2
       - name: Smoke test game scenes
         run: |
           godot --headless --path . res://scenes/main.tscn --quit-after 2
