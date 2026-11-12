@@ -30,6 +30,16 @@ func _build_panel(key: String) -> void:
 	feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	feedback.custom_minimum_size.y = 60
 	page.add_child(feedback)
+	var inspector_controls := HBoxContainer.new()
+	var inspect := Button.new()
+	inspect.text = "Inspector에서 편집"
+	inspect.pressed.connect(_open_inspector.bind(key))
+	inspector_controls.add_child(inspect)
+	var import_inspector := Button.new()
+	import_inspector.text = "Inspector 값 가져오기"
+	import_inspector.pressed.connect(_import_inspector.bind(key))
+	inspector_controls.add_child(import_inspector)
+	page.add_child(inspector_controls)
 	var save := Button.new()
 	save.text = "검증 후 저장"
 	save.pressed.connect(_save_record.bind(key))
@@ -49,7 +59,7 @@ func _build_panel(key: String) -> void:
 		previews.add_child(selected_wave)
 		page.add_child(previews)
 	tabs.add_child(page)
-	panels[key] = {"picker": picker, "edit": edit, "feedback": feedback}
+	panels[key] = {"picker": picker, "edit": edit, "feedback": feedback, "inspector_record": null}
 	picker.item_selected.connect(_select_record.bind(key))
 	_refresh_records(key)
 
@@ -90,6 +100,7 @@ func _select_record(index: int, key: String) -> void:
 	if index < 0 or index >= picker.item_count:
 		return
 	var item_meta: Dictionary = picker.get_item_metadata(index)
+	panels[key].inspector_record = null
 	var file := FileAccess.open(CATALOG_PATH, FileAccess.READ)
 	if file == null:
 		return
@@ -99,6 +110,27 @@ func _select_record(index: int, key: String) -> void:
 			panels[key].edit.text = JSON.stringify(item, "\t")
 			panels[key].feedback.text = "JSON을 편집한 뒤 검증 후 저장을 누르세요."
 			return
+
+func _open_inspector(key: String) -> void:
+	var panel: Dictionary = panels[key]
+	var record: Variant = JSON.parse_string(panel.edit.text)
+	if not record is Dictionary:
+		panel.feedback.text = "Error: Inspector에 열기 전에 유효한 JSON 객체를 입력하세요."
+		return
+	var inspector_record := EditableCatalogRecord.new()
+	inspector_record.set_record(record)
+	panel.inspector_record = inspector_record
+	EditorInterface.edit_resource(inspector_record)
+	panel.feedback.text = "Inspector 수정 후 ‘Inspector 값 가져오기’를 눌러 패널과 동기화하세요."
+
+func _import_inspector(key: String) -> void:
+	var panel: Dictionary = panels[key]
+	var inspector_record: Variant = panel.get("inspector_record")
+	if not inspector_record is EditableCatalogRecord:
+		panel.feedback.text = "Inspector에서 먼저 레코드를 여세요."
+		return
+	panel.edit.text = JSON.stringify(inspector_record.values, "\t")
+	panel.feedback.text = "Inspector 값을 가져왔습니다. 저장 전 Validator가 전체 카탈로그를 검사합니다."
 
 func _save_record(key: String) -> void:
 	var panel: Dictionary = panels[key]

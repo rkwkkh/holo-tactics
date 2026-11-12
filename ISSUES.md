@@ -39,3 +39,5 @@
 - 원격 저장소, GitHub Actions 실행 권한, 실기기 연결, Google Play 계정/서명 키는 확인되지 않았다. 해당 외부 상태를 완료로 표시하지 않는다.
 - Android 10(API 29) AVD 이미지(`android-29/google_apis/x86_64`)는 GLES 2로 보고되어 Godot Android 실행에 필요한 GLES3 컨텍스트를 생성하지 못했다. 이는 AVD 이미지 한계로 보이며 Android 10 물리 기기 호환성 판정이 아니다.
 - 최신 APK를 API 37 AVD에 설치·실행했으나 Godot GLES3 `CanvasShaderGLES3`/`SceneShaderGLES3`에서 `GL_MAX_FRAGMENT_UNIFORM_VECTORS (261)` 초과 오류가 기록됐다. 프로세스는 유지됐지만 화면/입력 플레이는 통과로 판정하지 않았으며, 실제 GLES3 기기 또는 지원 렌더러로 재검증이 필요하다.
+
+- M5 Inspector 동기화 모델은 구현됐지만 Godot GUI에서 편집→가져오기→저장 흐름은 직접 확인하지 않았다. 검증 오류는 텍스트 피드백만 제공하며 오류별 레코드 이동/필드 위치 선택은 미구현이다.

@@ -1,6 +1,11 @@
 ﻿extends SceneTree
 
 func _initialize() -> void:
+	var inspector_record := EditableCatalogRecord.new()
+	inspector_record.set_record({"id": "test.record", "label": "Before", "cost": 1})
+	assert(inspector_record._get("label") == "Before")
+	assert(inspector_record._set("cost", 50) and inspector_record.values.cost == 50)
+	assert(not inspector_record._set("unknown", 1))
 	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash", "skill.guard"], "dependencies": []}], "skills": [{"id": "skill.slash", "unit_kind": "swordsman", "mode": "automatic", "effect": "strike", "cooldown": 5.0, "cost": 0, "value": 10, "radius": 0, "label": "Strike", "references": [], "dependencies": []}, {"id": "skill.guard", "unit_kind": "swordsman", "mode": "manual", "effect": "shield", "cooldown": 5.0, "cost": 1, "value": 10, "radius": 1, "label": "Guard", "references": [], "dependencies": []}]}}
 	assert(ContentValidator.validate(valid).is_empty())
 	var progress_test_path := "user://progress_store_test.json"

@@ -183,3 +183,9 @@
 
 - `ANDROID_TESTING.md`에 APK 설치/로그 수집, 캠페인·저장 복원 검수, Godot Remote Profiler 및 `dumpsys gfxinfo` 성능 계측, Google Play 비공개 테스트 준비 항목을 정리했다.
 - 이 문서는 재현 절차이며 실기기 검증 증거가 아니다. 물리 기기/Android 10 UI/FPS와 release AAB·Play 배포는 접근 권한이 없어 미실행이다.
+
+## 2026-11-12 이어하기 재검증
+
+- 통과: Godot 4.7.2 editor import 및 `content_editor.gd --check-only`, `tests/run.gd`, `tests/editor_preview.gd`, `scripts/validate_content.gd`, `git diff --check`.
+- 추가 검사: Inspector용 `EditableCatalogRecord`의 동적 속성 get/set과 미등록 속성 거부를 자동 검사.
+- 미검증: 실제 Inspector GUI 입력/JSON 가져오기/저장 버튼 조작. headless 검사는 스크립트 파싱과 모델 로직까지만 확인한다.
