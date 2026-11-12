@@ -241,3 +241,7 @@ Corrected ADB coordinates entered M1 on `MaDangStage6_API37`/Emulator 37.2.13. T
 ## Godot build-output scan exclusion (2026-11-12)
 
 Added tracked `build/.gdignore`. Godot 4.7.2 headless editor initialization now skips the ignored output directory, including generated emulator PNGs and Android packages; the import log no longer scans those artifacts. The editor-panel script still passes, but its standalone editor shutdown continues to print renderer/ObjectDB cleanup diagnostics (exit code 0), so that existing test-harness warning remains open.
+
+## API37 checkpoint reboot path (2026-11-12)
+
+Reproduced on the current APK: verified the M1 wave-start checkpoint JSON directly in Android app storage, force-stopped/relaunched the app, then observed the same stage/unit in resumed combat. The resumed unattended battle ended in a normal core-zero defeat; settlement kept permanent currency 115 and cleared the checkpoint. This validates routing, restore, and defeat cleanup on API37, not a win path. Four SwiftShader profiler windows averaged 23.7–25.2 FPS (p95 42.80–45.68ms); physical-device performance remains unknown.

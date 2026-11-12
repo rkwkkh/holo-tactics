@@ -592,3 +592,8 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 - Added empty `build/.gdignore` (force-tracked because `/build/` is Git-ignored) so Godot's editor filesystem scanner ignores generated Android APK/AAB and local screenshots.
 - `Godot_v4.7.2 --headless --editor --path . --quit`: passed; filesystem scan/import output did not enumerate generated files under `build/`.
 - `tests/editor_panels.gd`: passed after the change. Existing renderer/ObjectDB teardown diagnostics persist on exit; do not count them as a clean shutdown.
+
+## Android checkpoint + perf follow-up
+
+- API37 M1 checkpoint file inspection, force-stop/relaunch resume, defeat settlement and checkpoint removal passed on the current APK. Permanent-currency balance stayed at 115 (no duplicate reward on this zero-reward defeat).
+- SwiftShader AVD combat samples: average 25.2/24.5/23.7/24.4 FPS, p95 43.45/43.75/45.68/42.80ms. Under target in this software emulator; not a physical-device result.

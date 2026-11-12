@@ -139,3 +139,10 @@ Re-exported with the restored Mobile/Vulkan Android renderer after the temporary
 - Started wave 1; the game changed to combat state, enemies moved into the defense area, and core HP changed 300→280 after an enemy attack. Battle board, sprites, core HUD, build controls, and combat controls rendered in the 1080x2400 capture (`build/mvp-followup-api37-wave.png`, ignored artifact).
 - This is a short SwiftShader AVD gameplay smoke. It does not verify full stage completion, Android 10 physical compatibility, or FPS targets.
 - Exact installed APK SHA-256: `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC`.
+
+## API37 Android checkpoint relaunch reproduction (2026-11-12)
+
+- On the current installed APK (SHA-256 `E0B817428BEC235CEAC51950794658D88C92FA42E7AC89494C3F2C46A6D033EC`), entered M1, deployed a swordsman (combat resource 160→110), and started wave 1.
+- Direct `run-as` inspection confirmed `files/battle_checkpoint.json` existed. It contained stage M1, wave 1, phase `preparation` (the deliberate pre-wave checkpoint), core HP 300, combat resource 110, and the deployed unit.
+- Force-stopped and relaunched the app. The new process reopened M1 with the same deployed unit and active enemies (`build/mvp-repro-restart3.png`, ignored local capture), confirming automatic route-to-checkpoint and resume. The unattended test battle then reached core HP 0, showed the defeat result, left permanent currency at 115, and removed the settled checkpoint as expected. This is a restart/resume and defeat-settlement smoke, not a victory test.
+- SwiftShader profiler windows during this battle: average 25.2 / 24.5 / 23.7 / 24.4 FPS; p95 frame time 43.45 / 43.75 / 45.68 / 42.80 ms. These AVD values miss targets and are not representative hardware measurements; physical-device acceptance remains open.

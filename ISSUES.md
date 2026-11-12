@@ -144,3 +144,5 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 - 2026-11-12 API29 재검증 보충: Emulator 37.2.13으로 올린 뒤 기존 Google APIs API29 AVD의 Vulkan present error 5가 재현됐다. 별도 Google Play API29 이미지에서도 Vulkan 오류가 재현됐고 임시 Compatibility 빌드는 GLES 2 EGL 컨텍스트를 만들지 못했다. 임시 AVD/이미지는 제거했고 기존 AVD 데이터는 보존했다. 이 결과는 실기기 Android 10 호환 판정이 아니다.
 
 - 2026-11-12 API37 interaction follow-up: corrected touch coordinates entered M1; deploy/resource deduction and first enemy attack/core damage were visually observed. This verifies only a short AVD combat path. Full stage, API29 hardware, GUI editor and FPS checks remain open.
+
+- API37 checkpoint reproduction (2026-11-12): saved pre-wave snapshot was inspected on-device; force-stop/relaunch returned to same M1 run and deployed unit; core-zero defeat settled and removed checkpoint. No duplicate reward was observed. AVD combat FPS remained below numeric target (23.7–25.2 average, p95 42.80–45.68ms); physical performance is still unverified.
