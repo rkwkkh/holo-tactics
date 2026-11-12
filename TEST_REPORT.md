@@ -251,3 +251,4 @@
 - UnitData 11종에 `movement_type: ground`, obstacle 정의에 `blocked_movement_types: [ground]`를 명시했다. Validator가 누락/미지원 이동 유형을 거부하고, 경로 검사와 A*에서 장애물 유형을 반영한다. 세이브 복원 시 기존 스냅샷은 기본 ground로 이어지고, 저장된 유형이 카탈로그와 다르면 거부한다.
 - 통과: editor import, validator parse, 전체 모델·에디터 미리보기·전투 UI 테스트, 콘텐츠 검사, 5개 씬 smoke, `git diff --check`.
 - APK 갱신: 86,369,046 bytes (2026-11-12 15:14 KST), apksigner v2/v3 서명 검증 통과. Debug 서명, 실기기/FPS 및 Play 업로드 미검증.
+- 후속 회귀 추가: 이동 유형이 없는 레거시 유닛 스냅샷은 `ground`로 복원되고, 카탈로그와 불일치하는 명시 유형은 복원을 거부한다. `tests/run.gd` 통과.
