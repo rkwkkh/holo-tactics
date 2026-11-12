@@ -552,3 +552,7 @@ Marked M0–M4 complete in `PROGRESS.md`: M1 has API37 manual defense evidence p
 ## CI build gate correction (2026-11-12)
 
 The Android AAB job now declares `needs: godot`, so export and artifact upload are skipped unless import, tests, content validation, and scene smoke all succeed. Cached actionlint v1.7.12 linted `.github/workflows/validate.yml` with no diagnostics, and `git diff --check` passed. A hosted GitHub Actions run remains pending repository/Actions access.
+
+## Status-effect policy revalidation (2026-11-12)
+
+- Godot 4.7.2 `tests/run.gd` passes after the user reconfirmed the rules. Existing assertions verify bleed/burn consume an 8-point shield before applying 50% damage reduction (10 total post-shield damage results in 6.5 HP loss) and that a shorter freeze application does not shorten an overlapping 0.8-second stun. No runtime code change was needed.
