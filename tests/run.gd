@@ -3,6 +3,20 @@
 func _initialize() -> void:
 	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash", "skill.guard"], "dependencies": []}], "skills": [{"id": "skill.slash", "unit_kind": "swordsman", "mode": "automatic", "effect": "strike", "cooldown": 5.0, "cost": 0, "value": 10, "radius": 0, "label": "Strike", "references": [], "dependencies": []}, {"id": "skill.guard", "unit_kind": "swordsman", "mode": "manual", "effect": "shield", "cooldown": 5.0, "cost": 1, "value": 10, "radius": 1, "label": "Guard", "references": [], "dependencies": []}]}}
 	assert(ContentValidator.validate(valid).is_empty())
+	var progress_test_path := "user://progress_store_test.json"
+	for suffix in ["", ".tmp", ".bak"]:
+		var old_path: String = progress_test_path + suffix
+		if FileAccess.file_exists(old_path):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(old_path))
+	var progress_test := ProgressStore.new(progress_test_path)
+	assert(progress_test.load_progress())
+	assert(progress_test.grant_reward_once("clear.stage.1.first", 12))
+	assert(not progress_test.grant_reward_once("clear.stage.1.first", 12))
+	var progress_restore := ProgressStore.new(progress_test_path)
+	assert(progress_restore.load_progress() and progress_restore.data.permanent_currency == 12)
+	progress_restore.data.permanent_currency = -1
+	assert(not progress_restore.save_progress())
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(progress_test_path))
 	var duplicate := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "same"}], "skills": [{"id": "same"}]}}
 	assert(ContentValidator.validate(duplicate).any(func(error): return error.contains("duplicate content id")))
 	var dangling := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.a", "references": ["missing"]}]}}
