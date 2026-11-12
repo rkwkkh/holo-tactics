@@ -20,6 +20,19 @@ func _initialize() -> void:
 	assert(GridPathfinder.find_path(Vector2i(0, 0), Vector2i(2, 0), 3, 1, {Vector2i(1, 0): true}).is_empty())
 	var seeded_catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/catalog.json"))
 	assert(ContentValidator.validate(seeded_catalog).is_empty())
+	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "ally").size() == 5)
+	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "enemy").size() == 6)
+	var roster_deploy_test := BattleModel.new()
+	roster_deploy_test.combat_gold = 1000
+	var ally_kinds := ["swordsman", "archer", "spearman", "support", "mage"]
+	assert(not roster_deploy_test.deploy("spearman", Vector2i(0, 8)))
+	roster_deploy_test.stage.available_units = ally_kinds
+	for index in ally_kinds.size():
+		assert(roster_deploy_test.deploy(ally_kinds[index], Vector2i(index, 8)))
+	assert(roster_deploy_test.units.size() == 5 and roster_deploy_test.combat_gold == 660)
+	var invalid_support_unit: Dictionary = seeded_catalog.duplicate(true)
+	invalid_support_unit.categories.units[3].heal_range = 0
+	assert(ContentValidator.validate(invalid_support_unit).any(func(error): return error.contains("invalid unit healing data")))
 	var ai_override_catalog: Dictionary = seeded_catalog.duplicate(true)
 	ai_override_catalog.categories.waves[0].ai_weight_overrides = {"objective": 1.5}
 	assert(ContentValidator.validate(ai_override_catalog).is_empty())
@@ -194,6 +207,39 @@ func _initialize() -> void:
 	var support_heal_snapshot := support_heal_test.to_dict()
 	var support_heal_restore := BattleModel.new()
 	assert(support_heal_restore.restore(support_heal_snapshot) and support_heal_restore.facilities[0].heal == 8)
+	var support_unit_test := BattleModel.new()
+	support_unit_test.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
+	assert(support_unit_test.deploy("swordsman", Vector2i(1, 8)) and support_unit_test.deploy("support", Vector2i(2, 8)))
+	support_unit_test.units[0].hp = 60.0
+	support_unit_test.phase = "combat"
+	support_unit_test.enemies.append({"id": 40, "kind": "goblin", "cell": Vector2i.ZERO, "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
+	support_unit_test.tick(0.2)
+	assert(support_unit_test.units[0].hp == 68.0 and support_unit_test.units[1].cooldown == 1.5)
+	support_unit_test.phase = "preparation"
+	var support_unit_restore := BattleModel.new()
+	assert(support_unit_restore.restore(support_unit_test.to_dict()) and support_unit_restore.units[1].heal == 8 and support_unit_restore.units[1].heal_range == 3)
+	var mage_unit_test := BattleModel.new()
+	mage_unit_test.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
+	assert(mage_unit_test.deploy("mage", Vector2i(4, 8)))
+	mage_unit_test.phase = "combat"
+	mage_unit_test.enemies.append({"id": 41, "kind": "goblin", "cell": Vector2i(4, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
+	mage_unit_test.enemies.append({"id": 42, "kind": "goblin", "cell": Vector2i(5, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
+	mage_unit_test.enemies.append({"id": 43, "kind": "goblin", "cell": Vector2i(7, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
+	mage_unit_test.tick(0.2)
+	assert(mage_unit_test.enemies[0].hp == 40.0 and mage_unit_test.enemies[1].hp == 40.0 and mage_unit_test.enemies[2].hp == 65.0)
+	mage_unit_test.phase = "preparation"
+	var mage_unit_restore := BattleModel.new()
+	assert(mage_unit_restore.restore(mage_unit_test.to_dict()) and mage_unit_restore.units[0].splash_radius == 1)
+	var enemy_support_test := BattleModel.new()
+	enemy_support_test.phase = "combat"
+	enemy_support_test.enemies.append({"id": 44, "kind": "enemy_support", "team": "enemy", "cell": Vector2i(1, 1), "hp": 90.0, "damage": 5.0, "range": 1, "heal": 10.0, "heal_range": 3, "cooldown": 0.0, "active": true, "alive": true})
+	enemy_support_test.enemies.append({"id": 45, "kind": "goblin", "team": "enemy", "cell": Vector2i(2, 1), "hp": 20.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "active": true, "alive": true})
+	enemy_support_test.tick(0.2)
+	assert(enemy_support_test.enemies[1].hp == 30.0 and enemy_support_test.enemies[0].cooldown == 1.5)
+	var non_goblin_reward := BattleModel.new()
+	var orc_target: Dictionary = {"kind": "orc_warrior", "team": "enemy", "hp": 10.0, "alive": true}
+	non_goblin_reward._strike({"kind": "swordsman", "damage": 20.0, "cooldown": 0.0, "attack_time": 1.0}, orc_target)
+	assert(not orc_target.alive and non_goblin_reward.combat_gold == non_goblin_reward.stage.start_resource + non_goblin_reward.stage.kill_reward)
 	var magic_splash_test := BattleModel.new()
 	magic_splash_test.phase = "combat"
 	assert(magic_splash_test.build_facility("facility.magic_tower", Vector2i(1, 8)))

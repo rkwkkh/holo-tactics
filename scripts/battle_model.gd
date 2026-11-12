@@ -68,14 +68,14 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 	_prepare_wave_preview()
 
 func deploy(kind: String, cell: Vector2i) -> bool:
-	if not balance_seed.has(kind) or balance_seed[kind].team != "ally" or not _is_inside(cell) or cell.y < 6 or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied(cell):
+	if not balance_seed.has(kind) or balance_seed[kind].team != "ally" or not stage.get("available_units", []).has(kind) or not _is_inside(cell) or cell.y < 6 or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied(cell):
 		return false
 	var cost: int = balance_seed[kind].cost
 	if combat_gold < cost:
 		return false
 	combat_gold -= cost
 	var stats: Dictionary = balance_seed[kind]
-	units.append({"id": next_id, "kind": kind, "cell": cell, "hp": stats.hp, "damage": stats.damage, "range": stats.range, "cooldown": 0.0, "alive": true})
+	units.append({"id": next_id, "kind": kind, "cell": cell, "hp": stats.hp, "damage": stats.damage, "range": stats.range, "heal": stats.get("heal", 0), "heal_range": stats.get("heal_range", 0), "splash_radius": stats.get("splash_radius", 0), "cooldown": 0.0, "alive": true})
 	next_id += 1
 	return true
 
@@ -149,9 +149,19 @@ func tick(delta: float) -> void:
 				if unit.cell == unit.destination:
 					unit.erase("destination")
 				continue
-		var target_index := _closest_target(unit.cell, enemies + enemy_facilities, unit.range)
+		if unit.get("heal", 0) > 0 and unit.cooldown <= 0.0:
+			var ally_index := _lowest_hp_ally(unit.cell, unit.get("heal_range", 0), unit.id)
+			if ally_index >= 0:
+				units[ally_index].hp = minf(float(balance_seed[units[ally_index].kind].hp), units[ally_index].hp + unit.heal)
+				unit.cooldown = balance_seed[unit.kind].attack_time
+				continue
+		var unit_targets: Array[Dictionary] = enemies + enemy_facilities
+		var target_index := _closest_target(unit.cell, unit_targets, unit.range)
 		if target_index >= 0:
-			_strike(unit, (enemies + enemy_facilities)[target_index])
+			if unit.get("splash_radius", 0) > 0:
+				_strike_area(unit, unit_targets, unit_targets[target_index].cell, unit.splash_radius)
+			else:
+				_strike(unit, unit_targets[target_index])
 		elif stage.mode == "siege" and wave == waves.size() and unit.cooldown <= 0.0:
 			var distance := absi(unit.cell.x - core_cell.x) + absi(unit.cell.y - core_cell.y)
 			if distance <= unit.range:
@@ -190,10 +200,26 @@ func tick(delta: float) -> void:
 		if not enemy.alive or not enemy.get("active", true):
 			continue
 		enemy.cooldown = maxf(0.0, enemy.cooldown - delta)
+		if enemy.get("heal", 0) > 0 and enemy.cooldown <= 0.0:
+			var ally_index := _lowest_hp_enemy(enemy.cell, enemy.get("heal_range", 0), enemy.id)
+			if ally_index >= 0:
+				enemies[ally_index].hp = minf(float(balance_seed[enemies[ally_index].kind].hp), enemies[ally_index].hp + enemy.heal)
+				enemy.cooldown = balance_seed[enemy.kind].attack_time
+				continue
 		var decision := _choose_enemy_action(enemy)
 		match decision.kind:
-			"attack_unit": _strike(enemy, units[decision.target_index])
-			"attack_facility": _strike(enemy, facilities[decision.target_index])
+			"attack_unit":
+				var targets: Array[Dictionary] = units + facilities
+				if enemy.get("splash_radius", 0) > 0:
+					_strike_area(enemy, targets, targets[decision.target_index].cell, enemy.splash_radius)
+				else:
+					_strike(enemy, targets[decision.target_index])
+			"attack_facility":
+				var targets: Array[Dictionary] = units + facilities
+				if enemy.get("splash_radius", 0) > 0:
+					_strike_area(enemy, targets, targets[decision.target_index + units.size()].cell, enemy.splash_radius)
+				else:
+					_strike(enemy, facilities[decision.target_index])
 			"advance_facility_wall": enemy.cell = decision.route[0]
 			"attack_wall":
 				walls[decision.wall_index].hp = maxf(0.0, walls[decision.wall_index].hp - enemy.damage)
@@ -273,7 +299,7 @@ func restore(snapshot: Dictionary) -> bool:
 		var id := int(saved_unit.id)
 		var cell := Vector2i(int(saved_unit.cell[0]), int(saved_unit.cell[1]))
 		var stats: Dictionary = balance_seed[saved_unit.kind]
-		if ids.has(id) or cell.y < 5 or occupied.has(cell) or not _is_finite_nonnegative(saved_unit.get("hp")) or float(saved_unit.hp) > stats.hp or not _version_matches(saved_unit.get("damage"), int(stats.damage)) or not _version_matches(saved_unit.get("range"), int(stats.range)) or not _is_finite_nonnegative(saved_unit.get("cooldown")):
+		if ids.has(id) or cell.y < 5 or occupied.has(cell) or not _is_finite_nonnegative(saved_unit.get("hp")) or float(saved_unit.hp) > stats.hp or not _version_matches(saved_unit.get("damage"), int(stats.damage)) or not _version_matches(saved_unit.get("range"), int(stats.range)) or not _version_matches(saved_unit.get("heal", stats.get("heal", 0)), int(stats.get("heal", 0))) or not _version_matches(saved_unit.get("heal_range", stats.get("heal_range", 0)), int(stats.get("heal_range", 0))) or not _version_matches(saved_unit.get("splash_radius", stats.get("splash_radius", 0)), int(stats.get("splash_radius", 0))) or not _is_finite_nonnegative(saved_unit.get("cooldown")):
 			return false
 		if unit.has("destination") and not _is_valid_cell(unit.destination):
 			return false
@@ -284,6 +310,9 @@ func restore(snapshot: Dictionary) -> bool:
 		if unit.alive and unit.hp <= 0.0 or not unit.alive and unit.hp > 0.0:
 			return false
 		unit.cell = cell
+		unit.heal = stats.get("heal", 0)
+		unit.heal_range = stats.get("heal_range", 0)
+		unit.splash_radius = stats.get("splash_radius", 0)
 		ids[id] = true
 		if unit.alive:
 			occupied[cell] = true
@@ -365,16 +394,31 @@ func _closest_target(cell: Vector2i, targets: Array[Dictionary], attack_range: i
 			best_distance = distance
 	return best
 
-func _lowest_hp_ally(cell: Vector2i, heal_range: int) -> int:
+func _lowest_hp_ally(cell: Vector2i, heal_range: int, exclude_id: int = -1) -> int:
 	var best := -1
 	var lowest_ratio := 1.0
 	for index in units.size():
 		var unit: Dictionary = units[index]
 		var max_hp := float(balance_seed[unit.kind].hp)
 		var distance := absi(cell.x - unit.cell.x) + absi(cell.y - unit.cell.y)
-		if not unit.alive or unit.hp >= max_hp or distance > heal_range:
+		if not unit.alive or unit.id == exclude_id or unit.hp >= max_hp or distance > heal_range:
 			continue
 		var ratio: float = float(unit.hp) / max_hp
+		if ratio < lowest_ratio:
+			best = index
+			lowest_ratio = ratio
+	return best
+
+func _lowest_hp_enemy(cell: Vector2i, heal_range: int, exclude_id: int) -> int:
+	var best := -1
+	var lowest_ratio := 1.0
+	for index in enemies.size():
+		var enemy: Dictionary = enemies[index]
+		var max_hp := float(balance_seed[enemy.kind].hp)
+		var distance := absi(cell.x - enemy.cell.x) + absi(cell.y - enemy.cell.y)
+		if not enemy.alive or not enemy.get("active", true) or enemy.id == exclude_id or enemy.hp >= max_hp or distance > heal_range:
+			continue
+		var ratio: float = float(enemy.hp) / max_hp
 		if ratio < lowest_ratio:
 			best = index
 			lowest_ratio = ratio
@@ -400,7 +444,7 @@ func _apply_damage(attacker: Dictionary, target: Dictionary) -> void:
 	if target.hp <= 0.0:
 		target.hp = 0.0
 		target.alive = false
-		if target.kind == "goblin":
+		if target.get("team", "") == "enemy" or target.kind == "goblin":
 				combat_gold += stage.kill_reward
 
 func _unit_by_id(unit_id: int) -> Dictionary:
@@ -444,7 +488,7 @@ func _spawn_enemy(content_id: String, cell: Vector2i, wave_definition: Dictionar
 	for action in wave_definition.get("ai_weight_overrides", {}):
 		ai_weights[action] = wave_definition.ai_weight_overrides[action]
 	var destination := enemies if active else preview_enemies
-	destination.append({"id": -1000 - destination.size(), "kind": enemy_definition.kind, "cell": spawn, "hp": enemy_definition.hp, "damage": enemy_definition.damage, "range": enemy_definition.range, "ai_profile_id": enemy_definition.ai_profile_id, "ai_weights": ai_weights, "cooldown": 0.0, "alive": true, "active": active})
+	destination.append({"id": -1000 - destination.size(), "kind": enemy_definition.kind, "team": "enemy", "cell": spawn, "hp": enemy_definition.hp, "damage": enemy_definition.damage, "range": enemy_definition.range, "heal": enemy_definition.get("heal", 0), "heal_range": enemy_definition.get("heal_range", 0), "splash_radius": enemy_definition.get("splash_radius", 0), "ai_profile_id": enemy_definition.ai_profile_id, "ai_weights": ai_weights, "cooldown": 0.0, "alive": true, "active": active})
 	return true
 
 func _prepare_wave_preview() -> bool:

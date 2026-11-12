@@ -53,9 +53,13 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	var facility_teams: Dictionary = {}
 	var profile_ids := _ids_in(_as_array(categories.get("ai_profiles", [])))
 	for unit in unit_items:
-		if unit is Dictionary and (unit.get("team") not in ["ally", "enemy"] or not _is_positive_number(unit.get("hp")) or not _is_positive_number(unit.get("damage")) or not _is_positive_integer(unit.get("range")) or not _is_positive_number(unit.get("attack_time")) or not _is_nonnegative_integer(unit.get("cost"))):
+		if unit is Dictionary and (unit.get("team") not in ["ally", "enemy"] or not _is_positive_number(unit.get("hp")) or not _is_positive_number(unit.get("damage")) or not _is_positive_integer(unit.get("range")) or not _is_positive_number(unit.get("attack_time")) or not _is_nonnegative_integer(unit.get("cost")) or not _is_nonnegative_number(unit.get("heal", 0)) or not _is_nonnegative_integer(unit.get("heal_range", 0)) or not _is_nonnegative_integer(unit.get("splash_radius", 0))):
 			errors.append("%s has invalid combat or cost data" % unit.get("id", "<missing-id>"))
 		if unit is Dictionary:
+			if _is_positive_number(unit.get("heal", 0)) and (not _is_positive_integer(unit.get("heal_range", 0)) or unit.get("team") not in ["ally", "enemy"]):
+				errors.append("%s has invalid unit healing data" % unit.get("id", "<missing-id>"))
+			if _is_positive_integer(unit.get("splash_radius", 0)) and not _is_positive_number(unit.get("damage", 0)):
+				errors.append("%s has invalid unit splash data" % unit.get("id", "<missing-id>"))
 			unit_teams[unit.get("id", "")] = unit.get("team", "")
 			if unit.get("team") == "enemy":
 				var profile_id: Variant = unit.get("ai_profile_id", "")
@@ -108,6 +112,14 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	for stage in stage_items:
 		if not stage is Dictionary:
 			continue
+		var available_units: Variant = stage.get("available_units", [])
+		if not available_units is Array or available_units.is_empty():
+			errors.append("%s must list available units" % stage.get("id", "<missing-id>"))
+		else:
+			for kind in available_units:
+				var matching_units: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == kind and unit.get("team") == "ally")
+				if matching_units.size() != 1 or not stage.get("references", []).has(matching_units[0].get("id", "")):
+					errors.append("%s has invalid available unit: %s" % [stage.get("id", "<missing-id>"), kind])
 		var columns := int(stage.get("columns", 0))
 		var rows := int(stage.get("rows", 0))
 		var core_cell: Variant = stage.get("core_cell", [])

@@ -62,14 +62,16 @@ func _ready() -> void:
 			tile.pressed.connect(_on_tile_pressed.bind(cell))
 			grid.add_child(tile)
 			tiles.append(tile)
-	var controls := HBoxContainer.new()
-	controls.alignment = BoxContainer.ALIGNMENT_CENTER
-	layout.add_child(controls)
-	for kind in ["swordsman", "archer"]:
+	var unit_controls := GridContainer.new()
+	unit_controls.columns = 3
+	unit_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	layout.add_child(unit_controls)
+	for kind in battle.stage.get("available_units", []):
 		var deploy_button := Button.new()
-		deploy_button.text = "검사 (%d)" % battle.balance_seed[kind].cost if kind == "swordsman" else "궁수 (%d)" % battle.balance_seed[kind].cost
+		deploy_button.text = "%s %d" % [_unit_name(kind), battle.balance_seed[kind].cost]
+		deploy_button.custom_minimum_size = Vector2(88, 40)
 		deploy_button.pressed.connect(_select_unit_kind.bind(kind))
-		controls.add_child(deploy_button)
+		unit_controls.add_child(deploy_button)
 		deploy_buttons.append(deploy_button)
 	var facility_controls := HBoxContainer.new()
 	facility_controls.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -83,7 +85,10 @@ func _ready() -> void:
 	wave_button = Button.new()
 	wave_button.text = "웨이브 시작"
 	wave_button.pressed.connect(_start_wave)
-	controls.add_child(wave_button)
+	var wave_controls := HBoxContainer.new()
+	wave_controls.alignment = BoxContainer.ALIGNMENT_CENTER
+	layout.add_child(wave_controls)
+	wave_controls.add_child(wave_button)
 	status = Label.new()
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -187,6 +192,9 @@ func _unit_at(cell: Vector2i) -> Dictionary:
 			return unit
 	return {}
 
+func _unit_name(kind: String) -> String:
+	return {"swordsman": "검사", "archer": "궁수", "spearman": "창병", "support": "지원병", "mage": "마법사"}.get(kind, "유닛")
+
 func _facility_at(cell: Vector2i) -> Dictionary:
 	for facility in battle.facilities:
 		if facility.alive and facility.cell == cell:
@@ -207,7 +215,7 @@ func _refresh() -> void:
 			tile.text = "◆" if cell == battle.core_cell else "▧" if battle.blocked_cells.has(cell) else "▤" if battle._wall_at(cell) >= 0 else ""
 			for unit in battle.units:
 				if unit.alive and unit.cell == cell:
-					tile.text = "검" if unit.kind == "swordsman" else "궁"
+					tile.text = {"swordsman": "검", "archer": "궁", "spearman": "창", "support": "지", "mage": "법"}.get(unit.kind, "유")
 					if unit.id == selected_unit:
 						tile.text = "[" + tile.text + "]"
 			for facility in battle.facilities:
