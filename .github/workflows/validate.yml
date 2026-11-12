@@ -22,3 +22,8 @@ jobs:
           grep -q "All headless project tests passed" <<< "$output"
       - name: Validate content (errors block CI)
         run: godot --headless --path . --script res://scripts/validate_content.gd
+      - name: Smoke test game scenes
+        run: |
+          godot --headless --path . res://scenes/main.tscn --quit-after 2
+          godot --headless --path . res://scenes/battle.tscn --quit-after 2
+          godot --headless --path . res://scenes/village.tscn --quit-after 2

@@ -5,8 +5,9 @@
 - Godot 4.7.2 headless editor import, `tests/run.gd`, `scripts/validate_content.gd`, `scenes/village.tscn` 실행 스모크, `git diff --check` 통과.
 - 검사 항목: 신규 저장 기본값, 훈련소 비용 차감/이동/보관 후 무료 재배치, 공방 선행 스테이지 잠금 및 해금 후 구매, 건물 필드 없는 이전 세이브의 본부 마이그레이션, 저장 유효성.
 - 마을 추가 안전성 검사: 손상된 형식의 진행 저장을 읽지 못할 때 건설을 차단하고 원본 바이트를 보존한다.
+- CI workflow에 메인/전투/마을 씬 headless smoke 단계를 추가하고 로컬 Godot 4.7.2에서 3개 씬 모두 기동 통과.
 - 시작 재화와 가격은 SEED. 터치 화면 레이아웃, Android 실기기 및 FPS는 이번 변경에서 검증하지 않았다.
-- 변경 포함 Android Debug APK export 통과: `build/holo-debug.apk`, 86,326,570 bytes (2026-11-12 12:44 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 기기 실행과 실제 성능은 미검증.
+- 최신 마을 UI·저장 보호 포함 Android Debug APK 재생성: `build/holo-debug.apk`, 86,326,570 bytes (2026-11-12 12:49 KST); APK Signature v2/v3 검증 통과, min API 24/target API 36. 기기 실행과 실제 성능은 미검증.
 
 ## M0
 
