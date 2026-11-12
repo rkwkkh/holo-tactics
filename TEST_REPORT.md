@@ -616,3 +616,7 @@ The Android AAB job now declares `needs: godot`, so export and artifact upload a
 - Godot 4.7.2: editor import, 	ests/run.gd, editor preview isolation, M5 editor-panel construction, battle results, seeded 8-stage campaign simulation (all 8 wins), content validation (0 Errors), and headless starts for main/battle/village/village_research/editor_preview all passed. git diff --check passed.
 - Current local artifacts: APK SHA-256 $apkHash; test AAB SHA-256 $aabHash. undletool validate was previously successful; current jarsigner -verify confirms the test AAB is unsigned, as expected, and not a Play-upload artifact.
 - Rechecked external prerequisites: ADB reports no connected devices; all three GODOT_ANDROID_KEYSTORE_RELEASE_* environment variables are absent. The package ID remains com.example.holotactics. Thus release AAB signing, physical-device Android/FPS acceptance, and Play private-test upload cannot be completed in this environment.
+
+## Android AAB export exit probe (2026-11-12)
+
+Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Android Gradle export but did not return within the observation window; the existing test AAB stayed at SHA-256 `3941E299153244DB5BD4698DA95C6F2A9D9B6AD86C52A1E1CB038F8A8CED59E0`. `bundletool validate` still passed for that existing artifact, which does not prove this export attempt completed. Stopped only the Godot process started by this probe. No workflow change was retained because the added quit option was not verified to resolve the lingering process.
