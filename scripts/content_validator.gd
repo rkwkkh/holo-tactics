@@ -53,19 +53,26 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	var facility_teams: Dictionary = {}
 	var profile_ids := _ids_in(_as_array(categories.get("ai_profiles", [])))
 	for unit in unit_items:
-		if unit is Dictionary and (unit.get("team") not in ["ally", "enemy"] or not _is_positive_number(unit.get("hp")) or not _is_positive_number(unit.get("damage")) or not _is_positive_integer(unit.get("range")) or not _is_positive_number(unit.get("attack_time")) or not _is_nonnegative_integer(unit.get("cost")) or not _is_nonnegative_number(unit.get("heal", 0)) or not _is_nonnegative_integer(unit.get("heal_range", 0)) or not _is_nonnegative_integer(unit.get("splash_radius", 0))):
-			errors.append("%s has invalid combat or cost data" % unit.get("id", "<missing-id>"))
-		if unit is Dictionary:
-			if _is_positive_number(unit.get("heal", 0)) and (not _is_positive_integer(unit.get("heal_range", 0)) or unit.get("team") not in ["ally", "enemy"]):
-				errors.append("%s has invalid unit healing data" % unit.get("id", "<missing-id>"))
-			if _is_positive_integer(unit.get("splash_radius", 0)) and not _is_positive_number(unit.get("damage", 0)):
-				errors.append("%s has invalid unit splash data" % unit.get("id", "<missing-id>"))
-			unit_teams[unit.get("id", "")] = unit.get("team", "")
-			if unit.get("team") == "enemy":
-				var profile_id: Variant = unit.get("ai_profile_id", "")
-				var references: Variant = unit.get("references", [])
-				if not profile_ids.has(profile_id) or not references is Array or not references.has(profile_id):
-					errors.append("%s must reference an AI profile" % unit.get("id", "<missing-id>"))
+		if not unit is Dictionary:
+			continue
+		var unit_id: String = unit.get("id", "<missing-id>")
+		if unit.get("team") not in ["ally", "enemy"]:
+			_append_field_error(errors, unit_id, "team", "invalid combat or cost data")
+		for field in ["hp", "damage", "range", "attack_time", "cost", "heal", "heal_range", "splash_radius"]:
+			var value: Variant = unit.get(field, 0 if field in ["heal", "heal_range", "splash_radius"] else null)
+			var valid := _is_nonnegative_integer(value) if field in ["cost", "heal_range", "splash_radius"] else _is_nonnegative_number(value) if field == "heal" else _is_positive_integer(value) if field == "range" else _is_positive_number(value)
+			if not valid:
+				_append_field_error(errors, unit_id, field, "invalid combat or cost data")
+		if _is_positive_number(unit.get("heal", 0)) and (not _is_positive_integer(unit.get("heal_range", 0)) or unit.get("team") not in ["ally", "enemy"]):
+			_append_field_error(errors, unit_id, "heal_range|team", "invalid unit healing data")
+		if _is_positive_integer(unit.get("splash_radius", 0)) and not _is_positive_number(unit.get("damage", 0)):
+			_append_field_error(errors, unit_id, "damage|splash_radius", "invalid unit splash data")
+		unit_teams[unit_id] = unit.get("team", "")
+		if unit.get("team") == "enemy":
+			var profile_id: Variant = unit.get("ai_profile_id", "")
+			var references: Variant = unit.get("references", [])
+			if not profile_ids.has(profile_id) or not references is Array or not references.has(profile_id):
+				_append_field_error(errors, unit_id, "ai_profile_id|references", "must reference an AI profile")
 	var upgrade_counts: Dictionary = {}
 	for upgrade in _as_array(categories.get("upgrades", [])):
 		if not upgrade is Dictionary:
@@ -74,8 +81,15 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		var costs: Variant = upgrade.get("costs", [])
 		var matches: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == upgrade.get("unit_kind") and unit.get("team") == "ally")
 		var effect: Variant = upgrade.get("effect", null)
-		if matches.size() != 1 or not levels is Array or levels.size() != 3 or not costs is Array or costs.size() != 3 or levels.any(func(value): return not _is_positive_number(value)) or costs.any(func(value): return not _is_positive_integer(value)) or not effect is String or effect not in ["combo", "bleed", "splash", "charge", "pierce", "multishot", "freeze", "pushback", "counter", "taunt", "defense", "heal_area", "shield", "attack_buff", "cleanse", "chain", "burn", "mana_burst"]:
-			errors.append("%s has invalid combat upgrade data" % upgrade.get("id", "<missing-id>"))
+		var upgrade_id: String = upgrade.get("id", "<missing-id>")
+		if matches.size() != 1:
+			_append_field_error(errors, upgrade_id, "unit_kind", "invalid combat upgrade data")
+		if not levels is Array or levels.size() != 3 or levels.any(func(value): return not _is_positive_number(value)):
+			_append_field_error(errors, upgrade_id, "values", "invalid combat upgrade data")
+		if not costs is Array or costs.size() != 3 or costs.any(func(value): return not _is_positive_integer(value)):
+			_append_field_error(errors, upgrade_id, "costs", "invalid combat upgrade data")
+		if not effect is String or effect not in ["combo", "bleed", "splash", "charge", "pierce", "multishot", "freeze", "pushback", "counter", "taunt", "defense", "heal_area", "shield", "attack_buff", "cleanse", "chain", "burn", "mana_burst"]:
+			_append_field_error(errors, upgrade_id, "effect", "invalid combat upgrade data")
 		upgrade_counts[upgrade.get("unit_kind", "")] = int(upgrade_counts.get(upgrade.get("unit_kind", ""), 0)) + 1
 	for unit in unit_items:
 		if categories.has("upgrades") and unit is Dictionary and unit.get("team") == "ally" and upgrade_counts.get(unit.get("kind", ""), 0) != 4:
@@ -85,8 +99,23 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		if not skill is Dictionary:
 			continue
 		var matches: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == skill.get("unit_kind") and unit.get("team") == "ally")
-		if matches.size() != 1 or skill.get("mode") not in ["automatic", "manual"] or skill.get("effect") not in ["strike", "area", "heal", "shield"] or not _is_positive_number(skill.get("cooldown")) or not _is_nonnegative_integer(skill.get("cost")) or not _is_positive_number(skill.get("value")) or not _is_nonnegative_integer(skill.get("radius")) or not skill.get("label") is String:
-			errors.append("%s has invalid skill data" % skill.get("id", "<missing-id>"))
+		var skill_id: String = skill.get("id", "<missing-id>")
+		if matches.size() != 1:
+			_append_field_error(errors, skill_id, "unit_kind", "invalid skill data")
+		if skill.get("mode") not in ["automatic", "manual"]:
+			_append_field_error(errors, skill_id, "mode", "invalid skill data")
+		if skill.get("effect") not in ["strike", "area", "heal", "shield"]:
+			_append_field_error(errors, skill_id, "effect", "invalid skill data")
+		if not _is_positive_number(skill.get("cooldown")):
+			_append_field_error(errors, skill_id, "cooldown", "invalid skill data")
+		if not _is_nonnegative_integer(skill.get("cost")):
+			_append_field_error(errors, skill_id, "cost", "invalid skill data")
+		if not _is_positive_number(skill.get("value")):
+			_append_field_error(errors, skill_id, "value", "invalid skill data")
+		if not _is_nonnegative_integer(skill.get("radius")):
+			_append_field_error(errors, skill_id, "radius", "invalid skill data")
+		if not skill.get("label") is String:
+			_append_field_error(errors, skill_id, "label", "invalid skill data")
 		var mode_key := "%s:%s" % [skill.get("unit_kind", ""), skill.get("mode", "")]
 		skill_modes[mode_key] = int(skill_modes.get(mode_key, 0)) + 1
 	for unit in unit_items:
@@ -98,22 +127,56 @@ static func validate(catalog: Dictionary) -> Array[String]:
 		if not facility is Dictionary:
 			continue
 		facility_teams[facility.get("id", "")] = facility.get("team", "")
-		if facility.get("team") not in ["ally", "enemy"] or not _is_positive_number(facility.get("hp")) or not _is_nonnegative_number(facility.get("damage")) or not _is_nonnegative_number(facility.get("heal", 0)) or not _is_nonnegative_integer(facility.get("splash_radius", 0)) or not _is_nonnegative_integer(facility.get("range")) or not _is_nonnegative_number(facility.get("attack_time")) or not _is_nonnegative_integer(facility.get("cost")) or not facility.get("blocks_path") is bool:
-			errors.append("%s has invalid facility data" % facility.get("id", "<missing-id>"))
-		elif facility.damage > 0 and (facility.range < 1 or facility.attack_time <= 0):
-			errors.append("%s has invalid facility attack data" % facility.get("id", "<missing-id>"))
-		elif float(facility.get("splash_radius", 0)) > 0.0 and facility.damage <= 0:
-			errors.append("%s has invalid facility splash data" % facility.get("id", "<missing-id>"))
-		elif facility.heal > 0 and (facility.range < 1 or facility.attack_time <= 0 or facility.team != "ally"):
-			errors.append("%s has invalid facility healing data" % facility.get("id", "<missing-id>"))
+		var facility_id: String = facility.get("id", "<missing-id>")
+		if facility.get("team") not in ["ally", "enemy"]:
+			_append_field_error(errors, facility_id, "team", "invalid facility data")
+		if not _is_positive_number(facility.get("hp")):
+			_append_field_error(errors, facility_id, "hp", "invalid facility data")
+		if not _is_nonnegative_number(facility.get("damage")):
+			_append_field_error(errors, facility_id, "damage", "invalid facility data")
+		if not _is_nonnegative_number(facility.get("heal", 0)):
+			_append_field_error(errors, facility_id, "heal", "invalid facility data")
+		if not _is_nonnegative_integer(facility.get("splash_radius", 0)):
+			_append_field_error(errors, facility_id, "splash_radius", "invalid facility data")
+		if not _is_nonnegative_integer(facility.get("range")):
+			_append_field_error(errors, facility_id, "range", "invalid facility data")
+		if not _is_nonnegative_number(facility.get("attack_time")):
+			_append_field_error(errors, facility_id, "attack_time", "invalid facility data")
+		if not _is_nonnegative_integer(facility.get("cost")):
+			_append_field_error(errors, facility_id, "cost", "invalid facility data")
+		if not facility.get("blocks_path") is bool:
+			_append_field_error(errors, facility_id, "blocks_path", "invalid facility data")
+		if facility.damage > 0 and facility.range < 1:
+			_append_field_error(errors, facility_id, "range", "invalid facility attack data")
+		if facility.damage > 0 and facility.attack_time <= 0:
+			_append_field_error(errors, facility_id, "attack_time", "invalid facility attack data")
+		if float(facility.get("splash_radius", 0)) > 0.0 and facility.damage <= 0:
+			_append_field_error(errors, facility_id, "damage", "invalid facility splash data")
+		if facility.heal > 0 and facility.range < 1:
+			_append_field_error(errors, facility_id, "range", "invalid facility healing data")
+		if facility.heal > 0 and facility.attack_time <= 0:
+			_append_field_error(errors, facility_id, "attack_time", "invalid facility healing data")
+		if facility.heal > 0 and facility.team != "ally":
+			_append_field_error(errors, facility_id, "team", "invalid facility healing data")
 	var town_buildings := _as_array(categories.get("town_buildings", []))
 	for research in _as_array(categories.get("research", [])):
 		if not research is Dictionary:
 			continue
 		var research_units: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == research.get("unit_kind") and unit.get("team") == "ally")
 		var research_buildings: Array = town_buildings.filter(func(building): return building is Dictionary and building.get("kind") == research.get("building_kind"))
-		if research_units.size() != 1 or research_buildings.size() != 1 or research.get("stat") != "damage" or not _is_positive_number(research.get("amount")) or not _is_nonnegative_integer(research.get("cost")) or not ids.has(research.get("requires_stage", "")):
-			errors.append("%s has invalid permanent research data" % research.get("id", "<missing-id>"))
+		var research_id: String = research.get("id", "<missing-id>")
+		if research_units.size() != 1:
+			_append_field_error(errors, research_id, "unit_kind", "has invalid permanent research data")
+		if research_buildings.size() != 1:
+			_append_field_error(errors, research_id, "building_kind", "has invalid permanent research data")
+		if research.get("stat") != "damage":
+			_append_field_error(errors, research_id, "stat", "has invalid permanent research data")
+		if not _is_positive_number(research.get("amount")):
+			_append_field_error(errors, research_id, "amount", "has invalid permanent research data")
+		if not _is_nonnegative_integer(research.get("cost")):
+			_append_field_error(errors, research_id, "cost", "has invalid permanent research data")
+		if not ids.has(research.get("requires_stage", "")):
+			_append_field_error(errors, research_id, "requires_stage", "has invalid permanent research data")
 	for profile in _as_array(categories.get("ai_profiles", [])):
 		var weights: Variant = profile.get("weights") if profile is Dictionary else null
 		if not weights is Dictionary or weights.is_empty():
@@ -270,7 +333,42 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	var cycle_nodes := _find_dependency_cycles(categories)
 	for id in cycle_nodes:
 		errors.append("cyclic dependency involving: %s" % id)
+	for index in errors.size():
+		errors[index] = with_field_path(errors[index], catalog)
 	return errors
+
+static func with_field_path(message: String, catalog: Dictionary) -> String:
+	var id := content_id_from_error(message, catalog)
+	if not id.is_empty() and message.begins_with(id + "."):
+		return message
+	var field := _field_for_error(message)
+	var detail := message.trim_prefix(id).strip_edges() if not id.is_empty() else message
+	return "%s.%s: %s" % [id, field, detail] if not id.is_empty() else "%s: %s" % [field, detail]
+
+static func _append_field_error(errors: Array[String], id: String, field: String, message: String) -> void:
+	errors.append("%s.%s: %s" % [id, field, message])
+
+static func _field_for_error(message: String) -> String:
+	var hints := [
+		["unsupported content_version", "content_version"], ["unsupported schema_version", "schema_version"],
+		["content_version must", "content_version"], ["schema_version must", "schema_version"],
+		["contains an item without a stable id", "id"], ["duplicate content id", "id"],
+		["unresolved dependency", "dependencies"], ["dependencies must", "dependencies"], ["unresolved reference", "references"], ["references must", "references"],
+		["invalid unit healing", "heal|heal_range|team"], ["invalid unit splash", "splash_radius|damage"], ["invalid combat or cost data", "team|hp|damage|range|attack_time|cost|heal|heal_range|splash_radius"], ["AI profile", "ai_profile_id|references"],
+		["invalid combat upgrade", "unit_kind|values|costs|effect"], ["four combat upgrades", "upgrades[]"],
+		["invalid skill data", "unit_kind|mode|effect|cooldown|cost|value|radius|label"], ["must have one ", "skills[mode]"],
+		["invalid facility attack", "damage|range|attack_time"], ["invalid facility splash", "splash_radius|damage"], ["invalid facility healing", "heal|range|attack_time|team"], ["invalid facility data", "team|hp|damage|heal|splash_radius|range|attack_time|cost|blocks_path"],
+		["invalid permanent research", "unit_kind|building_kind|stat|amount|cost|requires_stage"], ["AI weights", "weights"], ["AI weight", "weights.*"],
+		["enemy and have a positive integer count", "enemy_id|count|references"], ["AI weight overrides", "ai_weight_overrides"], ["invalid reinforcement", "reinforcements[]"],
+		["enemy_facilities must", "enemy_facilities"], ["invalid enemy facility placement", "enemy_facilities[].facility_id|cell"], ["enemy facility must be referenced", "references"], ["conflicting enemy facility cell", "enemy_facilities[].cell"], ["conflicts with initial spawn", "enemy_facilities[].cell"], ["conflicts with reinforcement spawn", "enemy_facilities[].cell"],
+		["invalid available unit", "available_units"], ["must list available units", "available_units"], ["invalid board dimensions or core cell", "columns|rows|core_cell"], ["unknown battle mode", "mode"], ["invalid enemy spawn row", "enemy_spawn_row"], ["blocked_cells must", "blocked_cells"], ["invalid blocked cell", "blocked_cells[]"], ["duplicate blocked cell", "blocked_cells[]"], ["blocks its core cell", "blocked_cells[]|core_cell"], ["walls must", "walls"], ["invalid wall data", "walls[].cell|hp"], ["conflicting wall cell", "walls[].cell"], ["blocks a required wave route", "blocked_cells|walls|core_cell|waves"], ["blocks a reinforcement route", "blocked_cells|walls|core_cell|reinforcements"], ["must reference at least one wave", "references"], ["invalid core or resource values", "core_hp|start_resource|kill_reward|wave_reward|permanent_first_bonus|permanent_repeat_reward|permanent_partial_per_wave|intermission_seconds"], ["invalid campaign order", "campaign_order"], ["duplicates campaign order", "campaign_order"], ["campaign must contain", "stages|waves"], ["cyclic dependency", "dependencies"]
+	]
+	for hint in hints:
+		if message.contains(hint[0]):
+			return hint[1]
+	if message.begins_with("category "):
+		return "categories"
+	return "catalog"
 
 static func content_id_from_error(message: String, catalog: Dictionary) -> String:
 	var match_id := ""

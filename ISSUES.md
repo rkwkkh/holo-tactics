@@ -47,3 +47,8 @@
 - 2026-11-12 AVD 재검증 결과: API 29 Android 10 이미지의 GLES 2 한계로 EGL 컨텍스트 생성 실패, API 37 SwiftShader는 Godot GLES3 canvas shader uniform 초과로 검은 화면. APK 설치만으로 Android 실행 호환성이 입증되지 않는다.
 
 - Android 렌더러 판단 근거: [Godot 4.7 system requirements](https://docs.godotengine.org/en/4.7/about/system_requirements.html)는 Compatibility 모바일 GPU에 GLES 3.0을 요구한다. API 29 AVD의 GLES 2 실패는 이 요구 미충족으로 설명된다. API 37 SwiftShader uniform 오류는 [Godot 엔진 이슈 #109550](https://github.com/godotengine/godot/issues/109550)에서 동일한 4.7.2/Android Emulator 조합으로 확인됐고, 엔진 개발자는 SwiftShader의 GLES 3.0 불완전 구현 가능성을 지적했다. 이는 물리 기기 호환성을 입증하지 않는다.
+# 2026-11-12 이어서 작업 상태
+
+- 해결: Validator 오류를 ID/필드 경로와 함께 표시하고, 연구 데이터의 개별 필드 경로를 테스트함.
+- 남음: 편집기 GUI에서 오류 선택→레코드 이동의 시각/상호작용 검증은 자동 headless 테스트로 대체할 수 없음. Android 실기기 GLES 및 성능도 별도 기기 검증 필요.
+- 기존 OPEN 전투 규칙 결정(수성 전멸 처리, 진화 분기/재진화, 시설 수리 시점)은 사용자 답변 대기이며 코드에서 확정하지 않음.

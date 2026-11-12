@@ -225,3 +225,8 @@
 - 통과: Godot editor import, `tests/run.gd`, `tests/editor_preview.gd`, `scripts/validate_content.gd`, main/battle/village/village_research/editor_preview 씬 smoke.
 - 통과: 최신 결과 화면 포함 Android Debug APK 재생성 (`build/holo-debug.apk`, 86,356,758 bytes, 2026-11-12 14:18 KST); apksigner v2/v3 서명.
 - 미검증: 결과 패널의 실제 기기/GUI 시각 배치와 버튼 상호작용. 실기기/FPS 미검증은 계속 유지한다.
+# 2026-11-12 Validator field-path 보강
+
+- 환경: Godot 4.7.2 stable, Windows, headless.
+- 통과: editor import, validator `--check-only`, `tests/run.gd` (연구 amount 오류의 정확한 `research.swordsman.damage.amount` 경로 포함), `tests/editor_preview.gd`, `tests/results_view.gd`, `scripts/validate_content.gd`, `git diff --check`.
+- 범위 제한: 편집기 GUI 사용성, Android 실기기 렌더링/FPS는 이 실행에서 확인하지 않음.

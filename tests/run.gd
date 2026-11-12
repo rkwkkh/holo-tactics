@@ -149,9 +149,10 @@ func _initialize() -> void:
 	assert(ContentValidator.content_id_from_error("stage.m1.frontier has invalid core data", seeded_catalog) == "stage.m1.frontier")
 	assert(ContentValidator.content_id_from_error("campaign must have six main stages", seeded_catalog).is_empty())
 	assert(ContentValidator.content_id_from_error("stage.m1.frontier failed", {"categories": 1}).is_empty())
+	assert(ContentValidator.with_field_path("stage.m1.frontier blocks a required wave route", seeded_catalog) == "stage.m1.frontier.blocked_cells|walls|core_cell|waves: blocks a required wave route")
 	var invalid_research_catalog: Dictionary = seeded_catalog.duplicate(true)
 	invalid_research_catalog.categories.research[0].amount = 0
-	assert(ContentValidator.validate(invalid_research_catalog).any(func(error): return error.contains("invalid permanent research data")))
+	assert(ContentValidator.validate(invalid_research_catalog).any(func(error): return error == "research.swordsman.damage.amount: has invalid permanent research data"))
 	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "ally").size() == 5)
 	assert(seeded_catalog.categories.units.filter(func(unit): return unit.team == "enemy").size() == 6)
 	var story_rosters := {"stage.m1.frontier": ["swordsman", "archer"], "stage.m2.crossroads": ["swordsman", "archer", "spearman"], "stage.m3.fortress": ["swordsman", "archer", "spearman"], "stage.m4.forest": ["swordsman", "archer", "spearman", "support"], "stage.m5.citadel": ["swordsman", "archer", "spearman", "support", "mage"]}

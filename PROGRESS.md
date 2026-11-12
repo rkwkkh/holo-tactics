@@ -55,3 +55,8 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - 2026-11-12 M6 이어하기: 5개 주요 씬 smoke 및 현재 소스 Android Debug APK 재생성/서명(v2/v3) 통과. Editor GUI 검증은 computer-use native pipe 연결 불가로 진행되지 않았다. 실기기/성능/release AAB/Play 배포는 검증 대기이며 M6 완료가 아니다.
 
 - 2026-11-12 M5 보강: Validator Error 목록을 클릭하면 해당 콘텐츠 레코드가 있는 도구 탭으로 이동하고, 다른 레코드로 이동할 때 미저장 JSON 초안을 보존한다. Error→ID 추출과 전역 오류/잘못된 categories 입력을 회귀 검사했다. 실제 GUI 사용과 필드별 위치는 미검증이다.
+# 2026-11-12 이어서 작업
+
+- M5 Validator 오류에 가능한 콘텐츠 ID와 필드 경로를 표시하도록 보강. 연구 데이터 검사도 `research_id.amount` 등 개별 필드로 분리하고 회귀 테스트 추가.
+- 확인: Godot 4.7.2 headless 프로젝트 import, validator parse, `tests/run.gd`, `tests/editor_preview.gd`, `tests/results_view.gd`, 콘텐츠 검증 및 diff 공백 검사 통과.
+- M5 편집기 GUI 상호작용 검증 및 M6 Android 실기기 검증은 여전히 미완료. 기존 Android AVD 렌더링 제한은 `ISSUES.md` 참조.
