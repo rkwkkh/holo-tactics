@@ -119,3 +119,10 @@ Re-exported with the restored Mobile/Vulkan Android renderer after the temporary
 - Located ADB under `%LOCALAPPDATA%\Android\Sdk\platform-tools`; `adb reconnect offline` brought `MaDang_API29` (Android 10/API 29) and `MaDangStage6_API37` (Android 17/API 37) online.
 - Installed the exact APK SHA-256 above on both AVDs. API 37 resumed the Godot launcher and rendered the campaign menu; Vulkan initialized on SwiftShader. Current ADB touch injection did not change the menu, so this pass did not reconfirm M1 entry.
 - API 29 resumed the activity but repeatedly logged `Couldn't present to Vulkan queue (VkResult error 5)`. No physical Android device was attached; API 29 support and FPS acceptance remain unverified.
+
+## API 29 에뮬레이터 추가 격리 검사 (2026-11-12)
+
+- Android Emulator를 37.1.11에서 37.2.13으로 갱신하고, Android 10/API 29 Google Play 시스템 이미지의 임시 AVD에서도 현재 Mobile/Vulkan APK를 실행했다. 앱 Activity는 시작했지만 SwiftShader Vulkan queue present error 5와 검은 프레임이 재현됐다.
+- 같은 AVD에서 임시 Compatibility/OpenGL APK는 GLES 2 컨텍스트 생성 실패로 GL thread가 종료됐다. 기존 API29 Google APIs AVD에서도 Vulkan 오류가 최신 Emulator와 host GPU 설정에서 재현됐다.
+- 따라서 검사한 두 API29 AVD 구성에서는 두 렌더러 경로 모두 동작하지 않았다. 이는 Android 10 실기기 호환 실패를 뜻하지 않는다. 임시 Google Play 이미지와 AVD는 검사 후 제거했고, 기존 AVD 데이터는 유지했다. Emulator 37.2.13은 유지.
+- 기기: API29 Vulkan 렌더링, Android 10 실기기 호환성, FPS는 검증 대기.

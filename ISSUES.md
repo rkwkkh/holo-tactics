@@ -140,3 +140,5 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 - 2026-11-12 M5 GUI retry: Computer Use still reports the native app pipe missing and browser host unavailable after a fresh runtime reset. No UI action occurred; plugin/editor GUI interaction remains unverified, while headless plugin initialization and model tests pass.
 
 - Renderer fallback probe (2026-11-12): API29 AVD fails both configured Mobile/Vulkan presentation and a temporary Compatibility/OpenGL APK (EGL GL-thread startup failure). Production setting is unchanged. Physical Android 10 behavior is still unknown; do not claim API29 acceptance from AVD results.
+
+- 2026-11-12 API29 재검증 보충: Emulator 37.2.13으로 올린 뒤 기존 Google APIs API29 AVD의 Vulkan present error 5가 재현됐다. 별도 Google Play API29 이미지에서도 Vulkan 오류가 재현됐고 임시 Compatibility 빌드는 GLES 2 EGL 컨텍스트를 만들지 못했다. 임시 AVD/이미지는 제거했고 기존 AVD 데이터는 보존했다. 이 결과는 실기기 Android 10 호환 판정이 아니다.

@@ -224,3 +224,8 @@ Godot 4.7.2 import, core, editor-preview isolation, editor-panel construction, r
 ## External validation access check (2026-11-12)
 
 The computer-use native pipe again failed before listing Windows apps, so M5 GUI interaction could not be attempted. The connected GitHub account lists no repository corresponding to this project, and the local repository has no remote; hosted Actions remain unavailable. Local CI-equivalent results remain the available validation.
+
+## API 29 에뮬레이터 경로 추가 확인 (2026-11-12)
+
+- Emulator 37.2.13과 임시 Android 10 Google Play AVD를 이용해 재검증했다. Vulkan APK는 present error 5, Compatibility APK는 GLES 2 EGL 컨텍스트 실패로 실행 화면을 표시하지 못했다. API29 Google APIs AVD에서도 최신 Emulator로 Vulkan 오류가 재현됐다.
+- 임시 Play AVD/이미지는 정리했고 기존 AVD 사용자 데이터는 보존했다. Android 10 실기기 검증 및 대표 기기 FPS 측정은 여전히 남아 있다. 상세 결과는 `ANDROID_TESTING.md`.
