@@ -96,6 +96,15 @@
 - 통과: 20개 강화 각각 3단계 구매/최대 제한, 전투 자원 차감, 다른 유닛 항목 거부, 피해 보너스/콤보/관통/빙결/3중첩 출혈과 지속시간, 방어/반격/밀치기/도발, 광역 치유·보호막·버프·해제, 마력 폭발, 강화 저장·복원과 변조된 레벨 거부 테스트.
 - Godot 4.7.2 editor import, `tests/run.gd` sentinel, content validator, battle scene headless 실행을 통과했다. 수치·가격 및 스택 상한 초과 처리는 임시 SEED이며 `ISSUES.md`에 기록했다.
 
+## M3 기본 스킬 (2026-11-12)
+
+- 기본 아군 5종 자동/수동 스킬 각 1개(총 10개)를 콘텐츠로 정의했다. Validator는 효과 형식·수치·쿨타임·비용과 유닛별 모드 구성을 검사한다. 수동 스킬 UI는 선택 유닛에 연결했고, 자동 스킬은 유효 대상이 있을 때만 시전한다.
+- 통과: 수동 발동 성공 시에만 비용 차감, 적 부재/쿨타임/자원 부족 발동 거부, 자동 시전 후 독립 쿨타임, 재정비 중 쿨타임 정지, 체크포인트 쿨타임 보존과 변조 초과값 거부; 전체 `tests/run.gd`, 콘텐츠 검증, battle scene headless 실행.
+- 테스트 첫 반복에서 기존 validator fixture의 스킬 레코드가 새 스키마에 맞지 않아 실패했고, 전체 자동 시전이 구형 직접 생성 유닛 픽스처의 공격 결과도 바꿨다. 픽스처 스키마/시드 쿨타임을 보정한 후 최종 성공 sentinel로 재검증했다. 중간 반복에서 사전 생성 테스트 유닛의 cooldown map 누락 오류를 발견해 빈 맵 기본값 초기화로 수정했다.
+- 재검증 통과: Godot 4.7.2 editor import, 전체 `tests/run.gd`, 콘텐츠 Error 0, battle scene headless 실행, `git diff --check`. Android debug export도 통과: `build/holo-debug.apk`, 86,301,303 bytes, 2026-11-12 10:36 KST, package `com.example.holotactics`, min API 24/target API 36, APK Signature v2/v3 확인.
+- 첫 export 호출은 preset 이름을 `Android`로 지정해 실패했다. 프로젝트 preset 이름 `Android Debug APK`를 확인해 재실행했고 성공했다.
+- Android 실기기/에뮬레이터 UI 검증은 이전 기록처럼 미해결이다. 스킬 및 강화 밸런스는 모두 초기 SEED다.
+
 ## 해금 목록 validator 경계 검사 (2026-11-12)
 
 - 잘못된 스테이지 해금 목록이 유닛 누락·중복 또는 잘못된 `references` 형태를 가져도 validator가 충돌하지 않고 Error를 반환하는 회귀 검사를 추가했다.

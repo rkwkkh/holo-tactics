@@ -1,7 +1,7 @@
 ﻿extends SceneTree
 
 func _initialize() -> void:
-	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "team": "ally", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash"], "dependencies": []}], "skills": [{"id": "skill.slash", "references": [], "dependencies": []}]}}
+	var valid := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "unit.swordsman", "kind": "swordsman", "team": "ally", "hp": 100, "damage": 10, "range": 1, "attack_time": 1.0, "cost": 5, "references": ["skill.slash", "skill.guard"], "dependencies": []}], "skills": [{"id": "skill.slash", "unit_kind": "swordsman", "mode": "automatic", "effect": "strike", "cooldown": 5.0, "cost": 0, "value": 10, "radius": 0, "label": "Strike", "references": [], "dependencies": []}, {"id": "skill.guard", "unit_kind": "swordsman", "mode": "manual", "effect": "shield", "cooldown": 5.0, "cost": 1, "value": 10, "radius": 1, "label": "Guard", "references": [], "dependencies": []}]}}
 	assert(ContentValidator.validate(valid).is_empty())
 	var duplicate := {"content_version": 1, "schema_version": 1, "categories": {"units": [{"id": "same"}], "skills": [{"id": "same"}]}}
 	assert(ContentValidator.validate(duplicate).any(func(error): return error.contains("duplicate content id")))
@@ -37,6 +37,41 @@ func _initialize() -> void:
 		assert(roster_deploy_test.deploy(ally_kinds[index], Vector2i(index, 8)))
 	assert(roster_deploy_test.units.size() == 5 and roster_deploy_test.combat_gold == 660)
 	assert(seeded_catalog.categories.upgrades.size() == 20)
+	assert(seeded_catalog.categories.skills.size() == 10)
+	var skill_test := BattleModel.new()
+	skill_test.stage.available_units = ["swordsman", "archer"]
+	skill_test.combat_gold = 100
+	assert(skill_test.deploy("swordsman", Vector2i(2, 8)))
+	skill_test.phase = "combat"
+	assert(not skill_test.cast_skill(skill_test.units[0].id, "skill.swordsman.heroic_charge"))
+	assert(skill_test.combat_gold == 50)
+	skill_test.enemies.append({"id": 89, "kind": "goblin", "team": "enemy", "cell": Vector2i(2, 7), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 100.0, "alive": true, "active": true, "statuses": {}})
+	assert(skill_test.cast_skill(skill_test.units[0].id, "skill.swordsman.heroic_charge"))
+	assert(skill_test.combat_gold == 30 and skill_test.enemies[0].hp == 75.0)
+	assert(not skill_test.cast_skill(skill_test.units[0].id, "skill.swordsman.heroic_charge"))
+	assert(skill_test.units[0].skill_cooldowns["skill.swordsman.heroic_charge"] == 15.0)
+	var skill_checkpoint_model := BattleModel.new()
+	skill_checkpoint_model.stage.available_units = ["swordsman", "archer"]
+	skill_checkpoint_model.combat_gold = 100
+	assert(skill_checkpoint_model.deploy("swordsman", Vector2i(2, 8)))
+	skill_checkpoint_model.units[0].skill_cooldowns["skill.swordsman.heroic_charge"] = 4.0
+	var skill_snapshot := skill_checkpoint_model.to_dict()
+	var skill_restore := BattleModel.new()
+	assert(skill_restore.restore(skill_snapshot))
+	assert(skill_restore.units[0].skill_cooldowns["skill.swordsman.heroic_charge"] == 4.0)
+	var invalid_skill_snapshot: Dictionary = skill_snapshot.duplicate(true)
+	invalid_skill_snapshot.units[0].skill_cooldowns["skill.swordsman.heroic_charge"] = 99.0
+	assert(not BattleModel.new().restore(invalid_skill_snapshot))
+	var auto_skill_test := BattleModel.new()
+	auto_skill_test.stage.available_units = ["swordsman", "archer"]
+	assert(auto_skill_test.deploy("swordsman", Vector2i(2, 8)))
+	auto_skill_test.enemies.append({"id": 88, "kind": "goblin", "team": "enemy", "cell": Vector2i(2, 7), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 100.0, "alive": true, "active": true, "statuses": {}})
+	auto_skill_test.phase = "combat"
+	auto_skill_test.tick(0.1)
+	assert(auto_skill_test.units[0].skill_cooldowns["skill.swordsman.rend"] == 8.0)
+	auto_skill_test.phase = "preparation"
+	auto_skill_test.tick(1.0)
+	assert(auto_skill_test.units[0].skill_cooldowns["skill.swordsman.rend"] == 8.0)
 	var upgrade_test := BattleModel.new()
 	upgrade_test.combat_gold = 1000
 	assert(upgrade_test.deploy("swordsman", Vector2i(1, 8)))
@@ -91,6 +126,7 @@ func _initialize() -> void:
 	support_upgrade_test.units[0].hp = 60.0
 	support_upgrade_test.units[1].hp = 40.0
 	support_upgrade_test.units[1].statuses.freeze = {"remaining": 1.0, "damage": 0.0}
+	support_upgrade_test.units[2].skill_cooldowns["skill.support.mend"] = 10.0
 	support_upgrade_test.enemies.append({"id": 92, "kind": "goblin", "team": "enemy", "cell": Vector2i(7, 0), "hp": 100.0, "damage": 1.0, "range": 1, "cooldown": 100.0, "alive": true, "active": false, "statuses": {}})
 	support_upgrade_test.phase = "combat"
 	support_upgrade_test.tick(0.2)
@@ -341,6 +377,7 @@ func _initialize() -> void:
 	support_unit_test.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
 	assert(support_unit_test.deploy("swordsman", Vector2i(1, 8)) and support_unit_test.deploy("support", Vector2i(2, 8)))
 	support_unit_test.units[0].hp = 60.0
+	support_unit_test.units[1].skill_cooldowns["skill.support.mend"] = 10.0
 	support_unit_test.phase = "combat"
 	support_unit_test.enemies.append({"id": 40, "kind": "goblin", "cell": Vector2i.ZERO, "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
 	support_unit_test.tick(0.2)
@@ -352,6 +389,7 @@ func _initialize() -> void:
 	var mage_unit_test := BattleModel.new()
 	mage_unit_test.stage.available_units = ["swordsman", "archer", "spearman", "support", "mage"]
 	assert(mage_unit_test.deploy("mage", Vector2i(4, 8)))
+	mage_unit_test.units[0].skill_cooldowns["skill.mage.arcane_bolt"] = 10.0
 	mage_unit_test.phase = "combat"
 	mage_unit_test.enemies.append({"id": 41, "kind": "goblin", "cell": Vector2i(4, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
 	mage_unit_test.enemies.append({"id": 42, "kind": "goblin", "cell": Vector2i(5, 7), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 100.0, "alive": true})
@@ -454,7 +492,7 @@ func _initialize() -> void:
 	assert(enemy_facility_test.start_wave(enemy_facility_store) and enemy_facility_test.enemy_facilities[0].active)
 	assert(enemy_facility_test.enemies.size() == 2 and enemy_facility_test.enemies.all(func(enemy: Dictionary): return enemy.active) and enemy_facility_test.preview_enemies.is_empty())
 	var watchtower: Dictionary = enemy_facility_test.enemy_facilities[0]
-	enemy_facility_test.units.append({"id": 400, "kind": "swordsman", "cell": Vector2i(1, 2), "hp": 120.0, "damage": 20.0, "range": 1, "cooldown": 0.0, "alive": true})
+	enemy_facility_test.units.append({"id": 400, "kind": "swordsman", "cell": Vector2i(1, 2), "hp": 120.0, "damage": 20.0, "range": 1, "cooldown": 0.0, "skill_cooldowns": {"skill.swordsman.rend": 8.0}, "alive": true})
 	for enemy in enemy_facility_test.enemies:
 		enemy.alive = false
 	enemy_facility_test.enemies.append({"id": 401, "kind": "goblin", "cell": Vector2i(7, 2), "hp": 65.0, "damage": 10.0, "range": 1, "cooldown": 0.0, "ai_weights": {"attack": 1.2, "objective": 1.0}, "alive": true})

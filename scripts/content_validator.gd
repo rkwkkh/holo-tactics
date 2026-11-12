@@ -80,6 +80,20 @@ static func validate(catalog: Dictionary) -> Array[String]:
 	for unit in unit_items:
 		if categories.has("upgrades") and unit is Dictionary and unit.get("team") == "ally" and upgrade_counts.get(unit.get("kind", ""), 0) != 4:
 			errors.append("%s must have exactly four combat upgrades" % unit.get("id", "<missing-id>"))
+	var skill_modes: Dictionary = {}
+	for skill in _as_array(categories.get("skills", [])):
+		if not skill is Dictionary:
+			continue
+		var matches: Array = unit_items.filter(func(unit): return unit is Dictionary and unit.get("kind") == skill.get("unit_kind") and unit.get("team") == "ally")
+		if matches.size() != 1 or skill.get("mode") not in ["automatic", "manual"] or skill.get("effect") not in ["strike", "area", "heal", "shield"] or not _is_positive_number(skill.get("cooldown")) or not _is_nonnegative_integer(skill.get("cost")) or not _is_positive_number(skill.get("value")) or not _is_nonnegative_integer(skill.get("radius")) or not skill.get("label") is String:
+			errors.append("%s has invalid skill data" % skill.get("id", "<missing-id>"))
+		var mode_key := "%s:%s" % [skill.get("unit_kind", ""), skill.get("mode", "")]
+		skill_modes[mode_key] = int(skill_modes.get(mode_key, 0)) + 1
+	for unit in unit_items:
+		if unit is Dictionary and unit.get("team") == "ally":
+			for mode in ["automatic", "manual"]:
+				if categories.has("skills") and skill_modes.get("%s:%s" % [unit.get("kind", ""), mode], 0) != 1:
+					errors.append("%s must have one %s skill" % [unit.get("id", "<missing-id>"), mode])
 	for facility in _as_array(categories.get("facilities", [])):
 		if not facility is Dictionary:
 			continue

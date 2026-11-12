@@ -10,6 +10,7 @@ var content: Dictionary = {}
 var stage: Dictionary = {}
 var balance_seed: Dictionary = {}
 var upgrade_definitions: Dictionary = {}
+var skill_definitions: Dictionary = {}
 var facility_definitions: Dictionary = {}
 var ai_profiles: Dictionary = {}
 var waves: Array = []
@@ -46,6 +47,8 @@ func _init(selected_stage_id: String = STAGE_ID) -> void:
 		balance_seed[unit.kind] = unit
 	for upgrade in content.categories.upgrades:
 		upgrade_definitions[upgrade.id] = upgrade
+	for skill in content.categories.skills:
+		skill_definitions[skill.id] = skill
 	for facility in content.categories.facilities:
 		facility_definitions[facility.id] = facility
 	for profile in content.categories.ai_profiles:
@@ -78,7 +81,7 @@ func deploy(kind: String, cell: Vector2i) -> bool:
 		return false
 	combat_gold -= cost
 	var stats: Dictionary = balance_seed[kind]
-	units.append({"id": next_id, "kind": kind, "cell": cell, "hp": stats.hp, "damage": stats.damage, "range": stats.range, "heal": stats.get("heal", 0), "heal_range": stats.get("heal_range", 0), "splash_radius": stats.get("splash_radius", 0), "attack_count": 0, "upgrades": {}, "statuses": {}, "cooldown": 0.0, "alive": true})
+	units.append({"id": next_id, "kind": kind, "cell": cell, "hp": stats.hp, "damage": stats.damage, "range": stats.range, "heal": stats.get("heal", 0), "heal_range": stats.get("heal_range", 0), "splash_radius": stats.get("splash_radius", 0), "attack_count": 0, "upgrades": {}, "skill_cooldowns": {}, "statuses": {}, "cooldown": 0.0, "alive": true})
 	next_id += 1
 	return true
 
@@ -98,6 +101,56 @@ func purchase_upgrade(unit_id: int, upgrade_id: String) -> bool:
 	combat_gold -= cost
 	unit.upgrades[upgrade_id] = level + 1
 	_apply_unit_upgrades(unit)
+	return true
+
+func cast_skill(unit_id: int, skill_id: String) -> bool:
+	var unit := _unit_by_id(unit_id)
+	if unit.is_empty() or phase != "combat" or unit.has("destination") or not skill_definitions.has(skill_id):
+		return false
+	var skill: Dictionary = skill_definitions[skill_id]
+	if skill.unit_kind != unit.kind or skill.mode != "manual" or float(unit.skill_cooldowns.get(skill_id, 0.0)) > 0.0 or combat_gold < int(skill.cost):
+		return false
+	if not _execute_skill(unit, skill):
+		return false
+	combat_gold -= int(skill.cost)
+	unit.skill_cooldowns[skill_id] = float(skill.cooldown)
+	return true
+
+func _tick_skills(unit: Dictionary, delta: float) -> void:
+	unit.skill_cooldowns = unit.get("skill_cooldowns", {}) if unit.get("skill_cooldowns", {}) is Dictionary else {}
+	for skill_id in unit.skill_cooldowns:
+		unit.skill_cooldowns[skill_id] = maxf(0.0, float(unit.skill_cooldowns[skill_id]) - delta)
+	if unit.has("destination"):
+		return
+	for skill in content.categories.skills:
+		if skill.unit_kind == unit.kind and skill.mode == "automatic" and float(unit.skill_cooldowns.get(skill.id, 0.0)) <= 0.0 and _execute_skill(unit, skill):
+			unit.skill_cooldowns[skill.id] = float(skill.cooldown)
+
+func _execute_skill(unit: Dictionary, skill: Dictionary) -> bool:
+	var enemies_in_range := (enemies + enemy_facilities).filter(func(target: Dictionary): return target.alive and target.get("active", true) and _distance(unit.cell, target.cell) <= 5)
+	match skill.effect:
+		"strike":
+			if enemies_in_range.is_empty(): return false
+			enemies_in_range.sort_custom(func(a: Dictionary, b: Dictionary): return _distance(unit.cell, a.cell) < _distance(unit.cell, b.cell))
+			_apply_damage({"damage": float(skill.value)}, enemies_in_range[0])
+		"area":
+			if enemies_in_range.is_empty(): return false
+			enemies_in_range.sort_custom(func(a: Dictionary, b: Dictionary): return _distance(unit.cell, a.cell) < _distance(unit.cell, b.cell))
+			var center: Vector2i = enemies_in_range[0].cell
+			for target in enemies_in_range:
+				if _distance(center, target.cell) <= int(skill.radius):
+					_apply_damage({"damage": float(skill.value)}, target)
+		"heal":
+			var target_index := _lowest_hp_ally(unit.cell, int(skill.radius), unit.id)
+			if target_index < 0: return false
+			var target: Dictionary = units[target_index]
+			target.hp = minf(float(balance_seed[target.kind].hp), float(target.hp) + float(skill.value))
+		"shield":
+			var targets := units.filter(func(ally: Dictionary): return ally.alive and _distance(unit.cell, ally.cell) <= int(skill.radius) and float(ally.get("shield", 0.0)) < float(skill.value))
+			if targets.is_empty(): return false
+			for target in targets:
+				target.shield = maxf(float(target.get("shield", 0.0)), float(skill.value))
+		_: return false
 	return true
 
 func _upgrade_level(unit: Dictionary, effect: String) -> int:
@@ -202,6 +255,7 @@ func tick(delta: float) -> void:
 		if not unit.alive:
 			continue
 		unit.cooldown = maxf(0.0, unit.cooldown - delta)
+		_tick_skills(unit, delta)
 		if unit.has("destination"):
 			if unit.cell == unit.destination:
 				unit.erase("destination")
@@ -375,7 +429,7 @@ func restore(snapshot: Dictionary) -> bool:
 		var id := int(saved_unit.id)
 		var cell := Vector2i(int(saved_unit.cell[0]), int(saved_unit.cell[1]))
 		var stats: Dictionary = balance_seed[saved_unit.kind]
-		if not _valid_saved_upgrades(saved_unit.get("upgrades", {}), saved_unit.kind):
+		if not _valid_saved_upgrades(saved_unit.get("upgrades", {}), saved_unit.kind) or not _valid_saved_skill_cooldowns(saved_unit.get("skill_cooldowns", {}), saved_unit.kind):
 			return false
 		if not _is_integer_value(saved_unit.get("attack_count", 0)) or int(saved_unit.get("attack_count", 0)) < 0:
 			return false
@@ -461,6 +515,15 @@ func _valid_saved_upgrades(saved_upgrades: Variant, unit_kind: String) -> bool:
 		var definition: Dictionary = upgrade_definitions.get(upgrade_id, {})
 		var level: Variant = saved_upgrades[upgrade_id]
 		if definition.get("unit_kind", "") != unit_kind or not _is_integer_value(level) or int(level) < 1 or int(level) > 3:
+			return false
+	return true
+
+func _valid_saved_skill_cooldowns(saved_cooldowns: Variant, unit_kind: String) -> bool:
+	if not saved_cooldowns is Dictionary:
+		return false
+	for skill_id in saved_cooldowns:
+		var skill: Dictionary = skill_definitions.get(skill_id, {})
+		if skill.get("unit_kind") != unit_kind or not _is_finite_nonnegative(saved_cooldowns[skill_id]) or float(saved_cooldowns[skill_id]) > float(skill.get("cooldown", 0.0)):
 			return false
 	return true
 

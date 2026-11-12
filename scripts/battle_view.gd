@@ -20,6 +20,8 @@ var deploy_buttons: Array[Button] = []
 var upgrade_controls: GridContainer
 var upgrade_buttons: Array[Button] = []
 var upgrade_controls_unit := -1
+var skill_buttons: Array[Button] = []
+var skill_controls_unit := -1
 var status_override := ""
 
 func _ready() -> void:
@@ -80,6 +82,11 @@ func _ready() -> void:
 	upgrade_controls.columns = 2
 	upgrade_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	layout.add_child(upgrade_controls)
+	var skill_controls := GridContainer.new()
+	skill_controls.columns = 2
+	skill_controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	layout.add_child(skill_controls)
+	set_meta("skill_controls", skill_controls)
 	var facility_controls := HBoxContainer.new()
 	facility_controls.alignment = BoxContainer.ALIGNMENT_CENTER
 	layout.add_child(facility_controls)
@@ -178,6 +185,10 @@ func _purchase_upgrade(unit_id: int, upgrade_id: String) -> void:
 	status_override = "" if battle.purchase_upgrade(unit_id, upgrade_id) else "강화에 필요한 전투 자원이 부족하거나 구매할 수 없습니다"
 	_refresh()
 
+func _cast_skill(unit_id: int, skill_id: String) -> void:
+	status_override = "" if battle.cast_skill(unit_id, skill_id) else "스킬을 사용할 수 없습니다"
+	_refresh()
+
 func _tick() -> void:
 	var previous_phase := battle.phase
 	battle.tick(timer.wait_time)
@@ -219,6 +230,7 @@ func _refresh() -> void:
 	for button in deploy_buttons:
 		button.disabled = battle.phase != "preparation"
 	_refresh_upgrade_controls()
+	_refresh_skill_controls()
 	for y in BattleModel.ROWS:
 		for x in BattleModel.COLUMNS:
 			var cell := Vector2i(x, y)
@@ -280,3 +292,29 @@ func _refresh_upgrade_controls() -> void:
 		var button := upgrade_buttons[index]
 		button.text = "%s %d/3 · %d" % [upgrade.label, level, cost] if level < 3 else "%s 최대" % upgrade.label
 		button.disabled = battle.phase not in ["preparation", "combat"] or level >= 3 or battle.combat_gold < cost
+
+func _refresh_skill_controls() -> void:
+	var controls: GridContainer = get_meta("skill_controls")
+	var unit := battle._unit_by_id(selected_unit)
+	if unit.is_empty():
+		for button in skill_buttons: button.queue_free()
+		skill_buttons.clear()
+		skill_controls_unit = -1
+		return
+	var definitions: Array = battle.content.categories.skills.filter(func(item): return item.unit_kind == unit.kind and item.mode == "manual")
+	if skill_controls_unit != unit.id:
+		for button in skill_buttons: button.queue_free()
+		skill_buttons.clear()
+		skill_controls_unit = unit.id
+		for skill in definitions:
+			var button := Button.new()
+			button.custom_minimum_size = Vector2(120, 36)
+			button.pressed.connect(_cast_skill.bind(unit.id, skill.id))
+			controls.add_child(button)
+			skill_buttons.append(button)
+	for index in skill_buttons.size():
+		var skill: Dictionary = definitions[index]
+		var remaining := float(unit.skill_cooldowns.get(skill.id, 0.0))
+		var button := skill_buttons[index]
+		button.text = "%s · %.0f" % [skill.label, remaining] if remaining > 0.0 else "%s · %d" % [skill.label, skill.cost]
+		button.disabled = battle.phase != "combat" or unit.has("destination") or remaining > 0.0 or battle.combat_gold < int(skill.cost)

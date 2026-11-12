@@ -15,7 +15,18 @@
       {"id": "enemy.mage", "kind": "enemy_mage", "team": "enemy", "hp": 70, "damage": 22, "range": 3, "attack_time": 2.0, "cost": 0, "splash_radius": 1, "ai_profile_id": "ai.enemy.mage", "references": ["ai.enemy.mage"]},
       {"id": "enemy.support", "kind": "enemy_support", "team": "enemy", "hp": 90, "damage": 5, "range": 1, "attack_time": 1.5, "cost": 0, "heal": 10, "heal_range": 3, "ai_profile_id": "ai.enemy.support", "references": ["ai.enemy.support"]}
     ],
-    "skills": [],
+    "skills": [
+      {"id":"skill.swordsman.rend","unit_kind":"swordsman","mode":"automatic","effect":"strike","cooldown":8.0,"cost":0,"value":12,"radius":0,"label":"강타"},
+      {"id":"skill.swordsman.heroic_charge","unit_kind":"swordsman","mode":"manual","effect":"area","cooldown":15.0,"cost":20,"value":25,"radius":1,"label":"영웅 돌격"},
+      {"id":"skill.archer.quick_volley","unit_kind":"archer","mode":"automatic","effect":"strike","cooldown":10.0,"cost":0,"value":10,"radius":0,"label":"연속 사격"},
+      {"id":"skill.archer.rain","unit_kind":"archer","mode":"manual","effect":"area","cooldown":16.0,"cost":20,"value":20,"radius":1,"label":"화살비"},
+      {"id":"skill.spearman.guard","unit_kind":"spearman","mode":"automatic","effect":"shield","cooldown":12.0,"cost":0,"value":20,"radius":2,"label":"수호 진형"},
+      {"id":"skill.spearman.sweep","unit_kind":"spearman","mode":"manual","effect":"area","cooldown":16.0,"cost":20,"value":18,"radius":1,"label":"전선 휩쓸기"},
+      {"id":"skill.support.mend","unit_kind":"support","mode":"automatic","effect":"heal","cooldown":10.0,"cost":0,"value":20,"radius":3,"label":"응급 치유"},
+      {"id":"skill.support.sanctuary","unit_kind":"support","mode":"manual","effect":"shield","cooldown":18.0,"cost":20,"value":25,"radius":2,"label":"성역"},
+      {"id":"skill.mage.arcane_bolt","unit_kind":"mage","mode":"automatic","effect":"strike","cooldown":10.0,"cost":0,"value":15,"radius":0,"label":"비전 탄환"},
+      {"id":"skill.mage.meteor","unit_kind":"mage","mode":"manual","effect":"area","cooldown":18.0,"cost":25,"value":30,"radius":2,"label":"운석 낙하"}
+    ],
     "upgrades": [
       {"id":"upgrade.swordsman.combo","unit_kind":"swordsman","label":"연속 베기","effect":"combo","costs":[25,40,60],"values":[1,2,3]},
       {"id":"upgrade.swordsman.bleed","unit_kind":"swordsman","label":"출혈","effect":"bleed","costs":[25,40,60],"values":[2,3,4]},
