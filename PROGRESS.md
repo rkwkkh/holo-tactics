@@ -91,3 +91,6 @@ M4 캠페인 콘텐츠 진행 (2026-11-12): main 6개 + optional 2개를 26개 �
 - GitHub Actions에 `android-aab` job을 추가했다: JDK 17/Android SDK API 36/Godot 4.7.2 export templates를 설치하고 Gradle template로 Debug AAB를 export, 필수 bundle entry를 검증한 뒤 unsigned smoke artifact를 7일 보관한다. 로컬 actionlint v1.7.12 검증 통과. 원격 Actions 실행은 저장소/권한 미확인으로 대기 중이다.
 
 - M6 manifest 검증 추가: bundletool로 최신 Android Debug AAB 내부 manifest의 min API 29/target API 36을 직접 확인했다. AAB는 unsigned 테스트 산출물이다.
+
+- R-GAME-005 일부 구현: 전투 화면에 1×/2× 버튼을 추가했다. 현재 스테이지 최초 클리어 전과 테스트 미리보기에서는 2×가 잠기며, 완료 stage 재진입에서만 해제된다. 고정 전투 tick은 유지하고 호출 주기와 재정비 countdown을 함께 배속한다.
+- 남음: R-UI-003의 일시정지 중 조회 전용 규칙은 아직 미구현이다.

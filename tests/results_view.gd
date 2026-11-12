@@ -10,12 +10,25 @@ func _run() -> void:
 	var view = load("res://scenes/battle.tscn").instantiate()
 	root.add_child(view)
 	await process_frame
+	assert(view.speed_button.disabled and view.timer.wait_time == 0.2)
+	view.editor_preview = false
+	view._refresh()
+	assert(view.speed_button.disabled)
+	view.progress.data.completed_stages.append(view.battle.stage_id)
+	view._refresh()
+	assert(not view.speed_button.disabled)
+	view._toggle_speed()
+	assert(view.simulation_speed == 2 and view.timer.wait_time == 0.1 and view.rest_timer.wait_time == 0.5)
+	view._toggle_speed()
+	assert(view.simulation_speed == 1 and view.timer.wait_time == 0.2 and view.rest_timer.wait_time == 1.0)
 	view.editor_preview = false
 	view.battle.phase = "finished"
 	view.battle.battle_result = "victory"
 	view.battle.wave = view.battle.waves.size() + 1
 	view.result_reward = 30
 	view.progress.data.permanent_currency = 123
+	view._refresh_speed_control()
+	assert(view.speed_button.disabled)
 	view._refresh_result_panel()
 	assert(view.result_panel.visible)
 	assert(view.result_title.text == "전투 승리")

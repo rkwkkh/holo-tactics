@@ -299,3 +299,9 @@
 - Locally: official actionlint v1.7.12 binary checksum-list digest and archive checksum were verified before execution; actionlint passed. Actual GitHub-hosted execution is pending repository/Actions access. This artifact is not a signed Play release.
 
 - Android AAB manifest 직접 검사: Google bundletool 1.18.3 `dump manifest --bundle=build/holo-test.aab` 출력에서 `android:minSdkVersion="29"`, `android:targetSdkVersion="36"`을 각각 assert하여 통과했다. 번들 파일 자체가 Android 10+ manifest 조건을 충족함을 확인했다. 이 검사는 unsigned Debug AAB만 대상으로 하며 release 서명/Play 업로드를 입증하지 않는다.
+
+## 2026-11-12 battle speed control (R-GAME-005)
+
+- Added a 1×/2× battle speed control. New stages and isolated editor previews remain locked to 1×. Previously completed stage IDs from `ProgressStore` unlock 2× on re-entry; battle ticks remain fixed at 0.2 s while timer cadence and intermission countdown scale.
+- First test run found a GDScript type inference parse error on the unlock boolean; explicitly typed it as `bool`. Re-run passed: editor import, `tests/results_view.gd`, `tests/run.gd`, campaign playability, and content validation; `git diff --check` passed.
+- R-UI-003 pause/read-only inspection remains unimplemented.

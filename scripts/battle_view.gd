@@ -1,6 +1,7 @@
 extends Control
 
 const TILE_SIZE := Vector2(40, 39)
+const BATTLE_TICK_SECONDS := 0.2
 
 var battle: BattleModel
 var store: CheckpointStore
@@ -19,6 +20,8 @@ var timer: Timer
 var rest_timer: Timer
 var rest_seconds := 0
 var wave_button: Button
+var speed_button: Button
+var simulation_speed := 1
 var back_button: Button
 var deploy_buttons: Array[Button] = []
 var obstacle_controls: GridContainer
@@ -153,6 +156,9 @@ func _ready() -> void:
 	wave_controls.alignment = BoxContainer.ALIGNMENT_CENTER
 	layout.add_child(wave_controls)
 	wave_controls.add_child(wave_button)
+	speed_button = Button.new()
+	speed_button.pressed.connect(_toggle_speed)
+	wave_controls.add_child(speed_button)
 	status = Label.new()
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -171,7 +177,7 @@ func _ready() -> void:
 	add_child(abandon_dialog)
 	set_meta("abandon_dialog", abandon_dialog)
 	timer = Timer.new()
-	timer.wait_time = 0.2
+	timer.wait_time = BATTLE_TICK_SECONDS
 	timer.timeout.connect(_tick)
 	add_child(timer)
 	timer.start()
@@ -338,7 +344,7 @@ func _process_result() -> void:
 
 func _tick() -> void:
 	var previous_phase := battle.phase
-	battle.tick(timer.wait_time)
+	battle.tick(BATTLE_TICK_SECONDS)
 	if previous_phase == "combat" and battle.phase == "preparation":
 		rest_seconds = battle.stage.intermission_seconds
 		rest_timer.start()
@@ -370,6 +376,7 @@ func _facility_at(cell: Vector2i) -> Dictionary:
 	return {}
 
 func _refresh() -> void:
+	_refresh_speed_control()
 	hud.text = "%s · 웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [stage_title, battle.wave, battle.core_hp, battle.combat_gold]
 	_refresh_result_panel()
 	wave_button.text = "웨이브 시작 (%d)" % rest_seconds if rest_seconds > 0 else "웨이브 시작"
@@ -415,6 +422,19 @@ func _refresh() -> void:
 		status.text = "전투 중 · 선택 유닛을 누른 뒤 이동할 칸을 선택하세요"
 	else:
 		status.text = "배치 단계 · 검사/궁수를 선택한 뒤 아군 구역을 누르세요"
+
+func _refresh_speed_control() -> void:
+	var unlocked: bool = not editor_preview and progress_available and progress.data.completed_stages.has(battle.stage_id)
+	speed_button.disabled = not unlocked or battle.phase == "finished"
+	speed_button.text = "속도 %d×" % simulation_speed
+
+func _toggle_speed() -> void:
+	if speed_button.disabled:
+		return
+	simulation_speed = 1 if simulation_speed == 2 else 2
+	timer.wait_time = BATTLE_TICK_SECONDS / simulation_speed
+	rest_timer.wait_time = 1.0 / simulation_speed
+	speed_button.text = "속도 %d×" % simulation_speed
 
 func _refresh_obstacle_controls() -> void:
 	if obstacle_controls == null:

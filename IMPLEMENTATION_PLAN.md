@@ -46,3 +46,5 @@
 - 2026-11-12: M4 campaign seed 8개(메인 6+선택 2) 및 26개 wave 연결. 메뉴 진입 제한은 `ProgressStore.completed_stages` 의존 관계로 구현. 자원·맵·보상은 조정 가능한 설계초안 SEED. M4 인수에는 마을/연구 및 전체 캠페인 플레이 테스트가 남아 있다.
 
 - 2026-11-12 M6 Android packaging: Gradle APK/AAB presets use min API 29 and target API 36. APK manifest/v2 signature and unsigned AAB structure verified. Publisher signing and real-device validation remain open.
+
+- 2026-11-12: M1/M4 battle HUD gained the story-gated 1×/2× control from R-GAME-005, with headless UI-state regression. The separate pause/read-only requirement remains open.
