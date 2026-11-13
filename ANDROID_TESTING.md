@@ -60,15 +60,25 @@ Measure on at least one representative lower-tier Android 10+ device and one cur
 
 Record scenario, device, room temperature/power mode, run duration, average and 95th-percentile frame time, worst sustained interval, and profiler CPU/GPU frame times. Compare normal combat against a high-load wave with multiple units, facilities, and effects. Acceptance targets from the project brief are 60 FPS in normal combat (16.67 ms/frame) and at least 30 FPS under high load (33.33 ms/frame). Do not infer engine FPS from a single `dumpsys` summary.
 
+The debug APK also prints a Godot frame sample every 10 seconds during unpaused preparation/combat: `[PERF] stage=... frames=... avg_fps=... p50_ms=... p95_ms=... max_ms=...`. Capture it from a connected device after the play session:
+
+```powershell
+& $adbPath logcat -c
+# Play the scenario for at least 60 seconds, then:
+& $adbPath logcat -d -v time | Select-String '\[PERF\]' | Tee-Object -FilePath .\build\device-perf.txt
+```
+
+These samples come from Godot's debug `_process` delta; use the Remote Profiler/device GPU profiler for CPU/GPU attribution. Do not use emulator measurements for physical-device acceptance.
+
 ## Google Play private test readiness
 
 - The debug APK and its debug certificate are not a release upload.
-- A permanent application ID, release/upload keystore, and Play Console access have not been provided. Do not reuse the placeholder package ID or put signing credentials in this repository.
-- Before private testing, set the publisher-owned package ID, configure a protected release signing credential outside Git, export and verify a release AAB, then upload through the authorized Play Console account. Store listing, privacy declarations, and tester access still need publisher-owned information.
+- User confirmed application ID `com.rhstudio.holotactics`; Play Console availability, release/upload keystore, and Play Console access have not been verified or provided. Never put signing credentials in this repository.
+- Before private testing, verify the ID is available in the publisher's Play Console, configure a protected release signing credential outside Git, export and verify a signed release AAB, then upload through the authorized Play Console account. Store listing, privacy declarations, and tester access still need publisher-owned information.
 
 ## Current verification state
 
-Local Gradle Android debug APK export, API 29 manifest, and v2 signature verification pass. The latest test AAB was validated with bundletool 1.18.3 and its API 29/36 manifest, but it is unsigned. After switching the Android-only renderer to Godot Mobile/Vulkan, API 37 AVD (1080×2400) displayed the campaign menu and M1 defense board; ADB taps entered the stage, placed two swordsmen, and visibly reduced combat resources from 160 to 60. API 29 AVD installed and entered the Activity but logged Vulkan present `VkResult error 5`; that virtual GPU run failed rendering. Physical Android 10+ startup/touch behavior and FPS targets remain pending. The API 37 startup-only gfxinfo sample was 17 frames (11 janky, p50 61ms/p90 300ms), too short to establish performance. Publisher-key release AAB and Play Console private-test distribution also remain pending.
+The user-confirmed ID is `com.rhstudio.holotactics`. Current Godot tests/content validation and GitHub Actions Godot+AAB jobs pass. The debug APK is signed with its debug certificate and has installed/launched on API37 AVD; earlier API37 tests entered M1, deployed units, advanced a wave, and exercised checkpoint/reward behavior. Newer AVD cross-checks show a black capture after scene changes (M1 and Village) while the API37 emulator graphics service repeatedly aborts; this is not accepted as a physical-device result. API29 AVD Vulkan presentation fails, and the SDK has no Android 36 system image. Galaxy S25 Ultra install/startup is user-confirmed, but physical combat/FPS and Android 10 hardware remain unverified. The current test AAB is unsigned; publisher signing and Play Console access are still missing.
 
 
 Latest local exports (2026-11-12): Debug APK 249,828,829 bytes; unsigned test AAB 86,236,623 bytes. Both use min API 29 / target API 36. APK v2 signature and AAB bundletool 1.18.3 validation pass. The API 37 AVD visual check is only an emulator smoke test, not a physical-device performance result.
