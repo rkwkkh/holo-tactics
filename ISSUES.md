@@ -229,3 +229,8 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Root cause: the workflow ran `--install-android-build-template` without an export action, leaving all six recent Android jobs stuck while Godot tests passed.
 - Fix: combine template installation with debug AAB export and set a 20-minute timeout. CI run `43351099459` passed both jobs and uploaded the unsigned test artifact. No Play-ready signing or release was performed.
+
+## API37 emulator M1 retest is inconclusive (2026-11-13)
+
+- The confirmed-ID APK installs and launches; the campaign screen is visible. During a fresh visible-AVD retest, tapping M1 was followed by a black screenshot while the Android activity and app process remained alive. Logcat contained no Godot script exception, while the emulator's `android.hardware` compositor process repeatedly aborted.
+- This does not establish a game defect or an M1 pass. Earlier API37 M1 combat evidence remains, but the discrepancy needs a stable AVD reproduction and Galaxy S25 Ultra hands-on confirmation. Do not use this AVD retest as Android acceptance or FPS evidence.

@@ -19,6 +19,8 @@
 - [x] M5: three EditorPlugin tabs, Inspector resource sync, validator-gated atomic saves, error navigation, and isolated full-stage/direct-wave preview are implemented and automated. GUI smoke confirms named dock, all three populated panels, Inspector properties, and full-stage launch; direct-wave isolation test passes.
 - [ ] M6: local tests and Mobile/Vulkan Android exports pass; confirmed package `com.rhstudio.holotactics` APK installs/launches and opens M1 on API37 AVD. Corrected GitHub Actions run `43351099459` passed Godot checks and uploaded an unsigned debug AAB artifact. Emulated AVD measured 33.9–34.8 FPS in preparation and 13.5–14.9 FPS in M1 combat; neither is representative-device acceptance evidence. API29 AVD renderer failure, physical Android/FPS, publisher signing, Play Console ID availability, and private-test setup remain open.
 
+2026-11-13 재검증: Godot 전체 테스트와 최신 GitHub Actions run `43352193838` 통과. 확정 ID APK의 API37 설치·런처 실행 및 캠페인 화면을 확인했다. 이번 재시도에서 M1 터치 후 AVD 화면이 검게 캡처됐으나 앱 프로세스는 유지되고 emulator compositor가 반복 종료되어 결과는 미확정으로 기록했다(`ISSUES.md`, `TEST_REPORT.md`). M6는 실기기 성능/API 29, 서명·비공개 테스트 확인 전까지 미완료다.
+
 재검증 (2026-11-12): Godot 4.7.2 headless import/테스트/콘텐츠 검사/메인 씬 통과. APK 재생성 통과. API 29 AVD는 GLES2 한계로 Godot Android 렌더 컨텍스트 생성에 실패했고, API 37 AVD에서는 앱 프로세스가 실행됐으나 GLES3 셰이더 uniform 한도 오류 로그가 있어 시각 스모크 테스트는 미통과/미확정이다. 세부 결과는 `TEST_REPORT.md`.
 
 재검증 (2026-11-12): 5/6종 유닛을 카탈로그 검증, 실제 배치·전투 대상으로 확장했다. 상세는 `TEST_REPORT.md`. 당시 OPEN이던 M1 승패 정책과 시설 수리 시점은 이후 사용자 결정 및 구현으로 해결됐다. 실기기 확인은 미완료다.

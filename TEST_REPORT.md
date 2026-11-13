@@ -742,3 +742,11 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - On the API37 x86_64 AVD, installed package `com.rhstudio.holotactics`, opened M1 wave 1, and captured the battlefield. The app remained top-resumed; inspected logcat had no fatal Android/Godot shader errors.
 - The earlier sample-ID build's preparation windows measured 33.9–34.8 FPS (P95 30.0–32.46 ms); the confirmed-ID build's combat windows measured 13.5–14.9 FPS (P95 72.47–93.16 ms, max 80.09–128.88 ms). Both runs were on the same API37 AVD/emulated renderer (`ro.hardware.egl=emulation`), so this is not representative hardware validation and does not meet the 60 FPS normal-combat goal. Real-device profiling is required before deciding whether to optimize.
 - Ran `run_android_emulator_test.bat` against `MaDangStage6_API37` after updating its package ID. It reinstalled the new APK, launched `com.rhstudio.holotactics`, and exited successfully.
+
+## M6 revalidation after package ID confirmation (2026-11-13)
+
+- Re-ran `run_godot_tests.bat` on Godot 4.7.2: core tests, content validation, all 8 seeded campaign wins, editor preview isolation, battle result UI, and editor panels (stages/waves, 6 evolutions, 24 upgrades) passed. The editor-headless process still prints RID/ObjectDB cleanup diagnostics after its success sentinel.
+- GitHub Actions run `43352193838` for `00928e6` completed successfully for both Godot validation and Android AAB export/structure/upload.
+- Reconnected the existing API37 AVD, then `run_android_emulator_test.bat` installed and launched `com.rhstudio.holotactics`; package process and top-resumed activity were confirmed. The campaign screen was visible in a captured screenshot.
+- On this retest, tapping the M1 campaign button was followed by a black captured viewport while the Godot activity/process remained alive. Logcat showed no Godot script exception, but the AVD's `android.hardware` compositor process repeatedly aborted. Treat the M1 tap/render result as inconclusive on this AVD, not as a product pass or confirmed game defect. Earlier M1 battlefield/combat evidence remains in the preceding report entry; retest on a stable emulator and a physical device is still required.
+- This did not change code or export presets. Release signing variables are still unset, and no signed AAB or Play upload was produced.
