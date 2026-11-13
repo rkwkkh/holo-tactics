@@ -79,6 +79,7 @@ After the S25 Ultra run, send `build/device-perf.txt`, `build/device-gfxinfo.txt
 - The debug APK and its debug certificate are not a release upload.
 - User confirmed application ID `com.rhstudio.holotactics`; Play Console availability, release/upload keystore, and Play Console access have not been verified or provided. Never put signing credentials in this repository.
 - Before private testing, verify the ID is available in the publisher's Play Console, configure a protected release signing credential outside Git, export and verify a signed release AAB, then upload through the authorized Play Console account. Store listing, privacy declarations, and tester access still need publisher-owned information.
+- Korean listing copy, draft icon/feature graphic, draft screenshots and account-owner checklist are in `PLAY_PRIVATE_TEST_PREPARATION.md`; the current emulator screenshots exceed Play's documented 2:1 maximum aspect ratio and must be replaced or recaptured before submission.
 
 ## Current verification state
 

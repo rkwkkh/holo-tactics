@@ -246,5 +246,6 @@ The original four design documents now consistently reflect confirmed user rules
 
 ## Play closed-test submission materials (2026-11-13)
 
-- Drafted Korean listing text and an owner-facing checklist in `PLAY_PRIVATE_TEST_PREPARATION.md`; actual store assets (512px icon, feature graphic, screenshots), developer/support/privacy details, tester roster, app-ID availability and signed release AAB are still missing or unverified.
+- Drafted Korean listing text and an owner-facing checklist in `PLAY_PRIVATE_TEST_PREPARATION.md`; icon/feature graphic and emulator screenshot draft files now exist in `store_assets/draft/`, but owner design approval, compliant final screenshots, developer/support/privacy details, tester roster, app-ID availability and signed release AAB remain missing or unverified.
 - The target is Closed testing as specified by the project; Internal testing's incomplete-setup allowance does not clear Closed testing requirements. Verify current Console requirements when the owner has access.
+- Draft screenshots in `store_assets/draft/screenshots/` are 1080×2400 (2.22:1), exceeding the current 2:1 maximum. Keep them out of a release upload until recaptured or cropped without obscuring gameplay.

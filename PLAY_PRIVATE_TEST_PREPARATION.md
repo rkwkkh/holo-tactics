@@ -43,15 +43,25 @@
 
 - [ ] Play Console에서 ID `com.rhstudio.holotactics` 사용 가능 여부 확인 후 해당 ID로 앱 생성
 - [ ] 계정 소유자가 Play App Signing 선택 및 업로드 키 보관 방식을 결정하고, 보호된 환경 변수로 서명 AAB 내보내기
-- [ ] 앱 아이콘: PNG, 512×512, 32-bit RGBA, 1 MB 이하
-- [ ] 기능 그래픽: PNG/JPEG, 1024×500, 불투명
-- [ ] 실제 게임을 보여주는 휴대전화 스크린샷 최소 2장. 제출 직전 Play Console의 현재 형식 검사 확인
+- [x] 등록 자료 초안 생성: `store_assets/draft/app_icon_512.png` (512×512 PNG), `feature_graphic_1024x500.png` (1024×500 PNG, 24-bit), `screenshots/`에 캠페인과 M1 전투 화면 (JPEG 형식으로 변환)
+- [ ] 소유자가 앱 아이콘·기능 그래픽의 브랜드 사용과 디자인을 검토·승인
+- [ ] 실제 대상 기기에서 게임플레이 스크린샷을 다시 캡처하고 Play 규격의 화면 비율에 맞출 것. 현재 두 장은 API37 에뮬레이터 초안(1080×2400, 2.22:1)이라 Play의 최대 2:1 화면 비율 기준을 넘어서 최종 업로드에 사용할 수 없음
 - [ ] 개발자 표시명, 지원 이메일, 피드백 연락처 및 개인정보처리방침 URL 제공
 - [ ] 콘텐츠 등급 설문, 타깃 연령, 광고 여부, 앱 액세스 질문을 실제 앱 동작에 맞춰 작성
 - [ ] 최종 AAB의 SDK/권한/포함된 라이브러리와 데이터 흐름을 확인하고 Data safety 답변을 소유자가 확정
 - [ ] 테스터 이메일 목록, 테스트 목표, 피드백 채널을 준비하고 Closed testing 트랙에 릴리스
 
-현재 프로젝트 아이콘 `assets/icon.svg`는 192×192 원본 픽셀아트 런처 아이콘이다. Play 등록용 512×512 아이콘과 기능 그래픽, 정식 스크린샷은 아직 준비되지 않았다. 아이콘/그래픽을 만들기 전에 소유자가 브랜드 사용 권한과 최종 디자인을 확인해야 한다.
+현재 프로젝트 아이콘 `assets/icon.svg`는 192×192 원본 픽셀아트 런처 아이콘이다. 등록 자료는 기존 그래픽과 실제 API37 게임 화면으로 만든 초안이며, 소유자 브랜드 검토와 실기기 스크린샷 확인 전에는 최종 스토어 자료로 취급하지 않는다.
+
+Windows에서 초안을 다시 생성할 때:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\Godot\Godot_v4.7.2-stable_win64_console.exe" --headless --path . --script tools/export_play_assets.gd
+& .\tools\complete_play_feature.ps1
+& .\tools\prepare_play_screenshots.ps1
+```
+
+스크린샷 변환 스크립트는 현재 2.22:1 AVD 캡처에 경고를 낸다. 게임 화면을 가리기 위한 자동 크롭은 하지 않는다.
 
 ## 계정 작업 전후 순서
 

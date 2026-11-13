@@ -771,3 +771,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Re-ran `run_godot_tests.bat` on Godot 4.7.2: core tests, content validation (0 errors), seeded simulation of all 8 campaign stages, editor preview isolation, battle result UI, and editor panels (stages/waves, 6 evolutions, 24 upgrades) passed.
 - The editor-headless check emitted RID/ObjectDB cleanup warnings after its success sentinel; the runner continued and reported `All Godot test commands passed`.
 - CI run `43359360273` for `ad8ac60` passed the Godot validation job and Android debug AAB export, structure verification, and artifact upload. The artifact is unsigned and retained for 7 days.
+
+## Play listing asset drafts (2026-11-13)
+
+- Generated and inspected `store_assets/draft/app_icon_512.png` (512×512, 2,374 bytes) and `feature_graphic_1024x500.png` (1024×500, 24-bit RGB, 20,565 bytes) from the existing pixel-art icon and code-native SVG layout.
+- Converted the API37 campaign screen and M1 defense diagnostic capture to JPEG (1080×2400 each). Both are 2.22:1 and the helper warns that they exceed Play's current 2:1 screenshot aspect limit; they remain drafts and must be recaptured/cropped compliantly before submission. The M1 image came from a direct-start diagnostic copy, not a normal campaign scene transition.
+- `tools/export_play_assets.gd`, `tools/complete_play_feature.ps1`, and `tools/prepare_play_screenshots.ps1` generated and checked the outputs. This validates dimensions/encoding only, not brand approval, final store acceptance, physical-device screenshots, or Console submission.
