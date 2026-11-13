@@ -180,3 +180,7 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 
 - Visible dock and all three content tabs are now inspected in Godot 4.7.2. Invalid save blocking and Error-row-to-JSON-field focus are visually verified; Warning-row rendering is also visible.
 - Remaining visual checks: Warning click leaves a different active record selected, and Inspector field editing/import. Existing headless panel/navigation tests pass. No catalog mutation occurred in GUI testing.
+
+## M5 GUI progress update (2026-11-13)
+
+Inspector dynamic field display and edit/import synchronization have now been visually verified using a reversible test value; no catalog save occurred. Error navigation and Warning presentation were previously visually checked, and Error/Warning routing is headless-tested. Remaining M5 visual check: click Warning after switching records.

@@ -282,3 +282,8 @@ The original four design documents now consistently reflect confirmed user rules
 - Repository is at `024713a`; latest CI run `43377880342` passed both jobs. Worktree was clean before this checkpoint update.
 - No code defect is currently blocking local work. Outstanding acceptance evidence: S25 Ultra gameplay/FPS logs from the user, physical Android 10 compatibility, M5 visual Warning-row/Inspector checks, and owner Play Console plus publisher signing access. API29 AVD black screen/present error is emulator-only evidence and does not establish device incompatibility.
 - Resume from `SESSION_HANDOFF.md`; M6/MVP must not be marked complete until the physical-device and Closed-test gates are satisfied.
+
+## M5 Inspector GUI result (2026-11-13)
+
+- Inspector dynamic-property display, edit, and import-to-JSON were visually verified in Godot 4.7.2 with a temporary reversible value. No save was performed; test value was restored and editor changes discarded. Catalog, main scene, and committed project settings are unchanged.
+- Only remaining M5 visual check is Warning-row click after selecting another record; the behavior is already covered by the panel signal headless test.

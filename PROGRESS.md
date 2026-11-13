@@ -407,3 +407,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Latest full local Godot regression passed on 4.7.2; content validation has 0 errors. Error/Warning selection routing is covered by the headless panel test. Do not rerun without source changes.
 - M0–M4 implementation and M5 automated checks are complete. M5 visual follow-ups: click a Warning row after switching records, and verify Inspector edit/import. M6 remains incomplete pending representative physical-device gameplay/FPS and Android 10 evidence, plus publisher signing and Play Console access for Closed testing.
 - Stop here until the user resumes. The exact resume order and known risks are in `SESSION_HANDOFF.md`; no release or Play upload was made.
+
+## M5 Inspector GUI verification (2026-11-13)
+
+- Godot 4.7.2 GUI opened the selected `stage.m1.frontier` as `EditableCatalogRecord`; dynamic fields appeared in Inspector. A temporary `start_resource` edit (160→161) and import to the JSON draft worked. Restored the field to 160, imported it back, and deliberately discarded the unsaved scene; the catalog was never saved.
+- Godot auto-reformatted `project.godot` on launch. Restored that generated-only change after confirming the pre-launch worktree was clean. Final `git diff` confirmed `project.godot`, `data/catalog.json`, and `scenes/main.tscn` unchanged.
+- M5 visible acceptance remaining: click a Warning row after switching records (signal regression already passes headless). M6 external device and Closed-test gates remain open.

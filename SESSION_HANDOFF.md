@@ -1,29 +1,26 @@
-﻿# Session handoff checkpoint (2026-11-13)
+﻿# Session handoff (2026-11-13)
 
-The user asked to finish and record the current work, then pause. Stop all development here until the user resumes. This is not MVP completion; the original M0–M6 goal remains active.
+Continue the active Godot MVP objective; this is not an MVP completion record.
 
-## Repository and CI
+## Current repository state
 
-- Branch `master`, latest pre-checkpoint commit `024713a` (`Record editor row signal CI pass`), pushed to `origin/master`.
-- Latest GitHub Actions run [43377880342](https://github.com/rkwkkh/holo-tactics/actions/runs/43377880342) passed both Godot validation and Android AAB export/structure checks.
-- Worktree was clean before this handoff documentation update. Record this checkpoint in a docs-only commit and push it; do not create a release or upload to Play.
+- Branch `master`, current preceding commit `40330c4` (`Record current development pause checkpoint`), pushed. Worktree is clean after this GUI verification and automatic Godot config rewrite was restored.
+- Latest Actions evidence before this documentation update: run [43377880342](https://github.com/rkwkkh/holo-tactics/actions/runs/43377880342), both Godot and Android AAB jobs passed.
+- Do not repeat full regression without source changes; `run_godot_tests.bat` passed on Godot 4.7.2, with 0 content validation errors, all eight campaign simulations, preview isolation, result UI, and editor panel checks.
 
-## Verified state
+## Latest M5 result
 
-- M0–M4 implementation and M5 automated panel checks are recorded in `PROGRESS.md`.
-- Godot 4.7.2 full local regression passed: core logic, catalog validation (0 errors), all eight campaign stage simulations, preview isolation, battle-result UI, and editor panels. Error and Warning signal behavior is tested. No source changed after the test.
-- M5 visible checks already done: all three panels, invalid-save blocking, Error-row JSON focus, Warning presentation. Still to verify visually: click Warning after changing active record; edit/import through Inspector.
-- API37 AVD M1 smoke was performed. FPS readings from emulated EGL vary and are diagnostic only; the optimized matched A/B improved mean FPS 23.7 to 52.66 but remains below the 60 FPS target and is not hardware acceptance.
-- API29 AVD installs/starts but displays black with Vulkan present error 5. This is inconclusive for physical Android 10.
+- Visible stage/evolution/upgrade tabs, invalid-save blocking, Error-field focus, and Warning presentation were already verified.
+- This continuation verified Inspector dynamic field display and edit/import synchronization using a temporary reversible `start_resource` value. Restored 160 and closed with “저장하지 않음”. No catalog save occurred.
+- Remaining M5 GUI check: visually click a Warning row after another record is active. The signal behavior is already covered by `tests/editor_panels.gd`.
+- Godot rewrote `project.godot` on launch; restored only that generated diff. Confirmed catalog and main scene clean and no Godot process remains.
 
-## Pending acceptance and dependencies
+## M6 open gates and next work
 
-1. User will test Galaxy S25 Ultra gameplay and FPS, then provide logs. Review them against `ANDROID_TESTING.md` (regular/stress performance, touch/safe area, abandon/rewards, checkpoint).
-2. Physical Android 10 compatibility remains unverified.
-3. Finish the two M5 visual checks above; do not modify catalog data during validation.
-4. User has no Play Console access or publisher upload key. Closed-test signing, package availability, and upload require owner access/materials. Do not request secrets in chat.
-5. No release APK, GitHub release, Play upload, or Closed test was created. Keep M6 and MVP marked incomplete.
+1. User will perform Galaxy S25 Ultra gameplay/FPS testing and provide logs. Review using `ANDROID_TESTING.md` for normal/high-load performance, touch/safe area, abandon/reward, and checkpoint behavior.
+2. Verify Android 10 on physical hardware or a known-good API29 Vulkan setup. Existing API29 AVD black screen/present error 5 is inconclusive; do not change production renderer on that evidence alone.
+3. Finish the M5 Warning-row visual check if practical.
+4. Closed testing requires owner Play Console access, publisher signing, package availability, and final listing/tester materials. User previously said Console and upload key are not available. No secret should be requested in chat.
+5. Current emulated renderer A/B improved mean FPS 23.7→52.66 but remains below the 60 FPS target and is not representative-device acceptance. Keep M6/MVP incomplete until hardware and Closed-test gates have evidence.
 
-## Resume procedure
-
-First inspect `git status`, `git log`, and latest Actions state. Then continue with any independent M5 visual check and user-provided device evidence. Update `PROGRESS.md`, `ISSUES.md`, and `TEST_REPORT.md`, run relevant verification after source changes, commit/push, and update this handoff at the next pause.
+No release APK, GitHub Release, Play upload, or Closed test has been created. After any source change, run relevant tests, update evidence docs, commit/push, and inspect the CI run.
