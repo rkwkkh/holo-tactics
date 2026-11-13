@@ -203,3 +203,8 @@ The original four design documents now consistently reflect confirmed user rules
 - 확인: Godot 4.7.2 GUI에서 플러그인은 활성화되어 있으나 EditorPlugin `TabContainer`가 이름 미지정 상태로 내부 이름 `@TabContainer...`에 노출되어 도크를 식별하기 어려웠다.
 - 수정/검증: 도크에 `콘텐츠 편집기` 이름 지정, headless EditorPlugin 테스트에 이름 확인 추가; 전체 Godot 테스트 통과.
 - 남음: GUI 재시작 후 표시 라벨 및 실제 콘텐츠 선택·저장 전 검증 피드백·Inspector 연동·전체/웨이브 미리보기를 점검해야 M5 GUI 완료로 볼 수 있다.
+
+## M6 API37 sampler follow-up (2026-11-13)
+
+- Local API37 AVD install/launch and M1 battlefield screenshot passed. Renderer is emulated (`ro.hardware.egl=emulation`); sampled basic combat at 33.9–34.8 FPS / P95 30.0–32.46 ms. This is not representative hardware and cannot prove either device target. Do not mark performance accepted from this run.
+- Remaining: representative Android 10+ low-tier and Galaxy S25 Ultra gameplay/FPS, high-load scenario measurement, Android 10 graphics compatibility on real hardware, and signed private-test artifact setup.

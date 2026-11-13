@@ -308,3 +308,8 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Godot 4.7.2 GUI에서 프로젝트와 `Holo Content Editor` 플러그인 활성화를 확인했다. 우측 도크는 접근성 트리에 내부명 `@TabContainer...`로 표시되어 찾기 어려웠다.
 - 도크 컨트롤 이름을 `콘텐츠 편집기`로 지정하고 기존 EditorPlugin 테스트에 이름 assertion을 추가했다. 전체 `run_godot_tests.bat` 재실행 통과(core, validator, 8/8 캠페인, battle UI, editor panels 24 upgrades).
 - 변경 후 GUI 재시작/패널·Inspector·미리보기 버튼 직접 조작은 아직 확인하지 않았다. Editor headless 테스트 종료 시 기존 RID/ObjectDB 정리 진단이 출력된다.
+
+## 2026-11-13 Godot GUI/API37 retest
+
+- Reopened Godot GUI and confirmed the named `콘텐츠 편집기` dock, all three populated tabs, stage JSON draft, Inspector resource property view, and isolated M1 stage preview. Direct-wave preview and mutation/rejection UI were not manually clicked; their automated tests remain the evidence for those paths.
+- API37 x86_64 AVD installed and launched the current local debug APK; campaign and M1 battlefield rendered. Short sampler windows show 33.9–34.8 average FPS on the emulated renderer. This is below the ordinary 60 FPS goal and does not satisfy device acceptance; actual Galaxy S25 Ultra and a lower-tier Android 10+ device still require profiler runs.

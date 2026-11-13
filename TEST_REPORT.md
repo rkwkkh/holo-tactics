@@ -703,3 +703,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - `tabs.name = "콘텐츠 편집기"` 적용 및 `tests/editor_panels.gd` 이름 assertion 추가 후 `run_godot_tests.bat` 전체 통과: core, content validation, seeded campaign 8/8, battle UI, editor panels(6 evolutions/24 upgrades/stages and waves).
 - 테스트 배치 종료 코드 0 및 모든 성공 sentinel 확인. editor-headless 프로세스 종료 시 RID/ObjectDB 누수 진단은 출력되나 테스트 assertion은 성공했다.
 - 변경 후 GUI 재시작해 새 탭 라벨과 실제 편집/Inspector/preview 조작을 확인하는 작업은 대기 중이다.
+
+## Godot GUI and Android API37 verification (2026-11-13)
+
+- Relaunched Godot 4.7.2 GUI after the dock-name fix. The `콘텐츠 편집기` dock label is visible; stages/waves, evolution and upgrade tabs each load records and JSON drafts. The stage resource opens in Inspector and exposes its fields. Full-stage isolated preview launches the M1 battlefield and reports that saved content was isolated.
+- Installed `build/holo-debug.apk` (SHA-256 `73CFE1B90E186AF9929B25ED22942E66F30D2A3FC9EF867006BFD60372002C2F`, package `com.example.holotactics`) on the online API37 x86_64 AVD (1080x2400, density 420). App launch, campaign screen and M1 wave-1 battlefield/placement UI were visible; no fatal Android/Godot shader errors in the inspected log window.
+- Five short M1 combat sampler windows on this emulated renderer measured 33.9–34.8 FPS average, P95 30.0–32.46 ms, max 33.75–45.81 ms. This is below the 60 FPS regular target, but the AVD reports `ro.hardware.egl=emulation`; it is not representative-device acceptance evidence. The scenario was not a high-load stress run.
+- A separate Windows editor-preview sample measured 29.8 FPS average, P95 33.33 ms, max 146.94 ms; it is debug/editor evidence only and not an Android performance result.
