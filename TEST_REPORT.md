@@ -839,3 +839,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Full `run_godot_tests.bat` passed on Godot 4.7.2: core, content validation (0 errors), all 8 seeded campaign wins, editor preview isolation, result UI, and editor panel checks. Editor-headless shutdown still prints RID/ObjectDB cleanup diagnostics after its pass sentinel; runner exit code is 0.
 - The signal test does not replace visual Warning-click or Inspector interaction checks; those remain M5 GUI follow-ups.
 - GitHub Actions run [43377528604](https://github.com/rkwkkh/holo-tactics/actions/runs/43377528604) for commit `5798b8a` passed both Godot regression/content checks and Android debug AAB export/structure verification. CI AAB is unsigned; no release or Play upload was made.
+
+## Pause checkpoint verification (2026-11-13)
+
+- Rechecked Git: `master` at `024713a`; worktree clean before this documentation update. Latest Actions run `43377880342` succeeded for Godot validation and Android AAB export/structure checks.
+- Latest local full Godot suite passed on 4.7.2 (see the Editor validation row signal regression above); content validation reported 0 errors. No source changes were made after that test.
+- AVD FPS numbers are emulated-renderer diagnostics only. Physical Galaxy S25 Ultra gameplay/FPS, physical Android 10, remaining visible editor interactions, and account-dependent signing/Closed testing are unverified.

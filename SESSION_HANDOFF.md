@@ -1,32 +1,29 @@
-# Session handoff checkpoint (2026-11-13)
+﻿# Session handoff checkpoint (2026-11-13)
 
-The user requested that the current work be completed and documented, then paused. Keep the original M0–M6 objective intact; this checkpoint does not mean MVP completion.
+The user asked to finish and record the current work, then pause. Stop all development here until the user resumes. This is not MVP completion; the original M0–M6 goal remains active.
 
-## Repository and validation state
+## Repository and CI
 
-- Repository: `master`, latest work commit at checkpoint `71ccf9a` (`Record Android 10 emulator renderer recheck`), pushed to `origin/master`.
-- Latest Actions run: [43371542368](https://github.com/rkwkkh/holo-tactics/actions/runs/43371542368), both Godot and Android AAB jobs succeeded. The AAB is an unsigned CI artifact, not a Play upload.
-- Worktree was clean before this checkpoint documentation edit. Do not repeat the full suite unless source changes: `run_godot_tests.bat` passed on Godot 4.7.2 (core, content validation 0 errors, 8-stage seeded campaign simulation, editor preview isolation, result UI, and editor panels). Editor-headless shutdown prints RID/ObjectDB cleanup warnings after success; exit code is 0.
-- Latest debug APK: ignored local file `build/holo-debug.apk`, 250,223,794 bytes, SHA-256 `FFBFB6814DDF661DB214E72B560731E9CBE8D4D30AA2F1910600A3CFE9C5DDFA`, debug-signed, package `com.rhstudio.holotactics`, min API 29 / target API 36. It is not a release APK.
+- Branch `master`, latest pre-checkpoint commit `024713a` (`Record editor row signal CI pass`), pushed to `origin/master`.
+- Latest GitHub Actions run [43377880342](https://github.com/rkwkkh/holo-tactics/actions/runs/43377880342) passed both Godot validation and Android AAB export/structure checks.
+- Worktree was clean before this handoff documentation update. Record this checkpoint in a docs-only commit and push it; do not create a release or upload to Play.
 
-## Recent work and evidence
+## Verified state
 
-- Commit `acbf984` optimizes `scripts/battle_view.gd` board refresh by indexing obstacle/wall occupancy once and applying sprites by entity passes. The matched API37 emulated-EGL M1 A/B (three allies, two waves) improved mean FPS from 23.7 to 52.66 and mean P95 from 57.13ms to 22.08ms; both builds won 2/2 waves. The result remains below the 60 FPS goal and is not physical-device acceptance. Exact setup and hashes are in `TEST_REPORT.md`.
-- Commit `71ccf9a` records the latest API29 `MaDang_API29` AVD check: install/process startup succeeds, but screen stays black and logcat reports Vulkan queue present error 5. This reproduces an emulator issue only; do not infer physical Android 10 incompatibility or alter production renderer settings based on this alone.
-- API37 AVD combat and campaign navigation were previously demonstrated; emulator frame rates varied, so use controlled A/B only as a relative diagnostic.
-- M0–M4 implementation and automated campaign playability checks are recorded in `PROGRESS.md`. M5 has three editor panels, validator-gated persistence, and headless regression. Panel/dock/Inspector visible smoke is recorded; visible Error/Warning focus-navigation usability remains unverified.
+- M0–M4 implementation and M5 automated panel checks are recorded in `PROGRESS.md`.
+- Godot 4.7.2 full local regression passed: core logic, catalog validation (0 errors), all eight campaign stage simulations, preview isolation, battle-result UI, and editor panels. Error and Warning signal behavior is tested. No source changed after the test.
+- M5 visible checks already done: all three panels, invalid-save blocking, Error-row JSON focus, Warning presentation. Still to verify visually: click Warning after changing active record; edit/import through Inspector.
+- API37 AVD M1 smoke was performed. FPS readings from emulated EGL vary and are diagnostic only; the optimized matched A/B improved mean FPS 23.7 to 52.66 but remains below the 60 FPS target and is not hardware acceptance.
+- API29 AVD installs/starts but displays black with Vulkan present error 5. This is inconclusive for physical Android 10.
 
-## Decisions and external limits
+## Pending acceptance and dependencies
 
-- User-selected rules already captured in `ISSUES.md`/`DECISIONS.md`: progressive story unit unlocks; defense continues while the core survives; one fixed evolution choice; repair and facility upgrades allowed during combat and preparation; DoT consumes shield before mitigation; freeze/stun use the longer remaining duration; siege advance starts combat plus automatic advance, with individual move orders only.
-- User confirmed Galaxy S25 Ultra APK install/launch, and said they will perform M1/combat/FPS checks and provide logs. No physical-device logs have arrived. User reports no Play Console access and no publisher upload key.
-- No credentials were created or shared. No GitHub Release, APK release, Play upload, or Closed test was made.
+1. User will test Galaxy S25 Ultra gameplay and FPS, then provide logs. Review them against `ANDROID_TESTING.md` (regular/stress performance, touch/safe area, abandon/rewards, checkpoint).
+2. Physical Android 10 compatibility remains unverified.
+3. Finish the two M5 visual checks above; do not modify catalog data during validation.
+4. User has no Play Console access or publisher upload key. Closed-test signing, package availability, and upload require owner access/materials. Do not request secrets in chat.
+5. No release APK, GitHub release, Play upload, or Closed test was created. Keep M6 and MVP marked incomplete.
 
-## Ordered resume actions
+## Resume procedure
 
-1. Check `git status`, `git log`, and the latest Actions run. If it is still `71ccf9a`, the two CI jobs above passed.
-2. Ask for/use the user's Galaxy S25 Ultra Android version, gameplay results, and `ANDROID_TESTING.md` profiler/logcat files. Verify regular combat and high-load FPS/P95, touch/safe-area, battle abandon/reward, and checkpoint flows from that evidence.
-3. Verify Android 10 compatibility on a physical device or a known-good Vulkan-capable API29 setup; the current API29 AVD black screen is inconclusive for physical hardware.
-4. Finish remaining M5 visual checks: click the Warning row after selecting another record and verify it does not switch; interact with Inspector field controls. Error-row navigation and Warning rendering are now visually confirmed; Warning non-navigation remains headless-only.
-5. Resume Closed-test preparation only after owner access and publisher signing setup are available. Verify package ID availability, prepare a signed AAB and final approved listing/privacy/contact/tester materials, then upload with the authorized account. Never ask for secret key material in chat.
-6. Update `TEST_REPORT.md`, `ISSUES.md`, and `PROGRESS.md` with evidence; run relevant checks, commit and push. Do not claim M6/MVP complete until physical performance/compatibility and Closed-test gates are proven.
+First inspect `git status`, `git log`, and latest Actions state. Then continue with any independent M5 visual check and user-provided device evidence. Update `PROGRESS.md`, `ISSUES.md`, and `TEST_REPORT.md`, run relevant verification after source changes, commit/push, and update this handoff at the next pause.

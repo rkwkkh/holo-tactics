@@ -276,3 +276,9 @@ The original four design documents now consistently reflect confirmed user rules
 ## M5 signal-level regression follow-up (2026-11-13)
 
 - Error and Warning `ItemList.item_selected` routing now passes headless regression, including Warning non-navigation while another stage is active. Full Godot suite passes. Remaining M5 GUI checks are visual Warning-row click and Inspector edit/import; visual Error focus and Warning rendering are already confirmed.
+
+## Current pause checkpoint (2026-11-13)
+
+- Repository is at `024713a`; latest CI run `43377880342` passed both jobs. Worktree was clean before this checkpoint update.
+- No code defect is currently blocking local work. Outstanding acceptance evidence: S25 Ultra gameplay/FPS logs from the user, physical Android 10 compatibility, M5 visual Warning-row/Inspector checks, and owner Play Console plus publisher signing access. API29 AVD black screen/present error is emulator-only evidence and does not establish device incompatibility.
+- Resume from `SESSION_HANDOFF.md`; M6/MVP must not be marked complete until the physical-device and Closed-test gates are satisfied.

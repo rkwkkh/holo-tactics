@@ -400,3 +400,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - `tests/editor_panels.gd` now emits the actual `ItemList.item_selected` signal for both row types. It verifies Error focus and verifies a Warning signal does not switch an already-selected different stage.
 - Full `run_godot_tests.bat` passed on Godot 4.7.2; content validation reported 0 errors. Existing editor-headless RID/ObjectDB cleanup diagnostics remain after success output.
 - Visual Warning click and Inspector field editing remain open; visible Error-row focus and Warning rendering were observed in the GUI.
+
+## Current pause checkpoint (2026-11-13)
+
+- Latest HEAD is `024713a` (`Record editor row signal CI pass`), branch `master`; worktree was clean before this documentation update. GitHub Actions run [43377880342](https://github.com/rkwkkh/holo-tactics/actions/runs/43377880342) passed Godot and Android AAB jobs.
+- Latest full local Godot regression passed on 4.7.2; content validation has 0 errors. Error/Warning selection routing is covered by the headless panel test. Do not rerun without source changes.
+- M0–M4 implementation and M5 automated checks are complete. M5 visual follow-ups: click a Warning row after switching records, and verify Inspector edit/import. M6 remains incomplete pending representative physical-device gameplay/FPS and Android 10 evidence, plus publisher signing and Play Console access for Closed testing.
+- Stop here until the user resumes. The exact resume order and known risks are in `SESSION_HANDOFF.md`; no release or Play upload was made.
