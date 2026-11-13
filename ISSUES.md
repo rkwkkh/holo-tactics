@@ -287,3 +287,7 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Inspector dynamic-property display, edit, and import-to-JSON were visually verified in Godot 4.7.2 with a temporary reversible value. No save was performed; test value was restored and editor changes discarded. Catalog, main scene, and committed project settings are unchanged.
 - Only remaining M5 visual check is Warning-row click after selecting another record; the behavior is already covered by the panel signal headless test.
+
+## API29 SwiftShader follow-up (2026-11-13)
+
+- `MaDang_API29` under `-gpu swiftshader_indirect` boots Android 10/API29, installs the debug APK, and starts the Godot process/main loop, but still presents a black screen. Emulator startup warns that this emulator version does not support Vulkan. This remains emulator-only/inconclusive for real Android 10 devices; production renderer is unchanged.

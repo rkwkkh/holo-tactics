@@ -851,3 +851,11 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Opened `stage.m1.frontier` through the content-editor panel. Inspector exposed dynamic `EditableCatalogRecord` fields. Changed `start_resource` from 160 to 161, used “Inspector 값 가져오기”, restored 160 and imported again. UI confirmed successful import; catalog Save was not pressed.
 - Closed the editor with “저장하지 않음”. Godot had automatically rewritten `project.godot` during startup; the project was clean before GUI launch, so restored only this generated diff. Verified no diff in `project.godot`, `data/catalog.json`, or `scenes/main.tscn` afterward.
 - This is GUI acceptance evidence, not a source change; the preceding full Godot test result remains applicable. Warning-row non-navigation remains covered by headless regression but not yet visually repeated.
+
+## API29 SwiftShader emulator retest (2026-11-13)
+
+- Booted the existing `MaDang_API29` AVD with `-gpu swiftshader_indirect -no-snapshot`; `sys.boot_completed=1`, API level 29, EGL reports `emulation`.
+- Installed `build/holo-debug.apk` successfully. `pidof` returned a live app process; logcat reported Godot Vulkan/mobile renderer initialization and main-loop startup. Emulator printed a warning that it lacks support for the Vulkan feature(s).
+- Captured the resumed app; the viewport remained entirely black. The filtered log did not show a Godot fatal or AndroidRuntime crash. Emulator was shut down after capture.
+- Conclusion: this AVD cannot provide Vulkan-renderer acceptance evidence; this does not prove or disprove compatibility on physical Android 10 hardware. No production renderer change was made.
+- CI run [43379150514](https://github.com/rkwkkh/holo-tactics/actions/runs/43379150514) passed Godot and Android AAB jobs.

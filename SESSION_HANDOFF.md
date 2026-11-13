@@ -24,3 +24,10 @@ Continue the active Godot MVP objective; this is not an MVP completion record.
 5. Current emulated renderer A/B improved mean FPS 23.7→52.66 but remains below the 60 FPS target and is not representative-device acceptance. Keep M6/MVP incomplete until hardware and Closed-test gates have evidence.
 
 No release APK, GitHub Release, Play upload, or Closed test has been created. After any source change, run relevant tests, update evidence docs, commit/push, and inspect the CI run.
+
+## Resume after API29 diagnostic (2026-11-13)
+
+- Latest committed source remains `be29ac6`; docs now record Inspector GUI check. CI run [43379150514](https://github.com/rkwkkh/holo-tactics/actions/runs/43379150514) passed both jobs.
+- New API29 evidence: `MaDang_API29` booted with SwiftShader, installed/started the app, but screenshot is black and emulator warns Vulkan unsupported. Treat as AVD limitation; physical Android 10 remains unverified.
+- The AVD was stopped after capture. No game source/settings or catalog changed; only documentation is pending commit.
+- Continue with remaining M5 Warning-row visual check if useful, then wait for user-provided S25 Ultra logs and owner Play Console/publisher signing access. Keep M6 incomplete.

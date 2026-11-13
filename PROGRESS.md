@@ -413,3 +413,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Godot 4.7.2 GUI opened the selected `stage.m1.frontier` as `EditableCatalogRecord`; dynamic fields appeared in Inspector. A temporary `start_resource` edit (160→161) and import to the JSON draft worked. Restored the field to 160, imported it back, and deliberately discarded the unsaved scene; the catalog was never saved.
 - Godot auto-reformatted `project.godot` on launch. Restored that generated-only change after confirming the pre-launch worktree was clean. Final `git diff` confirmed `project.godot`, `data/catalog.json`, and `scenes/main.tscn` unchanged.
 - M5 visible acceptance remaining: click a Warning row after switching records (signal regression already passes headless). M6 external device and Closed-test gates remain open.
+
+## API29 emulator renderer diagnostic (2026-11-13)
+
+- Re-tested `MaDang_API29` using `-gpu swiftshader_indirect -no-snapshot`. Android 10 / API 29 booted; the current debug APK installed successfully and `com.rhstudio.holotactics` remained running with Godot main-loop startup logged.
+- Screenshot remained black. Emulator startup explicitly warned that its version does not support Vulkan. This supports an emulator Vulkan-capability limitation, not a physical Android 10 compatibility conclusion. Production renderer was not changed.
+- CI for the Inspector documentation commit passed both jobs: run [43379150514](https://github.com/rkwkkh/holo-tactics/actions/runs/43379150514).

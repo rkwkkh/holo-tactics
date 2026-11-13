@@ -184,3 +184,7 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 ## M5 GUI progress update (2026-11-13)
 
 Inspector dynamic field display and edit/import synchronization have now been visually verified using a reversible test value; no catalog save occurred. Error navigation and Warning presentation were previously visually checked, and Error/Warning routing is headless-tested. Remaining M5 visual check: click Warning after switching records.
+
+## Android 10 emulator diagnostic update (2026-11-13)
+
+Re-tested API29 AVD with SwiftShader: Android boots and app starts, but screenshot is black; emulator warns Vulkan is unsupported. This is not physical-device compatibility evidence. Production renderer remains unchanged. CI run `43379150514` passed both jobs.
