@@ -372,3 +372,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - User confirmed Galaxy S25 Ultra combat/FPS will be tested directly and logs provided afterward. User has neither Play Console access nor a publisher upload key; no account, key, or Play submission was created. These M6 gates remain pending.
 - Pushed documentation/import-metadata commit `cd6f356`; GitHub Actions run `43365467680` passed Godot validation and Android AAB export/structure verification. The uploaded artifact is unsigned and not Play-submittable.
 - Reconnected the API37 phone AVD and repeated current-APK M1 combat smoke: campaign→M1, unit deploy (160→110), wave 1, enemy render, core HP 300→240. Six FPS windows were 18.1–23.8 average on the emulated renderer; this is recorded as an emulator risk, not hardware acceptance. No fatal/script/Vulkan errors appeared in the filtered log scan.
+
+## Battle renderer optimization follow-up (2026-11-13)
+
+- Changed board refresh from per-tile scans of all entities/obstacles to occupancy lookup plus entity passes. This is a rendering-path optimization only; gameplay rules/data are unchanged.
+- Godot 4.7.2 full headless regression passed and content validation remains at 0 errors. Re-exported and installed the debug APK on API37 AVD; matched two-wave M1 smoke cleared successfully.
+- Controlled A/B on the emulated renderer improved mean FPS from 23.7 to 52.66 and mean P95 frame time from 57.13ms to 22.08ms. Current mean remains below 60FPS; S25 Ultra and representative-device performance acceptance remain pending. See `TEST_REPORT.md` and `ANDROID_TESTING.md` for APK hashes and limitations.
+- No APK release or Play submission was created. Commit and CI result are pending this update.

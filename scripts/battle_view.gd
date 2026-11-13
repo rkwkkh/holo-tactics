@@ -618,6 +618,21 @@ func _refresh() -> void:
 	pause_button.disabled = battle.phase == "finished"
 	pause_menu.visible = paused and battle.phase != "finished"
 	pause_abandon_button.text = "테스트 종료" if editor_preview else "전투 포기"
+	var cell_count := tiles.size()
+	var obstacle_cells := PackedByteArray()
+	obstacle_cells.resize(cell_count)
+	var wall_cells := PackedByteArray()
+	wall_cells.resize(cell_count)
+	var blocked_cells: Dictionary = {}
+	for blocked_cell in battle.blocked_cells:
+		blocked_cells[blocked_cell] = true
+	for obstacle_index in battle.obstacles.size():
+		var obstacle: Dictionary = battle.obstacles[obstacle_index]
+		if obstacle.placed and battle._is_inside(obstacle.cell):
+			obstacle_cells[obstacle.cell.y * BattleModel.COLUMNS + obstacle.cell.x] = 1
+	for wall in battle.walls:
+		if wall.hp > 0.0 and battle._is_inside(wall.cell):
+			wall_cells[wall.cell.y * BattleModel.COLUMNS + wall.cell.x] = 1
 	for y in BattleModel.ROWS:
 		for x in BattleModel.COLUMNS:
 			var cell := Vector2i(x, y)
@@ -625,28 +640,35 @@ func _refresh() -> void:
 			var tile := tiles[index]
 			var tile_sprite := tile_sprites[index]
 			tile.modulate = Color.WHITE
-			var sprite_id := "core" if cell == battle.core_cell else "obstacle" if battle._obstacle_at(cell) >= 0 else "wall" if battle._wall_at(cell) >= 0 else ""
-			tile.text = "◆" if cell == battle.core_cell else "▧" if battle.blocked_cells.has(cell) else "▤" if battle._wall_at(cell) >= 0 else ""
-			if battle._obstacle_at(cell) >= 0:
+			var has_obstacle := obstacle_cells[index] != 0
+			var has_wall := wall_cells[index] != 0
+			var sprite_id := "core" if cell == battle.core_cell else "obstacle" if has_obstacle else "wall" if has_wall else ""
+			tile.text = "◆" if cell == battle.core_cell else "▧" if blocked_cells.has(cell) else "▤" if has_wall else ""
+			if has_obstacle:
 				tile.text = "▨"
-			for unit in battle.units:
-				if unit.alive and unit.cell == cell:
-					sprite_id = unit.kind
-					_set_tile_selected(tile, unit.id == selected_unit)
-			for facility in battle.facilities:
-				if facility.alive and facility.cell == cell:
-					sprite_id = facility.kind
-					_set_tile_selected(tile, facility.id == selected_facility_instance)
-			for enemy in battle.enemies + battle.preview_enemies:
-				if enemy.alive and enemy.cell == cell:
-					sprite_id = enemy.kind
-			for facility in battle.enemy_facilities:
-				if facility.alive and facility.cell == cell:
-					sprite_id = facility.facility_id
 			tile_sprite.texture = _battle_sprite(sprite_id)
 			tile_sprite.visible = tile_sprite.texture != null
 			if tile_sprite.visible:
 				tile.text = ""
+	for unit in battle.units:
+		if unit.alive and battle._is_inside(unit.cell):
+			var index: int = unit.cell.y * BattleModel.COLUMNS + unit.cell.x
+			_set_cell_sprite(index, unit.kind)
+			_set_tile_selected(tiles[index], unit.id == selected_unit)
+	for facility in battle.facilities:
+		if facility.alive and battle._is_inside(facility.cell):
+			var index: int = facility.cell.y * BattleModel.COLUMNS + facility.cell.x
+			_set_cell_sprite(index, facility.kind)
+			_set_tile_selected(tiles[index], facility.id == selected_facility_instance)
+	for enemy in battle.enemies:
+		if enemy.alive and battle._is_inside(enemy.cell):
+			_set_cell_sprite(enemy.cell.y * BattleModel.COLUMNS + enemy.cell.x, enemy.kind)
+	for enemy in battle.preview_enemies:
+		if enemy.alive and battle._is_inside(enemy.cell):
+			_set_cell_sprite(enemy.cell.y * BattleModel.COLUMNS + enemy.cell.x, enemy.kind)
+	for facility in battle.enemy_facilities:
+		if facility.alive and battle._is_inside(facility.cell):
+			_set_cell_sprite(facility.cell.y * BattleModel.COLUMNS + facility.cell.x, facility.facility_id)
 	if paused:
 		status.text = "일시정지 · 전장 정보를 확인할 수 있습니다" if status_override.is_empty() else status_override
 	elif not status_override.is_empty():
@@ -676,6 +698,13 @@ func _battle_sprite(sprite_id: String) -> Texture2D:
 		atlas.region = Rect2(cell * 32, Vector2i(32, 32))
 		battle_sprite_cache[sprite_id] = atlas
 	return battle_sprite_cache[sprite_id]
+
+func _set_cell_sprite(index: int, sprite_id: String) -> void:
+	var tile_sprite := tile_sprites[index]
+	tile_sprite.texture = _battle_sprite(sprite_id)
+	tile_sprite.visible = tile_sprite.texture != null
+	if tile_sprite.visible:
+		tiles[index].text = ""
 
 func _set_tile_selected(tile: Button, selected: bool) -> void:
 	tile.modulate = Color("#ffe7a0") if selected else Color.WHITE

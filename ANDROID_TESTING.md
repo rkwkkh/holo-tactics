@@ -2,7 +2,7 @@
 
 ## Current artifact
 
-- Debug APK: `build/holo-debug.apk` (249,840,147 bytes; SHA-256 `70C4283381A65FF0E327EB188487A9BBACDA93C2F2F2BD230E07F89EDC3AB716`; debug-signed, API37 launch verified).
+- Debug APK: `build/holo-debug.apk` (250,223,794 bytes; SHA-256 `FFBFB6814DDF661DB214E72B560731E9CBE8D4D30AA2F1910600A3CFE9C5DDFA`; debug-signed, API37 launch verified).
 - Test AAB: `build/ci-local-check.aab` (86,248,046 bytes; SHA-256 `5A611E84AB2A00D087E05F10A327F78FEFC27E58EFD5855DDD2117552D43B154`; required entries present, unsigned and not uploadable to Play).
 - Package ID: `com.rhstudio.holotactics` (user-confirmed; Play Console availability still needs checking).
 - Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
@@ -181,3 +181,8 @@ The user confirmed the refreshed APK downloaded, installed, and launched on Gala
 - Reconnected the existing API37 x86_64 phone AVD (1080×2400, density 420); the current debug APK opened the campaign, entered M1, placed one swordsman (resource 160→110), and began wave 1. Enemies rendered and core HP fell 300→240.
 - Six in-game sampler windows measured 18.1–23.8 average FPS, P95 54.40–99.63 ms, max 73.34–138.45 ms on `ro.hardware.egl=emulation`. These values are below the 60 FPS normal / 30 FPS high-load targets and are not physical-device evidence. Use S25 Ultra and representative lower-tier hardware logs for acceptance.
 - The ADB error scan returned no fatal exception, Godot script error, or Vulkan/renderer error in the inspected log buffer. This was only a short wave-1 smoke.
+
+## A/B renderer measurement (2026-11-13)
+
+- The current debug APK contains a board refresh optimization. Against the prior-commit APK on the same API37 x86_64 AVD and matched three-unit/two-wave M1 scenario, five 10-second windows averaged 52.66 FPS (mean P95 22.08ms, mean max 38.07ms), versus baseline 23.7 FPS (57.13ms, 79.21ms). Both runs won 2/2 waves.
+- This is a relative improvement signal on emulated EGL, not an FPS acceptance pass; the 60 FPS ordinary-combat goal remains unmet/unverified on representative physical hardware. User Galaxy S25 Ultra combat logs are pending. Android 10 physical compatibility, signing, and Closed testing also remain open.

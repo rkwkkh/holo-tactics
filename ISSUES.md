@@ -256,3 +256,7 @@ The original four design documents now consistently reflect confirmed user rules
 - Drafted Korean listing text and an owner-facing checklist in `PLAY_PRIVATE_TEST_PREPARATION.md`; icon/feature graphic and emulator screenshot draft files now exist in `store_assets/draft/`, but owner design approval, compliant final screenshots, developer/support/privacy details, tester roster, app-ID availability and signed release AAB remain missing or unverified.
 - The target is Closed testing as specified by the project; Internal testing's incomplete-setup allowance does not clear Closed testing requirements. Verify current Console requirements when the owner has access.
 - Resolved the screenshot aspect-ratio issue on API37 AVD by capturing current campaign and M1 gameplay at 1080×2160 (2:1). The files remain emulator drafts pending Galaxy S25 Ultra capture and owner review.
+
+## Performance follow-up (2026-11-13)
+
+- Optimized the board refresh entity lookup. Matched API37 emulated-EGL A/B improved average from 23.7 to 52.66 FPS and mean P95 from 57.13ms to 22.08ms, but the optimized sample is still below the 60FPS normal-combat target. AVD graphics are not representative of the Galaxy S25 Ultra or lower-tier Android devices; obtain user physical-device logs before claiming performance acceptance. AVD also emitted intermittent Android hardware-service SIGABRTs, while filtered game logs had no script/fatal/Vulkan errors.
