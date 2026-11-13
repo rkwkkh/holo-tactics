@@ -154,3 +154,7 @@ Installed updated APK on `MaDangStage6_API37`, replayed the two-wave M1 defense,
 ## Facility upgrades and updated Android artifacts (2026-11-13)
 
 User selected facility upgrades during both preparation and combat. The latest APK/AAB hashes, content/upgrade SEEDs, regression coverage, and export checks are recorded in `TEST_REPORT.md`. API37 AVD launch/menu smoke passed; touch entry to M1 was not reproduced. This is not physical-device or FPS acceptance.
+
+## Latest physical-device note (2026-11-13)
+
+The user confirmed the refreshed APK downloaded, installed, and launched on Galaxy S25 Ultra. This supersedes prior notes that the device install result was unknown, but is not a gameplay or performance measurement. Run the numbered device smoke flows above and record Android version and frame-profiler results before treating M6 device acceptance as complete.

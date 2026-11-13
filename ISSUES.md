@@ -160,3 +160,8 @@ R-EFFECT-005: user selected shield-first then armor/damage reduction for bleed/b
 Computer Use state query returned no apps; native pipe and browser host are unavailable (Windows OS error 2). Headless editor-panel structure and content validation pass, but visible dock/Inspector interaction remains open. Retried this turn; no UI interaction occurred.
 
 - M6 environment recheck (2026-11-12): ADB currently lists no devices. Release keystore path, alias, and password environment variables are all unset; current package ID is the placeholder `com.example.holotactics`. The unsigned test AAB is not uploadable to Play. These require publisher/device inputs; no credentials were created or stored.
+
+## User-confirmed Galaxy S25 Ultra smoke (2026-11-13)
+
+- Resolved: user downloaded the refreshed `v0.1.0-preview.1` APK and confirmed it installed and launched on Galaxy S25 Ultra. This is user-reported startup evidence; Android version and gameplay/performance measurements were not provided.
+- Still open: hands-on gameplay flows and UI/touch/safe-area checks, S25 frame-time measurement at regular/high load, Android 10/API 29 device compatibility, Godot editor GUI usability, and publisher package ID/signing/Play private-test readiness.

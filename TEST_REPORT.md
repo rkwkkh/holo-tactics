@@ -648,3 +648,8 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - APK v2 signature and 16 KB ZIP alignment checks passed. API 37 x86_64 AVD install returned `Success`; app launched as foreground activity with a live process.
 - Replaced `holo-debug.apk` on GitHub release `v0.1.0-preview.1`; GitHub asset size and SHA-256 match the local build.
 - Physical Galaxy S25 Ultra installation remains unverified.
+
+## Galaxy S25 Ultra installation confirmation (2026-11-13)
+
+- User reports that the refreshed `v0.1.0-preview.1` APK downloaded, installed, and launched successfully on Galaxy S25 Ultra. Recorded as user-confirmed install/startup, not an agent-observed test; OS version, game-flow results, and frame-rate data are unknown.
+- This closes the prior S25 installation blocker only. Full device gameplay checks, performance target measurement, Android 10 compatibility, editor GUI checks, permanent package identity, publisher-signed AAB, and Play private-test readiness remain open.

@@ -135,3 +135,7 @@ Error-blocking and Warning-only catalog save behavior, stable-ID protection, ato
 - **M6: local artifacts and automated checks pass; release acceptance incomplete.** Debug APK and unsigned test AAB validate. API37 AVD M1 victory was manually observed. API29 AVD renderer fails; physical Android 10+, FPS on representative hardware, publisher package ID/signing, and Play private-test upload are not verified.
 - User policy overrides recorded in `ISSUES.md` govern implementation where the immutable source documents retain older/conflicting proposal text. In particular: progressive story unit unlocks; defense continues while the core survives; one locked evolution choice; in-combat facility repair and upgrades; DoT shield-first then mitigation; overlapping freeze/stun uses longer remaining duration.
 - Remaining unapproved balance values stay labeled SEED. Facility upgrade timing/availability is resolved; unrelated OPEN rule details remain recorded in `ISSUES.md`.
+
+## Acceptance update (2026-11-13)
+
+User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This resolves the device install/startup blocker, but does not verify gameplay flows, touch/safe-area behavior, or the 60/30 FPS targets. Remaining acceptance: hands-on device playthrough and profiler measurements; Android 10/API 29 compatibility on an appropriate device; visible Godot editor-panel/Inspector workflow; permanent application ID, publisher-signed AAB, and Play private-test readiness. See the user-confirmed evidence note in `TEST_REPORT.md`.

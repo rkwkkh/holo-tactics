@@ -264,3 +264,8 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Resolved R-FAC-003/R-UI-002 timing per the user: upgrades may be purchased in preparation and combat. Added four three-level facility upgrades, runtime stat application, resource cost, context-panel button, validator rules, checkpoint persistence/defaults, and unit/integration/UI regression tests.
 - Current values/costs are SEED; details and latest APK/AAB validations are in `TEST_REPORT.md`. 24 total upgrade records (20 unit + 4 facility) are covered by the editor panel structure check.
 - Latest local Godot test suite and API37 launch/menu check pass. Physical Android 10, device FPS, GUI dock/Inspector interaction, package ID/signing, and Play upload remain unverified.
+
+## Device update (2026-11-13)
+
+- Galaxy S25 Ultra: user confirmed the refreshed APK installs and launches. Treat as a device startup smoke pass only. Full gameplay, touch/safe-area, save/reward, and regular/high-load performance checks are still needed on-device.
+- MVP acceptance is not down to gameplay testing alone: M5 editor GUI usability and M6 Android performance/Android 10 and publisher-signed Play package gates remain as listed in `ISSUES.md`.
