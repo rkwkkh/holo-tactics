@@ -186,3 +186,7 @@ The user confirmed the refreshed APK downloaded, installed, and launched on Gala
 
 - The current debug APK contains a board refresh optimization. Against the prior-commit APK on the same API37 x86_64 AVD and matched three-unit/two-wave M1 scenario, five 10-second windows averaged 52.66 FPS (mean P95 22.08ms, mean max 38.07ms), versus baseline 23.7 FPS (57.13ms, 79.21ms). Both runs won 2/2 waves.
 - This is a relative improvement signal on emulated EGL, not an FPS acceptance pass; the 60 FPS ordinary-combat goal remains unmet/unverified on representative physical hardware. User Galaxy S25 Ultra combat logs are pending. Android 10 physical compatibility, signing, and Closed testing also remain open.
+
+## Android 10 emulator recheck (2026-11-13)
+
+- Latest debug APK installs and starts its process on the existing API29 `MaDang_API29` AVD, but a 20-second capture remains black and logcat repeats Vulkan queue present `error 5`. This is an emulator rendering failure only; physical Android 10 compatibility is still unverified. Production renderer settings were left unchanged.
