@@ -29,5 +29,6 @@ No release APK, GitHub Release, Play upload, or Closed test has been created. Af
 
 - Latest committed source remains `be29ac6`; docs now record Inspector GUI check. CI run [43379150514](https://github.com/rkwkkh/holo-tactics/actions/runs/43379150514) passed both jobs.
 - New API29 evidence: `MaDang_API29` booted with SwiftShader, installed/started the app, but screenshot is black and emulator warns Vulkan unsupported. Treat as AVD limitation; physical Android 10 remains unverified.
-- The AVD was stopped after capture. No game source/settings or catalog changed; only documentation is pending commit.
+- The AVD was stopped after capture. No game source/settings or catalog changed. The diagnostic was committed as `f394684` and CI run [43379665892](https://github.com/rkwkkh/holo-tactics/actions/runs/43379665892) passed both jobs.
 - Continue with remaining M5 Warning-row visual check if useful, then wait for user-provided S25 Ultra logs and owner Play Console/publisher signing access. Keep M6 incomplete.
+
