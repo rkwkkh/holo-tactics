@@ -886,3 +886,11 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Source scan of scripts, scenes, addons, Android build config and `project.godot` found no HTTP/API, Firebase, ads, analytics, Sentry or Crashlytics integration. Progress and checkpoint stores use app-local `user://` paths. APK dex package scan included AndroidX and Godot/Kotlin support, not a detected analytics/ad SDK.
 - This only characterizes the current debug APK/source snapshot. It is not a final privacy or Data safety attestation; final signed AAB and transitive SDK behavior still need owner review.
 - Play policy says Closed-track apps need Data safety and privacy-policy URL plus in-app link/text, even if no data is collected (Internal-only exemption does not cover Closed testing). Policy draft added; app UI link/text is not implemented pending owner-approved details.
+
+## Android export payload cleanup (2026-11-13)
+
+- Added `store_assets/**` and `tools/**` to both Android preset exclusion lists.
+- `run_godot_tests.bat` passed on Godot 4.7.2: core, content validation (0 errors), all 8 seeded campaign wins, preview isolation, result UI, and editor-panel checks. Existing editor shutdown RID/ObjectDB diagnostics appeared after the pass sentinel.
+- Re-exported `build/holo-debug.apk`. `aapt dump badging` reports package `com.rhstudio.holotactics`, min SDK 29, target/compile SDK 36; `apksigner verify` passes with Godot's debug certificate and v2 signature.
+- Inspected the APK's `assets/assets.sparsepck` and Android asset listing: no `store_assets`, `tools/export_play_assets`, or `campaign-api37-draft` marker was found. This confirms those draft materials and generator are excluded from this debug APK.
+- Godot emitted the export-complete sentinel and updated the APK, but the console process remained alive and was interrupted; rely on the artifact, signature, and payload checks above, not the process exit code. No physical device, signed release AAB, or Play upload was tested.

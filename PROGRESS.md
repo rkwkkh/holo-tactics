@@ -449,3 +449,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Inspected the current debug APK manifest: package `com.rhstudio.holotactics`, target API 36, no declared `uses-permission`. Source scan found only local progress/checkpoint saves under `user://`; no HTTP, Firebase, ads, analytics or crash-reporting integration found in project code/config.
 - Added `PRIVACY_POLICY_DRAFT.md` as an owner-review draft, not a final declaration. Official Play policy requires Data safety for Closed testing (internal-only is exempt) and a public privacy-policy URL plus in-app policy link/text even if no personal data is collected. Final signed AAB/SDK review and owner declaration remain outstanding.
 - The app currently has no in-app policy link/text. This code/UI task depends on final owner-provided developer/contact details and policy text/URL.
+
+## Android export payload cleanup (2026-11-13)
+
+- Excluded `store_assets/**` and `tools/**` from both Android export presets so store-listing drafts and their generator are not shipped in the game package.
+- Re-ran the full Godot test batch successfully on 4.7.2; content validation reported 0 errors. Re-exported `build/holo-debug.apk`, verified its Godot package data contains no store-assets/tool/draft markers, and verified the APK v2 signature and package metadata (`com.rhstudio.holotactics`, min API 29, target/compile API 36).
+- Godot printed the export-complete sentinel and wrote the APK, but its console process did not exit; it was interrupted after artifact verification. This is not a release build. No release keystore, Play upload, or device test was used.
+- User requested a pause after recording the current state. Resume with physical-device gameplay/FPS evidence and owner-side privacy/Play setup; M6 remains incomplete.

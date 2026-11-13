@@ -204,3 +204,8 @@ Release export preflight fails as expected without a configured release keystore
 ## Closed-test Data safety preparation update (2026-11-13)
 
 The current debug APK manifest declares no permissions; the app source saves only to app-private `user://` and no project analytics/ad/network integration was found. This is preliminary only. Google Play requires Data safety plus a public privacy policy and in-app policy text/link for Closed testing even when no personal data is collected. `PRIVACY_POLICY_DRAFT.md` records owner placeholders. Add the in-app entry after owner confirms the legal/display name, contact email, and final policy text/URL; re-audit the final signed AAB and SDKs.
+
+## Android export payload cleanup and pause checkpoint (2026-11-13)
+
+- Both Android presets now exclude `store_assets/**` and `tools/**`. The regenerated debug APK was signature-verified and inspected; no store draft or generator markers are present. Full local Godot tests and content validation passed.
+- User requested that work pause after recording this checkpoint. Continue at the remaining M6 device/privacy/Play gates in `SESSION_HANDOFF.md`; this does not mark M6 or the MVP complete.

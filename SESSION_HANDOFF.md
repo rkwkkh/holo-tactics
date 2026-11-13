@@ -54,3 +54,11 @@ Before the owner sets up Console, note the current target API 36 requirement (al
 - Current build preflight: no manifest permissions, no project network/ads/analytics SDK integration found, local progress/checkpoint `user://` storage. This is preliminary; recheck final signed AAB and SDK behavior before Data safety declaration.
 - Play Closed testing requires Data safety plus a public privacy policy URL and policy text/link in-app even if no personal/sensitive data is collected. Draft at `PRIVACY_POLICY_DRAFT.md`; app in-app link/text remains unimplemented.
 - Await owner developer/display name, public contact email, and final policy/hosting URL. App account type and creation date remain owner-only checks for conditional production-access tester policy.
+
+## Current pause checkpoint (2026-11-13)
+
+- Android Debug APK and Play AAB export presets now exclude `store_assets/**` and `tools/**`. This prevents draft store images and the asset-generation script from shipping with the game.
+- Latest local regression: `run_godot_tests.bat` passed on Godot 4.7.2; content validation had 0 errors. `build/holo-debug.apk` was re-exported; `apksigner` verified its v2 debug signature, `aapt` confirmed package/min/target SDK metadata, and the APK sparse PCK was scanned for store-draft/tool markers (none found).
+- Export completion was printed and the APK written, but the Godot console process did not exit by itself; it was interrupted after the artifact checks. Treat the artifact checks as successful and the process exit code as interrupted.
+- Latest change is not yet committed/pushed at this checkpoint. The next action on resume is commit/push this config + documentation update and confirm CI, then continue remaining gates below.
+- Still open: Galaxy S25 Ultra gameplay/FPS logs; physical Android 10; GUI Warning-row click; final owner-approved privacy policy/in-app link; release signing and Play Console access. M6/MVP remains incomplete. No release APK/AAB, GitHub Release, or Play upload was made.
