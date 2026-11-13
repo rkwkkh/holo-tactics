@@ -208,4 +208,5 @@ The current debug APK manifest declares no permissions; the app source saves onl
 ## Android export payload cleanup and pause checkpoint (2026-11-13)
 
 - Both Android presets now exclude `store_assets/**` and `tools/**`. The regenerated debug APK was signature-verified and inspected; no store draft or generator markers are present. Full local Godot tests and content validation passed.
+- Commit `14d43aa` is pushed; Actions run `43385072374` passed both Godot and Android AAB jobs.
 - User requested that work pause after recording this checkpoint. Continue at the remaining M6 device/privacy/Play gates in `SESSION_HANDOFF.md`; this does not mark M6 or the MVP complete.
