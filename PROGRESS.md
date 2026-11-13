@@ -302,3 +302,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - `export_android_aab.ps1`이 WinGet Godot 경로도 찾고, 샘플 앱 ID와 API36 사전조건을 검사하도록 보완했다. 임시 검증 값으로 사전검사 중단을 확인했으며 실제 서명/릴리즈 내보내기는 하지 않았다.
 - 현재 코드의 로컬 테스트 AAB: 86,248,032 bytes, SHA-256 `7A484105D3329C389D858111EC35BF8949E187C2AEE5C1796BCBE0921448F32D`. ZIP 필수 엔트리는 확인했고 서명되지 않았다. 실행형 bundletool을 확보하지 못해 AAB 매니페스트/번들 validator 검사는 대기.
 - 소스만 커밋·푸시한다. APK/AAB GitHub 릴리즈는 하지 않는다.
+
+## M5 Godot GUI 재점검 (2026-11-13)
+
+- Godot 4.7.2 GUI에서 프로젝트와 `Holo Content Editor` 플러그인 활성화를 확인했다. 우측 도크는 접근성 트리에 내부명 `@TabContainer...`로 표시되어 찾기 어려웠다.
+- 도크 컨트롤 이름을 `콘텐츠 편집기`로 지정하고 기존 EditorPlugin 테스트에 이름 assertion을 추가했다. 전체 `run_godot_tests.bat` 재실행 통과(core, validator, 8/8 캠페인, battle UI, editor panels 24 upgrades).
+- 변경 후 GUI 재시작/패널·Inspector·미리보기 버튼 직접 조작은 아직 확인하지 않았다. Editor headless 테스트 종료 시 기존 RID/ObjectDB 정리 진단이 출력된다.

@@ -197,3 +197,9 @@ The original four design documents now consistently reflect confirmed user rules
 
 - `export_android_aab.ps1` 사전검사는 PowerShell 파싱/Godot 경로/API36 확인 후 예시 앱 ID `com.example.holotactics`에서 안전하게 중단함. 영구 앱 ID와 출판 서명 값이 없어 Play용 AAB는 생성하지 않았다.
 - 현재 소스 unsigned 테스트 AAB의 ZIP 엔트리는 확인했지만 캐시된 bundletool은 실행형이 아니라 이번 산출물의 매니페스트/번들 규격 검증은 미완료. Play 업로드도 수행하지 않는다.
+
+## M5 편집기 GUI 접근성 (2026-11-13)
+
+- 확인: Godot 4.7.2 GUI에서 플러그인은 활성화되어 있으나 EditorPlugin `TabContainer`가 이름 미지정 상태로 내부 이름 `@TabContainer...`에 노출되어 도크를 식별하기 어려웠다.
+- 수정/검증: 도크에 `콘텐츠 편집기` 이름 지정, headless EditorPlugin 테스트에 이름 확인 추가; 전체 Godot 테스트 통과.
+- 남음: GUI 재시작 후 표시 라벨 및 실제 콘텐츠 선택·저장 전 검증 피드백·Inspector 연동·전체/웨이브 미리보기를 점검해야 M5 GUI 완료로 볼 수 있다.

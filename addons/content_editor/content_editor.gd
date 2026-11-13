@@ -24,6 +24,7 @@ static func read_catalog(path: String = CATALOG_PATH) -> Variant:
 
 func _enter_tree() -> void:
 	tabs = TabContainer.new()
+	tabs.name = "콘텐츠 편집기"
 	tabs.custom_minimum_size = Vector2(340, 260)
 	for key in ["stages_waves", "evolutions", "upgrades"]:
 		_build_panel(key)

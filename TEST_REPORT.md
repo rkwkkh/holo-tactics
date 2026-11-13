@@ -696,3 +696,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Added a siege preparation hint explaining that `진격` begins combat and the whole army's automatic advance; UI assertions verify the message and button. Existing model assertions cover prep repositioning and individual combat movement followed by automatic advance.
 - Android debug test AAB exported from this source: 86,248,032 bytes, SHA-256 `7A484105D3329C389D858111EC35BF8949E187C2AEE5C1796BCBE0921448F32D`. Required ZIP entries are present; `jarsigner` reports unsigned, as expected for a debug test artifact. Full bundletool validation/manifest decode was unavailable because only the non-executable bundletool library JAR is cached.
 - Release-export PowerShell parses and locates Godot from WinGet; API36 and placeholder-ID guards run before export. The current placeholder ID intentionally blocks release. No signed AAB or GitHub release was created.
+
+## M5 GUI 도크 이름 및 재검증 (2026-11-13)
+
+- Godot 4.7.2 GUI에서 EditorPlugin 활성화는 확인했다. 사용자 도크가 화면/접근성 트리에 내부 이름 `@TabContainer...`로 노출되는 문제를 확인했다.
+- `tabs.name = "콘텐츠 편집기"` 적용 및 `tests/editor_panels.gd` 이름 assertion 추가 후 `run_godot_tests.bat` 전체 통과: core, content validation, seeded campaign 8/8, battle UI, editor panels(6 evolutions/24 upgrades/stages and waves).
+- 테스트 배치 종료 코드 0 및 모든 성공 sentinel 확인. editor-headless 프로세스 종료 시 RID/ObjectDB 누수 진단은 출력되나 테스트 assertion은 성공했다.
+- 변경 후 GUI 재시작해 새 탭 라벨과 실제 편집/Inspector/preview 조작을 확인하는 작업은 대기 중이다.

@@ -5,9 +5,11 @@ func _initialize() -> void:
 	var plugin: EditorPlugin = plugin_script.new()
 	assert(plugin != null)
 	plugin.tabs = TabContainer.new()
+	plugin.tabs.name = "콘텐츠 편집기"
 	for key in ["stages_waves", "evolutions", "upgrades"]:
 		plugin.call("_build_panel", key)
 	assert(plugin.tabs.get_child_count() == 3)
+	assert(plugin.tabs.name == "콘텐츠 편집기")
 	assert(plugin.panels.evolutions.picker.item_count == 6)
 	assert(plugin.panels.upgrades.picker.item_count == 24)
 	assert(plugin.panels.stages_waves.picker.item_count > 0)
