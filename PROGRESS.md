@@ -378,4 +378,4 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Changed board refresh from per-tile scans of all entities/obstacles to occupancy lookup plus entity passes. This is a rendering-path optimization only; gameplay rules/data are unchanged.
 - Godot 4.7.2 full headless regression passed and content validation remains at 0 errors. Re-exported and installed the debug APK on API37 AVD; matched two-wave M1 smoke cleared successfully.
 - Controlled A/B on the emulated renderer improved mean FPS from 23.7 to 52.66 and mean P95 frame time from 57.13ms to 22.08ms. Current mean remains below 60FPS; S25 Ultra and representative-device performance acceptance remain pending. See `TEST_REPORT.md` and `ANDROID_TESTING.md` for APK hashes and limitations.
-- No APK release or Play submission was created. Commit and CI result are pending this update.
+- Pushed as `acbf984`; GitHub Actions run [43370736415](https://github.com/rkwkkh/holo-tactics/actions/runs/43370736415) passed both Godot validation and Android debug AAB export/structure checks. No APK release or Play submission was created.
