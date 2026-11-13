@@ -355,3 +355,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 
 - Commit `b425bf8` CI run `43351099459` completed successfully: Godot import/tests/content/scene smoke all passed, Android debug AAB export and required-entry verification passed, and artifact `holo-debug-aab-unsigned` uploaded with 7-day retention.
 - This is an unsigned CI test artifact, not a GitHub Release or Play-uploadable bundle. No APK/AAB release was created.
+
+## Play private-test preparation (2026-11-13)
+
+- Added `PLAY_PRIVATE_TEST_PREPARATION.md` with a Korean store-description/release-notes draft, verified project metadata, official Play requirements and owner-only setup checklist.
+- Distinguished Closed testing from Internal testing; listing assets, privacy/contact details, package ID availability, signing, Console access and tester roster remain owner/Console tasks. No credentials or account actions were performed.
+- The document records the existing 192px SVG icon and unsigned CI AAB as insufficient store assets/upload material. This advances preparation only; it does not satisfy M6's actual closed-test distribution gate.

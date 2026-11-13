@@ -243,3 +243,8 @@ The original four design documents now consistently reflect confirmed user rules
 
 - User will perform Galaxy S25 Ultra M1/combat and FPS checks directly, then send the logs. Physical acceptance remains pending until those logs arrive.
 - User has neither Play Console access nor a publisher upload keystore. Private-test setup remains pending on the user's external account and signing credentials; no account or key was created.
+
+## Play closed-test submission materials (2026-11-13)
+
+- Drafted Korean listing text and an owner-facing checklist in `PLAY_PRIVATE_TEST_PREPARATION.md`; actual store assets (512px icon, feature graphic, screenshots), developer/support/privacy details, tester roster, app-ID availability and signed release AAB are still missing or unverified.
+- The target is Closed testing as specified by the project; Internal testing's incomplete-setup allowance does not clear Closed testing requirements. Verify current Console requirements when the owner has access.
