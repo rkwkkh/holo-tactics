@@ -31,7 +31,8 @@ func _run() -> void:
 	var was_editor_preview: bool = view.editor_preview
 	view.editor_preview = false
 	view.pause_abandon_button.emit_signal("pressed")
-	assert((view.get_meta("abandon_dialog") as ConfirmationDialog).visible)
+	var abandon_dialog: ConfirmationDialog = view.get_meta("abandon_dialog")
+	assert(abandon_dialog.visible and abandon_dialog.get_ok_button().text == "포기" and abandon_dialog.cancel_button_text == "취소" and abandon_dialog.get_label().autowrap_mode == TextServer.AUTOWRAP_WORD_SMART)
 	(view.get_meta("abandon_dialog") as ConfirmationDialog).hide()
 	view.editor_preview = was_editor_preview
 	view._start_wave()

@@ -288,3 +288,8 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Reconciled the four design documents to prior user decisions and corrected the obsolete “all five units immediately unlocked” summary. Current status is in `PLANNING_COVERAGE.md`.
 - Godot 4.7.2 full local test batch passed after adding preparation-phase facility repair regression; combat-phase repair remains covered.
 - M5 visual editor inspection attempted again, but Computer Use reported native pipe unavailable (OS error 2). Treat GUI usability as unverified.
+
+## Abandon UI viewport fix (2026-11-13)
+
+- Fixed the Android portrait confirmation dialog: Korean wrapping text, localized title and action buttons, concise explanation. Added UI assertions and re-ran full Godot test batch successfully.
+- Re-exported local debug APK and manually exercised API37 AVD pause→confirm abandon→zero-wave result (+0/unchanged 165 currency)→village. No GitHub APK release. User-device positive partial-reward flow remains an acceptance check.

@@ -678,3 +678,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Corrected outdated source-document conflicts for stage-gated units, core-survival defense, fixed one-time evolution, both-phase facility repair, and DoT/status overlap. DEC-576~578 now explicitly defer to DEC-572~573/C2. Planning coverage marks historical status rows clearly.
 - Added a direct test for preparation-phase facility repair. Godot 4.7.2 `run_godot_tests.bat` passed: core, content validator (0 Errors), seeded campaign (8/8), battle UI, editor-panel structure. Existing editor-headless engine cleanup diagnostics remain.
 - Attempted M5 visible GUI verification; `sky.list_apps()` returned native pipe unavailable (Windows error 2). No visual interaction was possible.
+
+## Pause-abandon confirmation Android smoke (2026-11-13)
+
+- Updated dialog text to wrap within the portrait viewport, localized its title/buttons (취소/포기), and shortened the explanation. Godot UI regression checks wrap mode and both labels.
+- Re-exported uild/holo-debug.apk (local debug only, not released), installed it on API 37 x86_64 AVD, and launched M1. From pause menu, opened the confirmation, visibly tapped 포기, observed result 웨이브 0 / 2 완료, reward +0, permanent balance unchanged at 165, then tapped 마을로 돌아가기 and observed the village screen. No app crash; current APK SHA-256: $hash.
+- This verifies the zero-completed-wave UI path. Positive partial reward for already completed waves remains covered by ProgressStore unit tests; user gameplay acceptance on Galaxy S25 Ultra is still useful.

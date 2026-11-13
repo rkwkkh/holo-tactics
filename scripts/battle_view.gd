@@ -270,7 +270,12 @@ func _ready() -> void:
 	layout.add_child(pause_button)
 	_build_result_panel()
 	var abandon_dialog := ConfirmationDialog.new()
-	abandon_dialog.dialog_text = "테스트를 끝내고 돌아가시겠습니까? 전투 진행과 보상은 저장되지 않습니다." if editor_preview else "전투를 포기하고 돌아가시겠습니까? 완료한 웨이브 수만큼 부분 보상을 받습니다."
+	abandon_dialog.title = "테스트 종료 확인" if editor_preview else "전투 포기 확인"
+	abandon_dialog.dialog_text = "테스트를 종료할까요?\n진행과 보상은 저장되지 않습니다." if editor_preview else "전투를 포기할까요?\n완료 웨이브 기준 부분 보상을 받고 마을로 돌아갑니다."
+	abandon_dialog.get_label().autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	abandon_dialog.get_label().custom_minimum_size.x = 280.0
+	abandon_dialog.get_ok_button().text = "종료" if editor_preview else "포기"
+	abandon_dialog.cancel_button_text = "취소"
 	abandon_dialog.confirmed.connect(_abandon_battle)
 	add_child(abandon_dialog)
 	set_meta("abandon_dialog", abandon_dialog)

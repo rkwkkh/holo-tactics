@@ -146,3 +146,8 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 - 의존 변경: `battle_model` 단계 허용/개별 이동·자동진격, `battle_view` 입력/상태 UI, model/UI 회귀 테스트, 제품·요구사항·결정 문서, 사용자용 Godot/Android 실행 배치.
 - 확인: Godot 통합 스크립트와 편집기 패널 자동화, Android 37 AVD 설치/foreground 실행. APK 릴리즈는 하지 않는다. 소스 커밋 및 원격 푸시만 수행.
 - 남은 사용자 QA: 확인 대화상자에서 포기 확정 후 실제 부분 보상 및 마을 복귀 여부 확인.
+
+## Pause-abandon UI viewport adjustment (2026-11-13)
+
+- Current code changes are limited to localized/wrapping `ConfirmationDialog` controls plus UI regression assertions; model settlement was unchanged.
+- Godot 4.7.2 full batch passed after the change. API37 debug APK was rebuilt locally and tested through pause, confirmation, 0/2 abandon result, and village return. No APK release was created.

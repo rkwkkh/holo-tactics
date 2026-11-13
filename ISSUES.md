@@ -185,3 +185,8 @@ Computer Use was reinitialized and `sky.list_apps()` retried; the helper again r
 ## User policy document reconciliation (2026-11-13)
 
 The original four design documents now consistently reflect confirmed user rules: story-gated unit unlocks, defense continues while the core survives, one locked evolution choice per unit, combat/preparation repairs, and the selected DoT/incapacitation policy. The old “five units immediately unlocked” summary is explicitly marked superseded by DEC-572/573/C2. No gameplay rule required new user approval.
+
+## Abandon confirmation viewport correction (2026-11-13)
+
+- ADB screenshot testing found the stock abandon confirmation clipped its Korean message and left the confirm action off-screen on API37 portrait. Changed the text to wrap, localized title/actions, and shortened the message; UI assertions and a rebuilt debug APK pass. Do not release from this turn; latest APK exists only in ignored `build/`.
+- API37 AVD hands-on path: campaign→M1→pause→abandon confirm→tap `포기`→0/2 result, +0 permanent currency (balance remained 165)→village. The positive completed-wave partial payout is still model-tested, not visually exercised here.
