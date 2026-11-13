@@ -419,3 +419,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Re-tested `MaDang_API29` using `-gpu swiftshader_indirect -no-snapshot`. Android 10 / API 29 booted; the current debug APK installed successfully and `com.rhstudio.holotactics` remained running with Godot main-loop startup logged.
 - Screenshot remained black. Emulator startup explicitly warned that its version does not support Vulkan. This supports an emulator Vulkan-capability limitation, not a physical Android 10 compatibility conclusion. Production renderer was not changed.
 - CI for the Inspector documentation commit passed both jobs: run [43379150514](https://github.com/rkwkkh/holo-tactics/actions/runs/43379150514).
+
+## Warning-row GUI verification attempt (2026-11-13)
+
+- Rechecked repository/CI before opening Godot; worktree clean at `0b864e8`, latest CI `43380120755` passed both jobs.
+- Godot 4.7.2 process opened the project, but the Windows computer-use bridge could not activate the editor window on repeated attempts. No warning-row click was made. Godot again rewrote `project.godot`; restored the generated-only diff, then stopped the editor process. Source/catalog/scene remained unchanged.
+- Re-ran `run_godot_tests.bat`: core, content validation (0 errors), 8 seeded stage sims, preview isolation, battle result UI and editor panel signal checks all passed. The editor-panel test reports success before known RID/ObjectDB shutdown leak diagnostics; script exit was successful.

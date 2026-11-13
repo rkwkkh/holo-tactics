@@ -32,3 +32,7 @@ No release APK, GitHub Release, Play upload, or Closed test has been created. Af
 - The AVD was stopped after capture. No game source/settings or catalog changed. The diagnostic was committed as `f394684` and CI run [43379665892](https://github.com/rkwkkh/holo-tactics/actions/runs/43379665892) passed both jobs.
 - Continue with remaining M5 Warning-row visual check if useful, then wait for user-provided S25 Ultra logs and owner Play Console/publisher signing access. Keep M6 incomplete.
 
+
+## Latest local verification (2026-11-13)
+
+The Warning-row visual click attempt failed because the native Godot window could not be activated through Computer Use. The application was closed afterward; generated-only `project.godot` changes were restored and the worktree is clean. Full `run_godot_tests.bat` passed, including the Error/Warning signal regression and 0-error content validation. Resume with physical-device evidence and account-dependent Closed-test gates; M6 stays incomplete.

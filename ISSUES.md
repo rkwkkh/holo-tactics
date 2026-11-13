@@ -291,3 +291,8 @@ The original four design documents now consistently reflect confirmed user rules
 ## API29 SwiftShader follow-up (2026-11-13)
 
 - `MaDang_API29` under `-gpu swiftshader_indirect` boots Android 10/API29, installs the debug APK, and starts the Godot process/main loop, but still presents a black screen. Emulator startup warns that this emulator version does not support Vulkan. This remains emulator-only/inconclusive for real Android 10 devices; production renderer is unchanged.
+
+## Warning-row visual check access issue (2026-11-13)
+
+- Windows automation could not activate the Godot editor window during the repeated GUI attempt, so no visual Warning-row click was performed. The underlying click signal/navigation behavior still passes `tests/editor_panels.gd` headlessly. No source change is indicated by this attempt.
+- Restored the Godot-generated `project.godot` rewrite and confirmed the working tree returned clean. Full local `run_godot_tests.bat` passed afterward.

@@ -188,3 +188,7 @@ Inspector dynamic field display and edit/import synchronization have now been vi
 ## Android 10 emulator diagnostic update (2026-11-13)
 
 Re-tested API29 AVD with SwiftShader: Android boots and app starts, but screenshot is black; emulator warns Vulkan is unsupported. This is not physical-device compatibility evidence. Production renderer remains unchanged. CI run `43379150514` passed both jobs.
+
+## M5 Warning-row GUI check status (2026-11-13)
+
+The visual click was attempted after Inspector verification, but the Windows Computer Use bridge could not activate the Godot editor window. The warning non-navigation behavior remains covered by the actual-signal headless regression (`tests/editor_panels.gd`). Full local regression was rerun and passed; visual click remains unverified.

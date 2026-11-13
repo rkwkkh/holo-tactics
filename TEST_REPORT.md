@@ -859,3 +859,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Captured the resumed app; the viewport remained entirely black. The filtered log did not show a Godot fatal or AndroidRuntime crash. Emulator was shut down after capture.
 - Conclusion: this AVD cannot provide Vulkan-renderer acceptance evidence; this does not prove or disprove compatibility on physical Android 10 hardware. No production renderer change was made.
 - CI run [43379150514](https://github.com/rkwkkh/holo-tactics/actions/runs/43379150514) passed Godot and Android AAB jobs.
+
+## Warning-row GUI access attempt and regression rerun (2026-11-13)
+
+- Godot process opened the project, but Computer Use could not activate/capture the native window; therefore the requested visible Warning-row click was not completed. No interaction with the editor content occurred.
+- Godot auto-rewrote `project.godot` on launch. Restored the generated-only diff and stopped the editor process. Verified no project-source/catalog/scene modifications.
+- Re-ran `run_godot_tests.bat` on Godot 4.7.2: core tests, content validation (0 errors), 8 seeded campaign wins, editor preview isolation, battle result UI, and editor-panel checks passed. Editor-panel shutdown emitted known RID/ObjectDB leak diagnostics after its success sentinel; the batch runner reported all commands passed.
