@@ -165,3 +165,4 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 ## GitHub Actions Android export retest (2026-11-13)
 
 - CI run `43351099459` for `b425bf8` passed the complete Godot validation job and Android debug AAB export/structure checks; the unsigned artifact uploaded successfully. This resolves the CI workflow stall. Play Console package availability and publisher-signed AAB/private-test setup remain open.
+- Confirmed-ID M1 combat smoke renders on API37 AVD, but the emulated renderer sampled only 13.5–14.9 FPS in combat. Use a physical-device profiler before attributing the issue or changing the battle rendering path.

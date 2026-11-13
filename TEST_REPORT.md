@@ -736,3 +736,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Godot job passed import, core tests, direct-wave preview isolation, editor panels, result UI, all 8 campaign stages, content validation, and scene smoke tests.
 - Android job passed SDK/template setup, project import, combined template-install/AAB export, ZIP structure checks (`BundleConfig.pb`, manifest, dex), and uploaded `holo-debug-aab-unsigned` (85,668,678 bytes, 7-day artifact retention).
 - The workflow only uploads an unsigned CI artifact. It did not publish a GitHub Release or upload to Play; publisher signing remains absent.
+
+## Confirmed-ID M1 combat smoke (2026-11-13)
+
+- On the API37 x86_64 AVD, installed package `com.rhstudio.holotactics`, opened M1 wave 1, and captured the battlefield. The app remained top-resumed; inspected logcat had no fatal Android/Godot shader errors.
+- The earlier sample-ID build's preparation windows measured 33.9–34.8 FPS (P95 30.0–32.46 ms); the confirmed-ID build's combat windows measured 13.5–14.9 FPS (P95 72.47–93.16 ms, max 80.09–128.88 ms). Both runs were on the same API37 AVD/emulated renderer (`ro.hardware.egl=emulation`), so this is not representative hardware validation and does not meet the 60 FPS normal-combat goal. Real-device profiling is required before deciding whether to optimize.
+- Ran `run_android_emulator_test.bat` against `MaDangStage6_API37` after updating its package ID. It reinstalled the new APK, launched `com.rhstudio.holotactics`, and exited successfully.
