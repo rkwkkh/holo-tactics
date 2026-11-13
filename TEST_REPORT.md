@@ -775,5 +775,11 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 ## Play listing asset drafts (2026-11-13)
 
 - Generated and inspected `store_assets/draft/app_icon_512.png` (512×512, 2,374 bytes) and `feature_graphic_1024x500.png` (1024×500, 24-bit RGB, 20,565 bytes) from the existing pixel-art icon and code-native SVG layout.
-- Converted the API37 campaign screen and M1 defense diagnostic capture to JPEG (1080×2400 each). Both are 2.22:1 and the helper warns that they exceed Play's current 2:1 screenshot aspect limit; they remain drafts and must be recaptured/cropped compliantly before submission. The M1 image came from a direct-start diagnostic copy, not a normal campaign scene transition.
+- Initial captures were 1080×2400 and over Play's current 2:1 screenshot aspect limit; superseded by the compliant-ratio production-app captures documented below. The first M1 image came from a direct-start diagnostic copy, not a normal campaign scene transition.
 - `tools/export_play_assets.gd`, `tools/complete_play_feature.ps1`, and `tools/prepare_play_screenshots.ps1` generated and checked the outputs. This validates dimensions/encoding only, not brand approval, final store acceptance, physical-device screenshots, or Console submission.
+
+## 2:1 Android gameplay captures (2026-11-13)
+
+- Reconnected the existing API37 x86_64 AVD and confirmed the installed `com.rhstudio.holotactics` process was foreground. Temporarily set Android display size to 1080×2160, entered M1 from campaign, placed one swordsman (resource 160→110), and started the wave; an enemy rendered and the app stayed foreground. Targeted Godot/AndroidRuntime error scan returned no matching script/fatal exception lines in the inspected log buffer.
+- Replaced draft screenshots with current app captures: campaign and M1 combat each 1080×2160 (2:1), converted to JPEG/24-bit RGB. These fit the current Play screenshot aspect limit. The old AVD size was restored with `wm size reset` (physical 1080×2400) after capture.
+- This improves emulator navigation/render evidence and produces compliant-ratio drafts; it does not establish physical-device behavior or FPS. User's S25 Ultra hands-on test remains pending.

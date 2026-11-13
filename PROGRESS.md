@@ -359,6 +359,7 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 ## Play private-test preparation (2026-11-13)
 
 - Added `PLAY_PRIVATE_TEST_PREPARATION.md` with a Korean store-description/release-notes draft, verified project metadata, official Play requirements and owner-only setup checklist.
-- Generated draft app icon and feature graphic plus campaign/M1 screenshot files under `store_assets/draft/`; image dimensions and encodings were checked. The 1080×2400 emulator screenshots exceed Play's 2:1 ratio limit, so the packet explicitly treats them as drafts and requires compliant replacement/capture.
+- Generated draft app icon and feature graphic plus campaign/M1 screenshots under `store_assets/draft/`; image dimensions/encodings are checked. Re-captured the campaign-to-M1 flow at 1080×2160 (2:1) on API37 AVD, replacing the earlier over-limit 1080×2400 drafts. Physical-device capture and owner review remain open.
+- Revalidated production campaign→M1 navigation at the same 2:1 AVD size: deployed one swordsman, started wave 1, and saw an enemy render. Prior AVD black transitions are now treated as intermittent, not a confirmed game defect; S25 Ultra validation remains the acceptance gate.
 - Distinguished Closed testing from Internal testing; listing assets, privacy/contact details, package ID availability, signing, Console access and tester roster remain owner/Console tasks. No credentials or account actions were performed.
 - The document records the existing 192px SVG icon and unsigned CI AAB as insufficient store assets/upload material. This advances preparation only; it does not satisfy M6's actual closed-test distribution gate.
