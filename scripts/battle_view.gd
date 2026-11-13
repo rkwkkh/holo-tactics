@@ -659,7 +659,7 @@ func _refresh() -> void:
 	elif battle.phase == "combat":
 		status.text = "%s 배치 · 아군 구역을 선택하세요" % _unit_name(selected_kind) if not selected_kind.is_empty() else "진격 중 · 유닛을 선택한 뒤 이동할 칸을 선택하세요" if battle.stage.get("mode") == "siege" else "전투 중 · 유닛을 선택한 뒤 이동할 칸을 선택하세요"
 	else:
-		status.text = "배치 단계 · 검사/궁수를 선택한 뒤 아군 구역을 누르세요"
+		status.text = "배치 단계 · `진격`을 누르면 전투와 전체 자동 진격 시작" if battle.stage.get("mode") == "siege" else "배치 단계 · 검사/궁수를 선택한 뒤 아군 구역을 누르세요"
 
 func _refresh_speed_control() -> void:
 	var unlocked: bool = not editor_preview and progress_available and progress.data.completed_stages.has(battle.stage_id)

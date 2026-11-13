@@ -190,3 +190,10 @@ The original four design documents now consistently reflect confirmed user rules
 
 - ADB screenshot testing found the stock abandon confirmation clipped its Korean message and left the confirm action off-screen on API37 portrait. Changed the text to wrap, localized title/actions, and shortened the message; UI assertions and a rebuilt debug APK pass. Do not release from this turn; latest APK exists only in ignored `build/`.
 - API37 AVD hands-on path: campaign→M1→pause→abandon confirm→tap `포기`→0/2 result, +0 permanent currency (balance remained 165)→village. The positive completed-wave partial payout is still model-tested, not visually exercised here.
+
+추가 UX 확인: 공성 준비 화면에서 `진격`이 전투 시작과 전체 자동 진격을 함께 한다는 안내를 노출하고 UI 회귀 테스트로 확인했다. 개별 전투 이동은 목적지 도착 후 자동 진격으로 복귀한다.
+
+## 2026-11-13 현재 소스 Android 사전검사
+
+- `export_android_aab.ps1` 사전검사는 PowerShell 파싱/Godot 경로/API36 확인 후 예시 앱 ID `com.example.holotactics`에서 안전하게 중단함. 영구 앱 ID와 출판 서명 값이 없어 Play용 AAB는 생성하지 않았다.
+- 현재 소스 unsigned 테스트 AAB의 ZIP 엔트리는 확인했지만 캐시된 bundletool은 실행형이 아니라 이번 산출물의 매니페스트/번들 규격 검증은 미완료. Play 업로드도 수행하지 않는다.

@@ -142,8 +142,8 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 
 ## 2026-11-13 사용자 피드백 반영 작업
 
-- M1/M2 UX 보완: 유닛 창 닫기, pause 메뉴 전투 포기, 전투 중 유닛 신규 배치, 사용자 확정 공성 `진격`/자동 진격 및 개별 이동 의미 반영.
-- 의존 변경: `battle_model` 단계 허용/개별 이동·자동진격, `battle_view` 입력/상태 UI, model/UI 회귀 테스트, 제품·요구사항·결정 문서, 사용자용 Godot/Android 실행 배치.
+- M1/M2 UX 보완: 유닛 창 닫기, pause 메뉴 전투 포기, 전투 중 유닛 신규 배치, 사용자 확정 공성 `진격`/자동 진격 및 개별 이동 의미 반영. 준비 화면 안내와 UI 회귀 assertion으로 `진격`이 전투 시작+전체 자동 진격임을 표시.
+- 의존 변경: `battle_model` 단계 허용/개별 이동·자동진격, `battle_view` 입력/상태 UI, model/UI 회귀 테스트, 제품·요구사항·결정 문서, 사용자용 Godot/Android 실행 배치. Android release export 스크립트는 현재 WinGet Godot 경로와 API36/샘플 앱 ID preflight를 검사.
 - 확인: Godot 통합 스크립트와 편집기 패널 자동화, Android 37 AVD 설치/foreground 실행. APK 릴리즈는 하지 않는다. 소스 커밋 및 원격 푸시만 수행.
 - 남은 사용자 QA: 확인 대화상자에서 포기 확정 후 실제 부분 보상 및 마을 복귀 여부 확인.
 

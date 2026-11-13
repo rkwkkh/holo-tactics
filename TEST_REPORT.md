@@ -684,3 +684,15 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Updated dialog text to wrap within the portrait viewport, localized its title/buttons (취소/포기), and shortened the explanation. Godot UI regression checks wrap mode and both labels.
 - Re-exported uild/holo-debug.apk (local debug only, not released), installed it on API 37 x86_64 AVD, and launched M1. From pause menu, opened the confirmation, visibly tapped 포기, observed result 웨이브 0 / 2 완료, reward +0, permanent balance unchanged at 165, then tapped 마을로 돌아가기 and observed the village screen. No app crash; current APK SHA-256: $hash.
 - This verifies the zero-completed-wave UI path. Positive partial reward for already completed waves remains covered by ProgressStore unit tests; user gameplay acceptance on Galaxy S25 Ultra is still useful.
+
+## Siege advance control clarity (2026-11-13)
+
+- Added a preparation-screen hint that `진격` starts combat and the whole army's automatic advance together; no separate all-unit movement command exists.
+- UI regression verifies the hint and button. Model regression covers preparation repositioning and individual combat movement followed by automatic advance after arrival.
+
+## Siege control hint and Android preflight (2026-11-13)
+
+- Godot 4.7.2 `run_godot_tests.bat` passed: core, content validation (0 Errors), seeded campaign (8/8), battle UI, and editor panels (24 upgrades). Existing headless editor RID/ObjectDB cleanup warnings remain after the passing assertion marker.
+- Added a siege preparation hint explaining that `진격` begins combat and the whole army's automatic advance; UI assertions verify the message and button. Existing model assertions cover prep repositioning and individual combat movement followed by automatic advance.
+- Android debug test AAB exported from this source: 86,248,032 bytes, SHA-256 `7A484105D3329C389D858111EC35BF8949E187C2AEE5C1796BCBE0921448F32D`. Required ZIP entries are present; `jarsigner` reports unsigned, as expected for a debug test artifact. Full bundletool validation/manifest decode was unavailable because only the non-executable bundletool library JAR is cached.
+- Release-export PowerShell parses and locates Godot from WinGet; API36 and placeholder-ID guards run before export. The current placeholder ID intentionally blocks release. No signed AAB or GitHub release was created.

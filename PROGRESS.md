@@ -275,6 +275,7 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - 완료: 유닛 정보창 닫기 동작 추가, 일시정지 메뉴에 확인형 전투 포기 추가.
 - 완료: 전투 중 해금 유닛 신규 배치 가능; 재정비 중 즉시 개별 재배치, 공성 전투 중 개별 목적지 보행 후 자동 진격 재개.
 - 완료: 공성 시작 버튼을 `진격`으로 표시. 진격 시 적 웨이브 활성화와 전체 아군 자동 진격이 함께 시작됨. 별도 전체 이동 명령은 없음.
+- UX 보완: 공성 준비 화면에 `진격`이 전투 시작과 전체 자동 진격을 함께 실행한다고 표시. UI 회귀 테스트가 버튼과 안내 문구를 확인한다.
 - 자동 확인: 배치/이동/버튼 상태, 사용자 인터페이스 닫기·포기 확인창 및 승리/패배 테스트가 통과.
 - 사용자 확인 대기: 일시정지 메뉴에서 포기 후 실제 부분 보상 액수와 마을 복귀 흐름은 사용자의 게임 내 재확인 필요.
 
@@ -293,3 +294,11 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 
 - Fixed the Android portrait confirmation dialog: Korean wrapping text, localized title and action buttons, concise explanation. Added UI assertions and re-ran full Godot test batch successfully.
 - Re-exported local debug APK and manually exercised API37 AVD pause→confirm abandon→zero-wave result (+0/unchanged 165 currency)→village. No GitHub APK release. User-device positive partial-reward flow remains an acceptance check.
+
+## 2026-11-13 공성 조작 안내 및 Android 빌드 사전검사
+
+- 확정 조작을 재확인: 공성 `진격`은 전투 시작과 전 유닛 자동 진격을 동시에 실행한다. 개별 이동은 선택 유닛만 대상으로 하며, 준비 단계에서는 그 자리에 재배치·대기하고 전투 중에는 목적지까지 보행 후 자동 진격을 재개한다. 전체 이동 명령은 제공하지 않는다.
+- 준비 화면 안내와 UI 회귀 assertion을 추가했다. `run_godot_tests.bat` 전체 통과(core, 콘텐츠 Errors 0, 8/8 캠페인, 전투 UI, 편집기 패널 24 강화); 편집기 headless 종료 시 기존 RID/ObjectDB 정리 경고는 출력된다.
+- `export_android_aab.ps1`이 WinGet Godot 경로도 찾고, 샘플 앱 ID와 API36 사전조건을 검사하도록 보완했다. 임시 검증 값으로 사전검사 중단을 확인했으며 실제 서명/릴리즈 내보내기는 하지 않았다.
+- 현재 코드의 로컬 테스트 AAB: 86,248,032 bytes, SHA-256 `7A484105D3329C389D858111EC35BF8949E187C2AEE5C1796BCBE0921448F32D`. ZIP 필수 엔트리는 확인했고 서명되지 않았다. 실행형 bundletool을 확보하지 못해 AAB 매니페스트/번들 validator 검사는 대기.
+- 소스만 커밋·푸시한다. APK/AAB GitHub 릴리즈는 하지 않는다.

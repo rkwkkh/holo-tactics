@@ -14,11 +14,32 @@ if (-not (Test-Path -LiteralPath $env:GODOT_ANDROID_KEYSTORE_RELEASE_PATH -PathT
     throw "The release keystore path does not exist."
 }
 
-$godot = Join-Path $env:LOCALAPPDATA "Programs/Godot/Godot_v4.7.2-stable_win64_console.exe"
-if (-not (Test-Path -LiteralPath $godot)) {
-    $godot = (Get-Command godot*console.exe -ErrorAction Stop).Source
-}
 $project = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$godotName = "Godot_v4.7.2-stable_win64_console.exe"
+$godot = Join-Path $env:LOCALAPPDATA "Programs/Godot/$godotName"
+if (-not (Test-Path -LiteralPath $godot)) {
+    $packageRoot = Join-Path $env:LOCALAPPDATA "Microsoft/WinGet/Packages"
+    $godot = Get-ChildItem -Path $packageRoot -Directory -Filter "GodotEngine.GodotEngine*" -ErrorAction SilentlyContinue |
+        ForEach-Object { Join-Path $_.FullName $godotName } |
+        Where-Object { Test-Path -LiteralPath $_ } |
+        Select-Object -First 1
+}
+
+if (-not $godot) {
+    $command = Get-Command $godotName -ErrorAction SilentlyContinue
+    if ($command) { $godot = $command.Source }
+}
+if (-not $godot) {
+    throw "Godot 4.7.2 console executable was not found. Install it or add it to PATH."
+}
+$presets = Get-Content -LiteralPath (Join-Path $project "export_presets.cfg") -Raw
+if ($presets.Contains('package/unique_name="com.example.holotactics"')) {
+    throw "Replace the sample Android package ID in both export presets before preparing a Play AAB."
+}
+if ($presets -notmatch '(?s)\[preset\.1\.options\][^\[]*target_sdk="36"') {
+    throw "The Play AAB preset must target API 36 before export under the current Google Play policy."
+}
+
 $output = Join-Path $project "build/holo-release.aab"
 New-Item -ItemType Directory -Path (Split-Path $output) -Force | Out-Null
 $godotArgs = @("--headless", "--path", $project)

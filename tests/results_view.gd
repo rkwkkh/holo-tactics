@@ -21,7 +21,7 @@ func _run() -> void:
 	var initial_phase: String = view.battle.phase
 	view.battle.stage.mode = "siege"
 	view._refresh()
-	assert(view.wave_button.text == "진격")
+	assert(view.wave_button.text == "진격" and view.status.text.contains("전투와 전체 자동 진격 시작"))
 	view.battle.stage.mode = "defense"
 	view._refresh()
 	var initial_gold: int = view.battle.combat_gold
