@@ -18,6 +18,8 @@ call :run "Content validation" "scripts/validate_content.gd" "--quit-after 2" "C
 if errorlevel 1 goto failed
 call :run "Campaign simulation" "tests/campaign_playability.gd" "--quit-after 2" "All 8 campaign stages won"
 if errorlevel 1 goto failed
+call :run "Editor preview isolation" "tests/editor_preview.gd" "" "Editor preview isolation passed"
+if errorlevel 1 goto failed
 call :run "Battle UI tests" "tests/results_view.gd" "" "Battle result panel tests passed"
 if errorlevel 1 goto failed
 echo Running editor-panel checks. Godot may print resource cleanup warnings after passing assertions.

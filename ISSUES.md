@@ -208,3 +208,7 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Local API37 AVD install/launch and M1 battlefield screenshot passed. Renderer is emulated (`ro.hardware.egl=emulation`); sampled basic combat at 33.9–34.8 FPS / P95 30.0–32.46 ms. This is not representative hardware and cannot prove either device target. Do not mark performance accepted from this run.
 - Remaining: representative Android 10+ low-tier and Galaxy S25 Ultra gameplay/FPS, high-load scenario measurement, Android 10 graphics compatibility on real hardware, and signed private-test artifact setup.
+
+## Windows runner preview-test coverage (2026-11-13)
+
+- The CI workflow already ran `tests/editor_preview.gd`, but the user-facing `run_godot_tests.bat` omitted it. Added the test to the local batch; direct-wave isolation test and expanded full batch pass. Direct-wave button click and invalid-draft feedback remain GUI spot checks only.

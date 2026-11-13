@@ -16,8 +16,8 @@
 - [x] M2: completed. Siege/defense outcomes, A*/FSM+Utility AI, reinforcements and safe termination, walls/obstacles, four facilities, repair, status effects and checkpoint restore are covered by core/integration tests; all campaign stages simulate to victory. Repair cost remains a documented SEED.
 - [x] M3: completed. Five ally/six enemy kinds, 20 unit upgrades plus four facility upgrades, six fixed evolutions, 10 skills, four village buildings, research unlocks and persistent battle effects are implemented and covered by regression tests.
 - [x] M4: completed. Main 6 + optional 2 stages and 26 waves are wired through story locks, rewards and progress persistence; `tests/campaign_playability.gd` wins all 8 stages and checks idempotent rewards/unlocks. Content balance remains SEED; a full manual playthrough is still useful QA.
-- [ ] M5: implementation is in place (three EditorPlugin tabs, Inspector sync, validator-gated atomic saves, error navigation, isolated full-stage/direct-wave preview); headless tests pass. GUI interaction remains unverified because the Computer Use host is unavailable.
-- [ ] M6: local tests and current Mobile/Vulkan APK/AAB export pass; APK v2 signature and AAB structure are checked. API37 AVD displays campaign/M1, but its SwiftShader sample is below target; API29 AVD fails both Vulkan presentation and Compatibility EGL startup. Physical Android/FPS, publisher-signed AAB/Play, and M5 GUI remain open.
+- [x] M5: three EditorPlugin tabs, Inspector resource sync, validator-gated atomic saves, error navigation, and isolated full-stage/direct-wave preview are implemented and automated. GUI smoke confirms named dock, all three populated panels, Inspector properties, and full-stage launch; direct-wave isolation test passes.
+- [ ] M6: local tests and Mobile/Vulkan Android exports pass; API37 AVD installation and M1 play screen work. Its emulated renderer measured 33.9–34.8 FPS in basic combat, below the regular 60 FPS target and not representative-device evidence. API29 AVD renderer failure, physical Android/FPS, publisher-signed package, and Play private-test setup remain open.
 
 재검증 (2026-11-12): Godot 4.7.2 headless import/테스트/콘텐츠 검사/메인 씬 통과. APK 재생성 통과. API 29 AVD는 GLES2 한계로 Godot Android 렌더 컨텍스트 생성에 실패했고, API 37 AVD에서는 앱 프로세스가 실행됐으나 GLES3 셰이더 uniform 한도 오류 로그가 있어 시각 스모크 테스트는 미통과/미확정이다. 세부 결과는 `TEST_REPORT.md`.
 
@@ -309,7 +309,13 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - 도크 컨트롤 이름을 `콘텐츠 편집기`로 지정하고 기존 EditorPlugin 테스트에 이름 assertion을 추가했다. 전체 `run_godot_tests.bat` 재실행 통과(core, validator, 8/8 캠페인, battle UI, editor panels 24 upgrades).
 - 변경 후 GUI 재시작/패널·Inspector·미리보기 버튼 직접 조작은 아직 확인하지 않았다. Editor headless 테스트 종료 시 기존 RID/ObjectDB 정리 진단이 출력된다.
 
+## M5/M6 확인사항 갱신 (2026-11-13)
+
+- Godot GUI 재시작으로 도크 표시, 세 콘텐츠 패널, Inspector 리소스, 격리된 전체 스테이지 미리보기를 확인했다. Editor preview test를 Windows 테스트 배치에 추가했고 전체 배치가 통과해 M5를 완료 처리했다.
+- M6는 API37 AVD 스모크를 추가했으나 성능 목표는 아직 통과 판정할 수 없다. 상세 FPS와 한계는 `TEST_REPORT.md`/`ISSUES.md` 참조.
+
 ## 2026-11-13 Godot GUI/API37 retest
 
 - Reopened Godot GUI and confirmed the named `콘텐츠 편집기` dock, all three populated tabs, stage JSON draft, Inspector resource property view, and isolated M1 stage preview. Direct-wave preview and mutation/rejection UI were not manually clicked; their automated tests remain the evidence for those paths.
 - API37 x86_64 AVD installed and launched the current local debug APK; campaign and M1 battlefield rendered. Short sampler windows show 33.9–34.8 average FPS on the emulated renderer. This is below the ordinary 60 FPS goal and does not satisfy device acceptance; actual Galaxy S25 Ultra and a lower-tier Android 10+ device still require profiler runs.
+- Ran existing `tests/editor_preview.gd` directly (selected wave 2, progress/request isolation passed) and added it to `run_godot_tests.bat`; the expanded full local batch passes.

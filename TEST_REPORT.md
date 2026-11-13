@@ -710,3 +710,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Installed `build/holo-debug.apk` (SHA-256 `73CFE1B90E186AF9929B25ED22942E66F30D2A3FC9EF867006BFD60372002C2F`, package `com.example.holotactics`) on the online API37 x86_64 AVD (1080x2400, density 420). App launch, campaign screen and M1 wave-1 battlefield/placement UI were visible; no fatal Android/Godot shader errors in the inspected log window.
 - Five short M1 combat sampler windows on this emulated renderer measured 33.9–34.8 FPS average, P95 30.0–32.46 ms, max 33.75–45.81 ms. This is below the 60 FPS regular target, but the AVD reports `ro.hardware.egl=emulation`; it is not representative-device acceptance evidence. The scenario was not a high-load stress run.
 - A separate Windows editor-preview sample measured 29.8 FPS average, P95 33.33 ms, max 146.94 ms; it is debug/editor evidence only and not an Android performance result.
+
+## Editor preview test in local batch (2026-11-13)
+
+- `tests/editor_preview.gd` was run directly and passed: selected wave 2 loaded through the editor-preview scene, result handling left campaign progress unchanged, and the one-shot request was consumed. The test restores any pre-existing progress/request files.
+- Added this existing CI test to `run_godot_tests.bat`; the full local batch passed core, content validation, 8-stage simulation, editor-preview isolation, battle UI, and editor panel checks. Existing editor-headless RID/ObjectDB shutdown diagnostics remain after the assertion sentinel.
+- Directly clicking the selected-wave preview and intentionally invalid draft Error/Warning presentation in GUI remains unchecked; automated scene/isolation coverage passes.

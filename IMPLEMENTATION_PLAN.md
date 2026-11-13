@@ -22,7 +22,7 @@
 | M2 공성/경로 | M1 | FSM+Utility AI+A*, 공성 핵심/시설, 증원, 방어벽·장애물, 안전 종료 | 공성/경로/증원 예외 통합 테스트 |
 | M3 전투 성장 | M2 | 아군 5/적 6/시설 4, 강화 20, 진화 6, 스킬·상태이상·연구 기반 | 성장의 전투 반영 및 AI/전투 테스트 |
 | M4 마을/캠페인 | M3 | 마을 건물 4, 영구 재화/연구/해금, 8개 스테이지·목표 웨이브 콘텐츠 | 메인 진행 및 선택 분기 플레이, 보상/진행 저장 |
-| M5 제작 도구 | M0·M3·M4 | 스테이지·웨이브/진화/강화 Godot 편집 패널, Inspector 속성 편집, 격리된 미리보기 | CI/headless 통과. GUI에서 세 탭·Inspector·전체 스테이지 미리보기 확인; 직접 웨이브·검증 오류 조작은 미확인 |
+| M5 제작 도구 | M0·M3·M4 | 스테이지·웨이브/진화/강화 Godot 편집 패널, Inspector 속성 편집, 격리된 미리보기 | CI/headless 및 로컬 배치 통과. GUI에서 세 탭·Inspector·전체 스테이지 미리보기, 자동 테스트에서 직접 웨이브 격리 확인; 검증 오류 UI 클릭은 미확인 |
 | M6 품질/배포 준비 | M1~M5 | 자동·통합 검증, 저장 마이그레이션, Android 패키지, 성능·비공개 테스트 자료 | 자동 테스트·콘텐츠 Error 0, AAB 및 실기기 측정 기록 |
 
 각 단계는 자동 테스트 및 진행 문서를 갱신한 뒤 다음 단계로 진행한다. 실기기/스토어 권한이 필요한 결과는 실제로 확인되기 전까지 미검증으로 남긴다.
@@ -156,4 +156,4 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 
 - Godot GUI now visibly exposes the named `콘텐츠 편집기` dock. Stage/wave, evolution, and upgrade pages load JSON drafts; the stage record opens as `EditableCatalogRecord` in Inspector. The isolated full-stage preview launched an M1 battlefield.
 - API37 x86_64 AVD accepted the local debug APK and displayed campaign and M1 battle UI. Its five M1 sampler intervals averaged 33.9–34.8 FPS (P95 30.0–32.46 ms); `ro.hardware.egl=emulation`, so this does not satisfy representative-device FPS acceptance. See `TEST_REPORT.md`.
-- Next: direct-wave preview/invalid-draft GUI smoke, representative lower-tier Android 10+ and Galaxy S25 Ultra profiling including a stress scenario, package ID/signing, and private-test preparation.
+- Next: invalid-draft Error/Warning GUI interaction, representative lower-tier Android 10+ and Galaxy S25 Ultra profiling including a stress scenario, package ID/signing, and private-test preparation.
