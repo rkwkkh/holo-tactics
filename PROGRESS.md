@@ -443,3 +443,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Official Play guidance now requires Android 16/API 36 target for new app submissions and updates from 2026-08-31; the export preset is already target API 36 / min API 29.
 - A 12-tester/14-consecutive-day Closed test applies to personal developer accounts created after 2023-11-13 before they can apply for production access. It is not a prerequisite merely to begin the Closed test. Account type/date are owner-only facts and remain unverified. MVP scope ends at Closed testing; public/production release is outside scope.
 - Official sources and the conditional account check are linked in `PLAY_PRIVATE_TEST_PREPARATION.md`.
+
+## Play privacy/Data safety preflight (2026-11-13)
+
+- Inspected the current debug APK manifest: package `com.rhstudio.holotactics`, target API 36, no declared `uses-permission`. Source scan found only local progress/checkpoint saves under `user://`; no HTTP, Firebase, ads, analytics or crash-reporting integration found in project code/config.
+- Added `PRIVACY_POLICY_DRAFT.md` as an owner-review draft, not a final declaration. Official Play policy requires Data safety for Closed testing (internal-only is exempt) and a public privacy-policy URL plus in-app policy link/text even if no personal data is collected. Final signed AAB/SDK review and owner declaration remain outstanding.
+- The app currently has no in-app policy link/text. This code/UI task depends on final owner-provided developer/contact details and policy text/URL.

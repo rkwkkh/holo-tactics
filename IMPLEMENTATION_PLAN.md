@@ -200,3 +200,7 @@ The automated editor-panel suite now tests dynamic Inspector resource mutation a
 ## M6 release-mode export follow-up (2026-11-13)
 
 Release export preflight fails as expected without a configured release keystore. No release artifact or replacement key was created; debug test export remains separate. Physical device and Closed-test gates still need owner participation.
+
+## Closed-test Data safety preparation update (2026-11-13)
+
+The current debug APK manifest declares no permissions; the app source saves only to app-private `user://` and no project analytics/ad/network integration was found. This is preliminary only. Google Play requires Data safety plus a public privacy policy and in-app policy text/link for Closed testing even when no personal data is collected. `PRIVACY_POLICY_DRAFT.md` records owner placeholders. Add the in-app entry after owner confirms the legal/display name, contact email, and final policy text/URL; re-audit the final signed AAB and SDKs.

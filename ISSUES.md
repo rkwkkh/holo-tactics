@@ -312,3 +312,9 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Official policy as of 2026-11-13 sets API 36 for new app/update submissions beginning 2026-08-31; current export preset already targets API 36.
 - If the owner's account is a personal account created after 2023-11-13, 12 testers must remain opted in for 14 consecutive days before applying for production access. This does not block starting Closed testing and does not extend this MVP into public release. Owner account type/date are unknown; verify in Console when access exists. Sources are linked in `PLAY_PRIVATE_TEST_PREPARATION.md`.
+
+## Closed-test privacy policy requirement (2026-11-13)
+
+- Play policy requires a Data safety form for Closed-track apps (only apps exclusively on Internal testing are exempt) and a public privacy-policy URL plus policy link/text inside the app even when no personal/sensitive data is collected. The current game has no in-app policy link/text.
+- A clearly labeled draft is in `PRIVACY_POLICY_DRAFT.md`; final developer/entity name, public contact email, account-approved policy and hosting URL are missing. Do not present this draft as published or as the final Data safety declaration.
+- Current debug APK manifest declares no permissions; inspected source shows local `user://` progress/checkpoint storage and no project analytics/ad/network SDK integration. Recheck the final signed AAB and third-party SDK data handling before making Console declarations.

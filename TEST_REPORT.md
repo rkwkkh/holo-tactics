@@ -878,3 +878,11 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Result: failed at Android code signing because the release keystore is not configured. `build/holo-perf-release.apk` was not created. No keystore was created or substituted; no release/Play artifact was produced.
 - Existing debug APK and unsigned CI AAB evidence remain valid for their stated test purposes only. Publisher signing/Play Console access is an external gate.
 - No Android target is currently connected to ADB; physical S25 Ultra gameplay/FPS and Android 10 checks remain unverified.
+
+## Data safety manifest/source preflight (2026-11-13)
+
+- `apkanalyzer manifest print build/holo-debug.apk` showed package `com.rhstudio.holotactics`, target API 36, and no `<uses-permission>` entries. `aapt dump permissions` likewise listed no app permissions.
+- The same merged APK manifest has `android:allowBackup="false"`, consistent with not using Android cloud backup for local campaign saves in this build.
+- Source scan of scripts, scenes, addons, Android build config and `project.godot` found no HTTP/API, Firebase, ads, analytics, Sentry or Crashlytics integration. Progress and checkpoint stores use app-local `user://` paths. APK dex package scan included AndroidX and Godot/Kotlin support, not a detected analytics/ad SDK.
+- This only characterizes the current debug APK/source snapshot. It is not a final privacy or Data safety attestation; final signed AAB and transitive SDK behavior still need owner review.
+- Play policy says Closed-track apps need Data safety and privacy-policy URL plus in-app link/text, even if no data is collected (Internal-only exemption does not cover Closed testing). Policy draft added; app UI link/text is not implemented pending owner-approved details.

@@ -48,3 +48,9 @@ No Android device is attached to ADB. A local release-mode APK export preflight 
 ## Play policy update (2026-11-13)
 
 Before the owner sets up Console, note the current target API 36 requirement (already configured) and the conditional 12 testers/14 consecutive days requirement for post-2023-11-13 personal accounts applying for production access. It is not a gate to begin the MVP Closed test. Verify account type and creation date with owner access; sources are in `PLAY_PRIVATE_TEST_PREPARATION.md`.
+
+## Closed-test policy/data handling checkpoint (2026-11-13)
+
+- Current build preflight: no manifest permissions, no project network/ads/analytics SDK integration found, local progress/checkpoint `user://` storage. This is preliminary; recheck final signed AAB and SDK behavior before Data safety declaration.
+- Play Closed testing requires Data safety plus a public privacy policy URL and policy text/link in-app even if no personal/sensitive data is collected. Draft at `PRIVACY_POLICY_DRAFT.md`; app in-app link/text remains unimplemented.
+- Await owner developer/display name, public contact email, and final policy/hosting URL. App account type and creation date remain owner-only checks for conditional production-access tester policy.
