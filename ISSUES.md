@@ -261,3 +261,8 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Optimized the board refresh entity lookup. Matched API37 emulated-EGL A/B improved average from 23.7 to 52.66 FPS and mean P95 from 57.13ms to 22.08ms, but the optimized sample is still below the 60FPS normal-combat target. AVD graphics are not representative of the Galaxy S25 Ultra or lower-tier Android devices; obtain user physical-device logs before claiming performance acceptance. AVD also emitted intermittent Android hardware-service SIGABRTs, while filtered game logs had no script/fatal/Vulkan errors.
 - Latest APK/API29 `MaDang_API29` AVD recheck (2026-11-13): install/process startup succeeded, but the 20-second capture was black and Vulkan queue present `error 5` recurred. This confirms the AVD issue persists in the optimized APK, not a physical Android 10 incompatibility. No production renderer change is justified without physical-device evidence.
+
+## User-requested pause checkpoint (2026-11-13)
+
+- Current stop point is documented in `SESSION_HANDOFF.md`. No known local source change is left uncommitted; latest code and API29 AVD findings are pushed in `71ccf9a`, with Actions run `43371542368` passing both jobs.
+- Resume blockers are external evidence/access: Galaxy S25 Ultra gameplay/FPS logs promised by the user, a physical Android 10 compatibility check, and owner Play Console plus publisher signing setup for Closed testing. These do not block independent documentation or other local M6 work after resume.

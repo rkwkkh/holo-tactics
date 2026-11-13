@@ -819,3 +819,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Started the existing `MaDang_API29` Android 10 AVD (API 29, emulated EGL), installed current `build/holo-debug.apk` (250,223,794 bytes; SHA-256 `FFBFB6814DDF661DB214E72B560731E9CBE8D4D30AA2F1910600A3CFE9C5DDFA`), and launched package `com.rhstudio.holotactics`. Install and process startup succeeded.
 - After 20 seconds the captured screen was black. Logcat again reported `Couldn't present to Vulkan queue (VkResult error 5)`. Screenshot: ignored local artifact `build/avd-api29-current.png`.
 - This reproduces the known API29 AVD presentation failure on the latest optimization APK. It is not proof that Android 10 physical devices fail; Galaxy S25 Ultra installation was previously user-confirmed, but a physical Android 10 device is not available here. No production renderer setting was changed.
+
+## Pause checkpoint verification summary (2026-11-13)
+
+- At the user's request, recorded an explicit handoff in `SESSION_HANDOFF.md`; latest pushed code commit `acbf984`, latest evidence/docs commit `71ccf9a`, and latest Actions run `43371542368` (Godot + Android AAB) succeeded.
+- Full local `run_godot_tests.bat` had passed after the renderer optimization; content validation was 0 errors. The latest API29 emulator check is separately recorded above and is a black-screen Vulkan-present failure, not physical Android 10 evidence.
+- No new code was changed for the pause. No APK release or Play upload was created. Physical-device measurements and account-dependent Closed-test steps remain pending.

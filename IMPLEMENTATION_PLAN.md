@@ -166,3 +166,12 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 
 - CI run `43351099459` for `b425bf8` passed the complete Godot validation job and Android debug AAB export/structure checks; the unsigned artifact uploaded successfully. This resolves the CI workflow stall. Play Console package availability and publisher-signed AAB/private-test setup remain open.
 - Confirmed-ID M1 combat smoke renders on API37 AVD, but the emulated renderer sampled only 13.5–14.9 FPS in combat. Use a physical-device profiler before attributing the issue or changing the battle rendering path.
+
+## Resume order after user-requested pause (2026-11-13)
+
+1. Confirm clean `git status`, latest `origin/master`, and Actions run. At this checkpoint commit `71ccf9a` and run `43371542368` passed both jobs.
+2. Use the Galaxy S25 Ultra gameplay/FPS logs the user said they will provide; test regular and high-load M1 performance, touch/safe-area, abandon/reward, and checkpoint flows. See `ANDROID_TESTING.md` for capture commands.
+3. Verify Android 10 on physical hardware or a known-good Vulkan-capable API29 setup. Existing API29 AVD black screen/present error is inconclusive for physical devices; don't alter renderer based on that alone.
+4. Finish visible EditorPlugin Error/Warning focus-navigation checks when Windows editor UI access is available; headless assertions already pass.
+5. For Closed testing, wait for owner Play Console access and publisher signing setup. Then verify app ID availability, create signed AAB and final owner-approved listing/privacy/contact/tester materials, and upload only with authorized account access. Never request signing secrets in chat.
+6. Record evidence in `TEST_REPORT.md`, `ISSUES.md`, and `PROGRESS.md`; run relevant checks, commit/push, and wait for CI. Keep M6 incomplete until physical-device and Closed-test gates are proven.

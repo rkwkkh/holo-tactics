@@ -379,3 +379,11 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Godot 4.7.2 full headless regression passed and content validation remains at 0 errors. Re-exported and installed the debug APK on API37 AVD; matched two-wave M1 smoke cleared successfully.
 - Controlled A/B on the emulated renderer improved mean FPS from 23.7 to 52.66 and mean P95 frame time from 57.13ms to 22.08ms. Current mean remains below 60FPS; S25 Ultra and representative-device performance acceptance remain pending. See `TEST_REPORT.md` and `ANDROID_TESTING.md` for APK hashes and limitations.
 - Pushed as `acbf984`; GitHub Actions run [43370736415](https://github.com/rkwkkh/holo-tactics/actions/runs/43370736415) passed both Godot validation and Android debug AAB export/structure checks. No APK release or Play submission was created.
+
+## Pause checkpoint (2026-11-13)
+
+- User requested a pause after a documented handoff. The full M0–M6 objective remains active; this is a continuation checkpoint, not an MVP completion claim.
+- Latest repository commit: `71ccf9a` (`Record Android 10 emulator renderer recheck`), pushed to `origin/master`; its GitHub Actions run [43371542368](https://github.com/rkwkkh/holo-tactics/actions/runs/43371542368) passed Godot and Android AAB jobs. Worktree was clean at checkpoint.
+- Latest source change is the board refresh lookup optimization (`acbf984`). Local full Godot suite passed on 4.7.2; content validation had 0 errors. Matched API37 emulated-EGL A/B improved mean FPS 23.7→52.66, but this remains below the 60 FPS goal and is not device acceptance.
+- Current local debug APK: `build/holo-debug.apk`, SHA-256 `FFBFB6814DDF661DB214E72B560731E9CBE8D4D30AA2F1910600A3CFE9C5DDFA`; debug-signed, not a release artifact. See `SESSION_HANDOFF.md` for evidence, gates, and ordered resume actions.
+- Pending M6: S25 Ultra hands-on gameplay/FPS logs from the user; Android 10 physical-device compatibility; high-load/representative-device performance; remaining visual EditorPlugin Error/Warning interaction checks; publisher signing and Play Console access/setup for Closed testing. The latest API29 AVD install starts but renders black with Vulkan present error 5; do not generalize this emulator failure to physical devices.
