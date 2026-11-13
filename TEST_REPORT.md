@@ -902,3 +902,8 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - `cmd /c run_android_emulator_test.bat` selected `MaDangStage6_API37`, booted it, installed `build/holo-debug.apk` successfully, and launched `com.rhstudio.holotactics`. ADB confirmed the app activity was resumed and the captured screen displayed the campaign menu.
 - The emulator script printed repeated “Input redirection is not supported” messages when run through this automated non-interactive shell; install and launch still succeeded. Double-click use in a regular Windows console was not separately checked.
 - This is a startup/menu smoke only. Full user playtest, physical-device performance, and Android 10 hardware remain unverified.
+## Clean-checkout test portability audit (2026-11-13)
+
+- Tracked-file audit found all project source, design docs, data, assets, plugin, export settings, CI workflow, and launch/test scripts in Git. `.godot/`, generated `android/` Gradle template/build cache, and `/build/` outputs are ignored; the debug APK/AAB and signing material are not staged.
+- A fresh clone initially failed because the test batch ran scripts before Godot created its global script-class cache. Added a headless editor-import step. The same fresh run exposed nondeterministic result-view setup: metadata was set on the root Window instead of SceneTree, and the speed assertion depended on persisted local campaign progress. Corrected both; the preview abandon check now matches its actual preview flow.
+- Full `run_godot_tests.bat` passed locally after the fix: core, content validation (0 errors), 8 seeded campaign wins, preview isolation, battle result UI, and editor content panels. Clean clone rerun after push is pending.

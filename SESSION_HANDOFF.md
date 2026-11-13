@@ -68,3 +68,8 @@ Before the owner sets up Console, note the current target API 36 requirement (al
 - Use `run_godot_game.bat` to start the visible Windows game; it locates the Godot 4.7.2 GUI binary and opens the project main scene. `run_godot_tests.bat` is still the separate headless automated suite.
 - Use `run_android_emulator_test.bat` to start the preferred `MaDangStage6_API37` AVD, install the local debug APK, and launch the game. This path was run successfully; the AVD showed the campaign screen. Keep using `ANDROID_TESTING.md` for the user gameplay/FPS checklist.
 - Launchers are validated for startup only, not full gameplay or hardware acceptance. The Android shell invocation produced harmless stdin-redirection notices despite successful install/launch.
+## Source portability audit (2026-11-13)
+
+- README now documents fresh checkout, Windows game/test launchers, Android SDK/JDK prerequisites, build template install/export, and the confirmed package ID.
+- `run_godot_tests.bat` now imports the project before tests so a new checkout registers global GDScript classes. `tests/results_view.gd` now uses SceneTree metadata and isolated in-memory completion state instead of relying on the local save.
+- The current checkout full suite passes after these changes. Before calling the source snapshot ready, rerun the same test batch in a newly cloned `master` checkout and verify CI. Do not add generated `.godot/`, `android/`, or `build/` artifacts.

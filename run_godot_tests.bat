@@ -12,6 +12,11 @@ if not defined GODOT (
   exit /b 2
 )
 
+echo.
+echo === Import project and register script classes ===
+"%GODOT%" --headless --editor --path "%CD%" --quit
+if errorlevel 1 goto failed
+
 call :run "Core tests" "tests/run.gd" "--quit-after 2" "All headless project tests passed"
 if errorlevel 1 goto failed
 call :run "Content validation" "scripts/validate_content.gd" "--quit-after 2" "Content validation passed"

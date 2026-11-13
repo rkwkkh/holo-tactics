@@ -2,9 +2,9 @@ extends SceneTree
 
 func _initialize() -> void:
 	root.size = Vector2i(360, 640)
-	root.set_meta("selected_stage_id", "stage.m1.frontier")
-	root.set_meta("editor_preview", true)
-	root.set_meta("editor_preview_id", "result-view-test-%s" % Time.get_ticks_usec())
+	set_meta("selected_stage_id", "stage.m1.frontier")
+	set_meta("editor_preview", true)
+	set_meta("editor_preview_id", "result-view-test-%s" % Time.get_ticks_usec())
 	call_deferred("_run")
 
 func _run() -> void:
@@ -27,14 +27,13 @@ func _run() -> void:
 	var initial_gold: int = view.battle.combat_gold
 	view._toggle_pause()
 	assert(view.paused and view.timer.time_left == 0.0 and view.wave_button.disabled and view.back_button.disabled)
-	assert(view.pause_menu.visible and not view.pause_abandon_button.disabled)
-	var was_editor_preview: bool = view.editor_preview
+	assert(view.pause_menu.visible and not view.pause_abandon_button.disabled and view.pause_abandon_button.text == "테스트 종료")
 	view.editor_preview = false
 	view.pause_abandon_button.emit_signal("pressed")
 	var abandon_dialog: ConfirmationDialog = view.get_meta("abandon_dialog")
-	assert(abandon_dialog.visible and abandon_dialog.get_ok_button().text == "포기" and abandon_dialog.cancel_button_text == "취소" and abandon_dialog.get_label().autowrap_mode == TextServer.AUTOWRAP_WORD_SMART)
+	assert(abandon_dialog.visible and abandon_dialog.get_ok_button().text == "종료" and abandon_dialog.cancel_button_text == "취소" and abandon_dialog.get_label().autowrap_mode == TextServer.AUTOWRAP_WORD_SMART)
 	(view.get_meta("abandon_dialog") as ConfirmationDialog).hide()
-	view.editor_preview = was_editor_preview
+	view.editor_preview = true
 	view._start_wave()
 	view._on_tile_pressed(view.battle.core_cell)
 	assert(view.status.text.contains("핵심 · HP") and view.battle.phase == initial_phase and view.battle.combat_gold == initial_gold)
@@ -80,6 +79,7 @@ func _run() -> void:
 	view._on_tile_pressed(Vector2i(0, 8))
 	assert(view.status.text.begins_with("검사 · HP"))
 	view._toggle_pause()
+	view.progress.data.completed_stages.clear()
 	view.editor_preview = false
 	view._refresh()
 	assert(view.speed_button.disabled)

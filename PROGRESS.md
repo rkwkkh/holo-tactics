@@ -462,3 +462,8 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 
 - Added root-level `run_godot_game.bat` for opening the visible game on Windows. The existing `run_android_emulator_test.bat` starts the API37 AVD, installs the current debug APK, and launches the Android app.
 - Ran both launch paths: Godot's GUI game process remained active; the Android script installed and launched successfully, and an AVD screenshot showed the campaign menu. See `ANDROID_TESTING.md` and `TEST_REPORT.md`. No release APK was created.
+## Fresh-checkout portability hardening (2026-11-13)
+
+- Full Godot source is tracked; `.godot/`, generated Android Gradle templates/cache, and `build/` binaries/logs remain ignored because they are machine-generated and reproducible. The Android template/export setup is documented in `README.md`.
+- A clean clone exposed that `run_godot_tests.bat` did not first create Godot's global script-class cache. Added a headless editor import step. The result UI test also attached preview metadata to the root Window instead of the SceneTree and inherited the workstation's saved campaign state; corrected it to use SceneTree metadata and deterministic in-memory progress.
+- Full local test batch passed after these fixes. Exact pushed-clone verification is the next check.
