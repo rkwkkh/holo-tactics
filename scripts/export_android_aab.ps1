@@ -33,8 +33,8 @@ if (-not $godot) {
     throw "Godot 4.7.2 console executable was not found. Install it or add it to PATH."
 }
 $presets = Get-Content -LiteralPath (Join-Path $project "export_presets.cfg") -Raw
-if ($presets.Contains('package/unique_name="com.example.holotactics"')) {
-    throw "Replace the sample Android package ID in both export presets before preparing a Play AAB."
+if ([regex]::Matches($presets, '(?m)^package/unique_name="com\.rhstudio\.holotactics"$').Count -ne 2) {
+    throw "Both Android export presets must use the confirmed package ID com.rhstudio.holotactics."
 }
 if ($presets -notmatch '(?s)\[preset\.1\.options\][^\[]*target_sdk="36"') {
     throw "The Play AAB preset must target API 36 before export under the current Google Play policy."

@@ -212,3 +212,15 @@ The original four design documents now consistently reflect confirmed user rules
 ## Windows runner preview-test coverage (2026-11-13)
 
 - The CI workflow already ran `tests/editor_preview.gd`, but the user-facing `run_godot_tests.bat` omitted it. Added the test to the local batch; direct-wave isolation test and expanded full batch pass. Direct-wave button click and invalid-draft feedback remain GUI spot checks only.
+
+## Android AAB CI stall (2026-11-13)
+
+- Six recent GitHub Actions pushes were stuck at the same Android build-template step; their Godot validation jobs succeeded. The workflow used `--install-android-build-template` as a standalone command although Godot documents it for use with export.
+- Fixed by combining template installation and AAB export, and capped the Android job at 20 minutes. Stale runs were cancelled to stop the repeated waiting jobs.
+- Local exact-command export passes and required ZIP entries exist, but `jarsigner` reports the test AAB is unsigned. Corrected remote run, final package ID, publisher signing, and Play readiness remain outstanding.
+
+## Android app identity (2026-11-13)
+
+- User confirmed `com.rhstudio.holotactics`; APK/AAB presets, release-export preflight, emulator launcher, and current Android test instructions are updated. Play Console availability is not checked.
+- Existing installs use the earlier sample ID and will not update in place. Rebuilt APK/AAB under the confirmed ID and verified API37 install/launch; old sample-ID app was preserved.
+- Release signing environment values are not provided; the unsigned debug AAB is not uploadable to Play.

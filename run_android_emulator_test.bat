@@ -70,7 +70,7 @@ goto wait_boot
 echo Installing current debug APK on %SERIAL%...
 "%ADB%" -s "%SERIAL%" install -r "%APK%"
 if errorlevel 1 goto failed
-"%ADB%" -s "%SERIAL%" shell monkey -p com.example.holotactics 1
+"%ADB%" -s "%SERIAL%" shell monkey -p com.rhstudio.holotactics 1
 if errorlevel 1 goto failed
 echo.
 echo Holo Tactics was installed and launched. Leave the emulator open for hands-on testing.

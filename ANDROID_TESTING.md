@@ -2,9 +2,9 @@
 
 ## Current artifact
 
-- Debug APK: `build/holo-debug.apk` (249,837,983 bytes; SHA-256 `6823CA453156ED7AB8B157C2C4AE65FBE6C98C6C89E3C29F9BC132356A4A5CB2`; debug-signed).
-- Test AAB: `build/holo-test.aab` (86,245,875 bytes; SHA-256 `80842D888B27FAC689502F1FFB8B1EBE391362ACA93E718C61FBB4E832FD182C`; unsigned packaging artifact, not uploadable to Play).
-- Package ID: `com.example.holotactics` (placeholder; replace with the publisher's permanent ID before release).
+- Debug APK: `build/holo-debug.apk` (249,840,147 bytes; SHA-256 `70C4283381A65FF0E327EB188487A9BBACDA93C2F2F2BD230E07F89EDC3AB716`; debug-signed, API37 launch verified).
+- Test AAB: `build/ci-local-check.aab` (86,248,046 bytes; SHA-256 `5A611E84AB2A00D087E05F10A327F78FEFC27E58EFD5855DDD2117552D43B154`; required entries present, unsigned and not uploadable to Play).
+- Package ID: `com.rhstudio.holotactics` (user-confirmed; Play Console availability still needs checking).
 - Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
 - The APK is debug-signed. It is for device smoke tests, not Google Play upload.
 
@@ -12,7 +12,7 @@
 
 `scripts/export_android_aab.ps1` installs the Godot Android Gradle template, exports `build/holo-release.aab`, and verifies its JAR signature. Provide a publisher-owned release key through the process environment variables `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER` (key alias), and `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`. The script does not print their values. Never commit the key or password.
 
-The repository's application ID is a placeholder and must be replaced by the publisher's permanent unique ID before Play upload. A locally generated throwaway key can validate packaging but its AAB is not upload-ready.
+The application ID is now set to `com.rhstudio.holotactics`. The debug APK installs and launches under this ID on the API37 AVD. Existing installs under the previous sample ID `com.example.holotactics` are a separate Android app and will not update in place.
 
 ## Device smoke test
 
@@ -25,7 +25,7 @@ $adbPath = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 & $adbPath devices
 & $adbPath install -r .\build\holo-debug.apk
 & $adbPath logcat -c
-& $adbPath shell monkey -p com.example.holotactics 1
+& $adbPath shell monkey -p com.rhstudio.holotactics 1
 ```
 
 Check each flow and record pass/fail plus a short note:
@@ -53,9 +53,9 @@ Collect logs after each run:
 Measure on at least one representative lower-tier Android 10+ device and one current mid-range device. Connect Godot's remote profiler for the engine frame time; use Android system frame stats as a cross-check:
 
 ```powershell
-& $adbPath shell dumpsys gfxinfo com.example.holotactics reset
+& $adbPath shell dumpsys gfxinfo com.rhstudio.holotactics reset
 # Play the named scenario for at least 60 seconds, including combat and effects.
-& $adbPath shell dumpsys gfxinfo com.example.holotactics framestats
+& $adbPath shell dumpsys gfxinfo com.rhstudio.holotactics framestats
 ```
 
 Record scenario, device, room temperature/power mode, run duration, average and 95th-percentile frame time, worst sustained interval, and profiler CPU/GPU frame times. Compare normal combat against a high-load wave with multiple units, facilities, and effects. Acceptance targets from the project brief are 60 FPS in normal combat (16.67 ms/frame) and at least 30 FPS under high load (33.33 ms/frame). Do not infer engine FPS from a single `dumpsys` summary.

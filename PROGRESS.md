@@ -17,7 +17,7 @@
 - [x] M3: completed. Five ally/six enemy kinds, 20 unit upgrades plus four facility upgrades, six fixed evolutions, 10 skills, four village buildings, research unlocks and persistent battle effects are implemented and covered by regression tests.
 - [x] M4: completed. Main 6 + optional 2 stages and 26 waves are wired through story locks, rewards and progress persistence; `tests/campaign_playability.gd` wins all 8 stages and checks idempotent rewards/unlocks. Content balance remains SEED; a full manual playthrough is still useful QA.
 - [x] M5: three EditorPlugin tabs, Inspector resource sync, validator-gated atomic saves, error navigation, and isolated full-stage/direct-wave preview are implemented and automated. GUI smoke confirms named dock, all three populated panels, Inspector properties, and full-stage launch; direct-wave isolation test passes.
-- [ ] M6: local tests and Mobile/Vulkan Android exports pass; API37 AVD installation and M1 play screen work. Its emulated renderer measured 33.9–34.8 FPS in basic combat, below the regular 60 FPS target and not representative-device evidence. API29 AVD renderer failure, physical Android/FPS, publisher-signed package, and Play private-test setup remain open.
+- [ ] M6: local tests and Mobile/Vulkan Android exports pass; confirmed package `com.rhstudio.holotactics` APK installs/launches on API37 AVD. Its emulated renderer measured 33.9–34.8 FPS in basic combat, below the regular 60 FPS target and not representative-device evidence. API29 AVD renderer failure, physical Android/FPS, publisher signing, Play Console ID availability, and private-test setup remain open.
 
 재검증 (2026-11-12): Godot 4.7.2 headless import/테스트/콘텐츠 검사/메인 씬 통과. APK 재생성 통과. API 29 AVD는 GLES2 한계로 Godot Android 렌더 컨텍스트 생성에 실패했고, API 37 AVD에서는 앱 프로세스가 실행됐으나 GLES3 셰이더 uniform 한도 오류 로그가 있어 시각 스모크 테스트는 미통과/미확정이다. 세부 결과는 `TEST_REPORT.md`.
 
@@ -319,3 +319,21 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Reopened Godot GUI and confirmed the named `콘텐츠 편집기` dock, all three populated tabs, stage JSON draft, Inspector resource property view, and isolated M1 stage preview. Direct-wave preview and mutation/rejection UI were not manually clicked; their automated tests remain the evidence for those paths.
 - API37 x86_64 AVD installed and launched the current local debug APK; campaign and M1 battlefield rendered. Short sampler windows show 33.9–34.8 average FPS on the emulated renderer. This is below the ordinary 60 FPS goal and does not satisfy device acceptance; actual Galaxy S25 Ultra and a lower-tier Android 10+ device still require profiler runs.
 - Ran existing `tests/editor_preview.gd` directly (selected wave 2, progress/request isolation passed) and added it to `run_godot_tests.bat`; the expanded full local batch passes.
+
+## Android CI AAB job correction (2026-11-13)
+
+- Six recent push workflows were all blocked at the same Android step: standalone `--install-android-build-template`; Godot 4.7.2 help specifies this option is used with `--export-debug`/`--export-release`.
+- Combined template installation with the AAB export and added a 20-minute job timeout. Cancelled the six stale runs after confirming they were stuck on the same step.
+- The exact combined export command succeeded locally: AAB 86,248,032 bytes, SHA-256 `7A484105D3329C389D858111EC35BF8949E187C2AEE5C1796BCBE0921448F32D`; required BundleConfig/manifest/dex entries present. `jarsigner` confirms it is unsigned; this is only a test bundle, not Play-ready.
+- The corrected remote workflow has not run yet; GitHub Actions validation after push remains pending.
+
+## Android package identity (2026-11-13)
+
+- User confirmed permanent package ID `com.rhstudio.holotactics`. Updated both Android export presets, the AAB preflight guard, emulator test launcher, and current device-test instructions.
+- Existing APK/AAB installations using `com.example.holotactics` keep their old identity; the confirmed ID creates a separate app until rebuilt. Play Console availability and publisher signing remain unverified.
+
+## Android package rebuild and smoke (2026-11-13)
+
+- Re-exported debug APK and test AAB after applying the confirmed ID. `aapt` reports `com.rhstudio.holotactics`, min API 29, target API 36; APK v2 signature verifies. AAB required BundleConfig/manifest/dex entries are present; `jarsigner` confirms it is unsigned.
+- API37 AVD briefly reported `device offline`; `adb reconnect offline` restored it. New APK installed successfully beside (without deleting) the old sample-ID app, launched with the new ID, reached the campaign screen, and showed no matching fatal/shader errors in the inspected log window.
+- Release-key path, alias, and password environment variables remain unset. The package ID is user-selected but its availability in Play Console is not established.

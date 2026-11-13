@@ -716,3 +716,16 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - `tests/editor_preview.gd` was run directly and passed: selected wave 2 loaded through the editor-preview scene, result handling left campaign progress unchanged, and the one-shot request was consumed. The test restores any pre-existing progress/request files.
 - Added this existing CI test to `run_godot_tests.bat`; the full local batch passed core, content validation, 8-stage simulation, editor-preview isolation, battle UI, and editor panel checks. Existing editor-headless RID/ObjectDB shutdown diagnostics remain after the assertion sentinel.
 - Directly clicking the selected-wave preview and intentionally invalid draft Error/Warning presentation in GUI remains unchecked; automated scene/isolation coverage passes.
+
+## Android CI AAB export diagnosis (2026-11-13)
+
+- Remote history showed six consecutive push runs staying in `android-aab` at `Import project and install Gradle template`, while each Godot test job passed. Cancelled those stale in-progress runs.
+- Godot 4.7.2 help says `--install-android-build-template` is used together with an export action. Moved it onto the same `--export-debug "Android Play AAB"` command and added a 20-minute Android job timeout.
+- Ran the exact combined command locally; it created an 86,248,032-byte AAB with `BundleConfig.pb`, `base/manifest/AndroidManifest.xml`, and `base/dex/classes.dex`. SHA-256: `7A484105D3329C389D858111EC35BF8949E187C2AEE5C1796BCBE0921448F32D`. `jarsigner` reports unsigned. GitHub run after the workflow fix is pending.
+
+## Confirmed Android package ID (2026-11-13)
+
+- User selected `com.rhstudio.holotactics`. Both APK/AAB export presets and the Windows emulator launcher now use this ID; the release-export preflight requires it in both presets.
+- Rebuilt APK: 249,840,147 bytes, SHA-256 `70C4283381A65FF0E327EB188487A9BBACDA93C2F2F2BD230E07F89EDC3AB716`. `aapt dump badging` confirms package ID, min API 29, target API 36; `apksigner verify --verbose` confirms APK v2 signature.
+- Rebuilt test AAB: 86,248,046 bytes, SHA-256 `5A611E84AB2A00D087E05F10A327F78FEFC27E58EFD5855DDD2117552D43B154`. Required BundleConfig/manifest/dex entries exist; `jarsigner` reports unsigned. Gradle bundle metadata names the confirmed application ID.
+- Installed new APK on API37 x86_64 AVD successfully while preserving the old sample-ID package. The new activity is top-resumed, the campaign menu screenshot is visible, and the inspected log window has no fatal Android/Godot shader errors. An initial install attempt hit `device offline`; `adb reconnect offline` restored the AVD before successful install.

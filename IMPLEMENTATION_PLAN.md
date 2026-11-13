@@ -156,4 +156,8 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 
 - Godot GUI now visibly exposes the named `콘텐츠 편집기` dock. Stage/wave, evolution, and upgrade pages load JSON drafts; the stage record opens as `EditableCatalogRecord` in Inspector. The isolated full-stage preview launched an M1 battlefield.
 - API37 x86_64 AVD accepted the local debug APK and displayed campaign and M1 battle UI. Its five M1 sampler intervals averaged 33.9–34.8 FPS (P95 30.0–32.46 ms); `ro.hardware.egl=emulation`, so this does not satisfy representative-device FPS acceptance. See `TEST_REPORT.md`.
-- Next: invalid-draft Error/Warning GUI interaction, representative lower-tier Android 10+ and Galaxy S25 Ultra profiling including a stress scenario, package ID/signing, and private-test preparation.
+- Next: invalid-draft Error/Warning GUI interaction, representative lower-tier Android 10+ and Galaxy S25 Ultra profiling including a stress scenario, publisher signing/Play Console package availability, and private-test preparation.
+
+## Android package ID decision (2026-11-13)
+
+- User confirmed `com.rhstudio.holotactics`; export presets and emulator launcher are updated. Rebuilt APK/AAB match the ID and API37 launch succeeded. The corrected remote AAB workflow, publisher signing, and Play Console availability remain open.

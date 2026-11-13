@@ -55,6 +55,7 @@ jobs:
 
   android-aab:
     needs: godot
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -72,14 +73,13 @@ jobs:
           version: 4.7.2
           use-dotnet: false
           include-templates: true
-      - name: Import project and install Gradle template
+      - name: Import project
         run: |
           godot --headless --editor --path . --quit
-          godot --headless --path . --install-android-build-template
       - name: Export Android debug AAB
         run: |
           mkdir -p build
-          godot --headless --path . --export-debug "Android Play AAB" build/holo-test.aab
+          godot --headless --path . --install-android-build-template --export-debug "Android Play AAB" build/holo-test.aab
       - name: Verify AAB structure
         run: |
           test -s build/holo-test.aab
