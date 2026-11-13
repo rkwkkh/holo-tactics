@@ -25,6 +25,8 @@
 
 추가 분리 테스트: Pixel 8 API37.2에서 M1뿐 아니라 마을 씬 전환 후에도 검은 화면·0 frame/5초·emulator compositor SIGABRT가 관찰됐다. host/lavapipe에서는 캠페인 화면은 그려졌고 SwiftShader는 시작부터 검정이었다. 에뮬레이터 일반 씬 전환/표시 문제로 좁혀졌지만, 물리 기기 검증은 여전히 필요하다.
 
+추가 렌더러 분리: 임시 프로젝트 복사본으로 Compatibility/OpenGL APK를 빌드해 같은 API37.2 AVD에서 실행했다. 캠페인 표시 후 M1 씬 전환 시 동일하게 검정이 나왔다. 원본 project 설정은 변경하지 않았고 정식 Vulkan APK를 다시 설치했다. 이 AVD 문제는 Vulkan만으로 설명되지 않으며 실기기 재현 여부가 필요하다.
+
 재검증 (2026-11-12): Godot 4.7.2 headless import/테스트/콘텐츠 검사/메인 씬 통과. APK 재생성 통과. API 29 AVD는 GLES2 한계로 Godot Android 렌더 컨텍스트 생성에 실패했고, API 37 AVD에서는 앱 프로세스가 실행됐으나 GLES3 셰이더 uniform 한도 오류 로그가 있어 시각 스모크 테스트는 미통과/미확정이다. 세부 결과는 `TEST_REPORT.md`.
 
 재검증 (2026-11-12): 5/6종 유닛을 카탈로그 검증, 실제 배치·전투 대상으로 확장했다. 상세는 `TEST_REPORT.md`. 당시 OPEN이던 M1 승패 정책과 시설 수리 시점은 이후 사용자 결정 및 구현으로 해결됐다. 실기기 확인은 미완료다.
