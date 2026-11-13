@@ -27,6 +27,8 @@
 
 M1 직접 시작 분리검증: 임시 복사본에서만 main scene을 battle로 바꾼 Mobile/Vulkan APK는 Pixel 8 API37.2 AVD에서 보드 표시, 배치 입력, 웨이브 시작, 전투 중 코어 HP 감소 및 적 처치 자원 보상을 렌더링했다. Godot `[PERF]` 10초 구간은 평균 53.6–55.5 FPS, p95 22.20–25.00ms였으나 lavapipe AVD 수치다. 직접 시작은 정상이고 일반 앱의 씬 전환은 검정인 상태라 실기기 정상 내비게이션/FPS 검증은 여전히 필요하다. 임시 APK/복사본 제거 후 정식 debug APK 재설치 확인.
 
+M6 외부 인수 상태 (2026-11-13): 사용자는 Galaxy S25 Ultra에서 직접 M1/성능을 확인하고 로그를 전달할 예정이다. 현재 실기기 로그는 미도착. Play Console 계정과 publisher 업로드 키 모두 아직 없으므로 비공개 테스트 AAB 서명/업로드는 사용자 외부 준비 대기다. 실행 절차와 로그 수집 파일명은 `ANDROID_TESTING.md`에 기록.
+
 추가 렌더러 분리: 임시 프로젝트 복사본으로 Compatibility/OpenGL APK를 빌드해 같은 API37.2 AVD에서 실행했다. 캠페인 표시 후 M1 씬 전환 시 동일하게 검정이 나왔다. 원본 project 설정은 변경하지 않았고 정식 Vulkan APK를 다시 설치했다. 이 AVD 문제는 Vulkan만으로 설명되지 않으며 실기기 재현 여부가 필요하다.
 
 재검증 (2026-11-12): Godot 4.7.2 headless import/테스트/콘텐츠 검사/메인 씬 통과. APK 재생성 통과. API 29 AVD는 GLES2 한계로 Godot Android 렌더 컨텍스트 생성에 실패했고, API 37 AVD에서는 앱 프로세스가 실행됐으나 GLES3 셰이더 uniform 한도 오류 로그가 있어 시각 스모크 테스트는 미통과/미확정이다. 세부 결과는 `TEST_REPORT.md`.

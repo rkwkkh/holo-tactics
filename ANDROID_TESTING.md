@@ -22,10 +22,13 @@ Use a physical Android 10+ device with USB debugging enabled. Record device mode
 
 ```powershell
 $adbPath = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adbPath devices
-& $adbPath install -r .\build\holo-debug.apk
-& $adbPath logcat -c
-& $adbPath shell monkey -p com.rhstudio.holotactics 1
+& $adbPath devices -l
+$deviceSerial = Read-Host 'Enter the Galaxy S25 Ultra serial from adb devices'
+& $adbPath -s $deviceSerial shell getprop ro.build.version.release
+& $adbPath -s $deviceSerial shell getprop ro.product.model
+& $adbPath -s $deviceSerial install -r .\build\holo-debug.apk
+& $adbPath -s $deviceSerial logcat -c
+& $adbPath -s $deviceSerial shell monkey -p com.rhstudio.holotactics 1
 ```
 
 Check each flow and record pass/fail plus a short note:
@@ -45,7 +48,7 @@ Check each flow and record pass/fail plus a short note:
 Collect logs after each run:
 
 ```powershell
-& $adbPath logcat -d | Select-String 'Godot|AndroidRuntime|FATAL EXCEPTION'
+& $adbPath -s $deviceSerial logcat -d | Select-String 'Godot|AndroidRuntime|FATAL EXCEPTION'
 ```
 
 ## Frame-rate measurement
@@ -53,9 +56,9 @@ Collect logs after each run:
 Measure on at least one representative lower-tier Android 10+ device and one current mid-range device. Connect Godot's remote profiler for the engine frame time; use Android system frame stats as a cross-check:
 
 ```powershell
-& $adbPath shell dumpsys gfxinfo com.rhstudio.holotactics reset
+& $adbPath -s $deviceSerial shell dumpsys gfxinfo com.rhstudio.holotactics reset
 # Play the named scenario for at least 60 seconds, including combat and effects.
-& $adbPath shell dumpsys gfxinfo com.rhstudio.holotactics framestats
+& $adbPath -s $deviceSerial shell dumpsys gfxinfo com.rhstudio.holotactics framestats | Tee-Object -FilePath .\build\device-gfxinfo.txt
 ```
 
 Record scenario, device, room temperature/power mode, run duration, average and 95th-percentile frame time, worst sustained interval, and profiler CPU/GPU frame times. Compare normal combat against a high-load wave with multiple units, facilities, and effects. Acceptance targets from the project brief are 60 FPS in normal combat (16.67 ms/frame) and at least 30 FPS under high load (33.33 ms/frame). Do not infer engine FPS from a single `dumpsys` summary.
@@ -63,12 +66,13 @@ Record scenario, device, room temperature/power mode, run duration, average and 
 The debug APK also prints a Godot frame sample every 10 seconds during unpaused preparation/combat: `[PERF] stage=... frames=... avg_fps=... p50_ms=... p95_ms=... max_ms=...`. Capture it from a connected device after the play session:
 
 ```powershell
-& $adbPath logcat -c
 # Play the scenario for at least 60 seconds, then:
-& $adbPath logcat -d -v time | Select-String '\[PERF\]' | Tee-Object -FilePath .\build\device-perf.txt
+& $adbPath -s $deviceSerial logcat -d -v time | Select-String '\[PERF\]|Godot|AndroidRuntime|FATAL EXCEPTION' | Tee-Object -FilePath .\build\device-perf.txt
 ```
 
 These samples come from Godot's debug `_process` delta; use the Remote Profiler/device GPU profiler for CPU/GPU attribution. Do not use emulator measurements for physical-device acceptance.
+
+After the S25 Ultra run, send `build/device-perf.txt`, `build/device-gfxinfo.txt`, the Android version/model printed above, and the pass/fail notes for the exercised flows. If more than one Android device is listed, keep using the same `$deviceSerial` so the AVD does not receive the commands.
 
 ## Google Play private test readiness
 
