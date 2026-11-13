@@ -23,6 +23,8 @@
 
 추가 AVD 교차검증 (2026-11-13): Pixel 8 API37.2에서도 host GPU에서 캠페인 렌더 후 M1 터치 시 화면 검정/앱 프로세스 유지, software GPU에서는 시작 화면 검정이 재현됐다. Android 36 AVD 이미지는 설치돼 있지 않아 대체 부팅 불가. 현재로선 에뮬레이터 렌더링 이상과 앱 씬 진입 결함을 구분하지 못했다. 자세한 로그와 제한은 `ISSUES.md`, `TEST_REPORT.md`.
 
+추가 분리 테스트: Pixel 8 API37.2에서 M1뿐 아니라 마을 씬 전환 후에도 검은 화면·0 frame/5초·emulator compositor SIGABRT가 관찰됐다. host/lavapipe에서는 캠페인 화면은 그려졌고 SwiftShader는 시작부터 검정이었다. 에뮬레이터 일반 씬 전환/표시 문제로 좁혀졌지만, 물리 기기 검증은 여전히 필요하다.
+
 재검증 (2026-11-12): Godot 4.7.2 headless import/테스트/콘텐츠 검사/메인 씬 통과. APK 재생성 통과. API 29 AVD는 GLES2 한계로 Godot Android 렌더 컨텍스트 생성에 실패했고, API 37 AVD에서는 앱 프로세스가 실행됐으나 GLES3 셰이더 uniform 한도 오류 로그가 있어 시각 스모크 테스트는 미통과/미확정이다. 세부 결과는 `TEST_REPORT.md`.
 
 재검증 (2026-11-12): 5/6종 유닛을 카탈로그 검증, 실제 배치·전투 대상으로 확장했다. 상세는 `TEST_REPORT.md`. 당시 OPEN이던 M1 승패 정책과 시설 수리 시점은 이후 사용자 결정 및 구현으로 해결됐다. 실기기 확인은 미완료다.
