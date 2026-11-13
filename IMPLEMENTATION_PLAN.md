@@ -196,3 +196,7 @@ The visual click was attempted after Inspector verification, but the Windows Com
 ## M5 Inspector import test update (2026-11-13)
 
 The automated editor-panel suite now tests dynamic Inspector resource mutation and importing the value into the JSON draft, while asserting that source catalog data was not persisted. Standalone panel and full Godot regression passed. The Warning-row visual click remains unverified due to native window activation failure.
+
+## M6 release-mode export follow-up (2026-11-13)
+
+Release export preflight fails as expected without a configured release keystore. No release artifact or replacement key was created; debug test export remains separate. Physical device and Closed-test gates still need owner participation.

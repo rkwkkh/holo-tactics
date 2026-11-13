@@ -431,3 +431,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Extended `tests/editor_panels.gd` to exercise `EditableCatalogRecord` dynamic edit, the panel's Inspector import path, and the no-persistence boundary. The draft reflects temporary `start_resource=161`, while the on-disk catalog remains 160.
 - Standalone editor-panel test passed on Godot 4.7.2 and printed the Inspector-import pass sentinel. Full `run_godot_tests.bat` also passed. Existing editor shutdown RID/ObjectDB diagnostics occur after success; runner exits successfully.
 - Visual Warning-row click remains unverified because the Windows automation bridge could not activate the editor. Its signal route and no-navigation behavior are covered headlessly.
+
+## Local release-mode export preflight (2026-11-13)
+
+- Attempted `Godot 4.7.2 --export-release "Android Debug APK" build/holo-perf-release.apk` to check release-mode packaging. Export stopped at Android code signing because no release keystore is configured; no artifact was produced.
+- This does not affect the existing debug APK/AAB export path. A publisher-signed build and Play upload require the owner's release keystore and Play Console access; no substitute key was generated and no upload was attempted.
+- ADB reports no connected device in this session, so Galaxy S25 Ultra and physical Android 10 acceptance still require user-provided hardware/log evidence.

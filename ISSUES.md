@@ -301,3 +301,9 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Added headless coverage for dynamic `EditableCatalogRecord` editing and `_import_inspector`: draft value changes to 161, while disk catalog stays at 160. Standalone panel test and full Godot batch passed.
 - M5 visual Warning-row click remains inaccessible in the current GUI automation session; do not interpret the headless result as visual acceptance.
+
+## Release signing preflight result (2026-11-13)
+
+- Local release-mode APK export was attempted and failed at code signing: Godot reported no release keystore. No APK artifact was produced. Existing debug export is unaffected.
+- Publisher-signed AAB/Closed testing remains dependent on owner-provided signing setup and Play Console access. No temporary/publisher key was created.
+- ADB currently has no connected target, leaving Galaxy S25 Ultra and physical Android 10 validation pending.

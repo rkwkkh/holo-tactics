@@ -40,3 +40,7 @@ The Warning-row visual click attempt failed because the native Godot window coul
 ## Latest test coverage update (2026-11-13)
 
 `tests/editor_panels.gd` now covers Inspector dynamic field edit/import plus catalog non-persistence. Both standalone panel run and full Godot batch passed on 4.7.2. GUI Warning-row click remains unverified; actual signal behavior is headless-tested. Device list currently has no connected Android target, so user-provided S25 Ultra logs remain pending.
+
+## Current M6 gate check (2026-11-13)
+
+No Android device is attached to ADB. A local release-mode APK export preflight was attempted but could not sign without an owner release keystore; no artifact was produced. Keep the debug APK/AAB labeled test-only. Remaining final acceptance requires Galaxy S25 Ultra logs, physical Android 10 evidence, and owner Play Console/release signing access.

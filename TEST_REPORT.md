@@ -871,3 +871,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Added to `tests/editor_panels.gd`: populate an `EditableCatalogRecord` from the selected stage draft, set `start_resource` to 161, route through `_import_inspector`, assert the JSON draft reflects 161, then assert source catalog still has 160.
 - Godot 4.7.2 standalone editor-panel command passed with the new “Inspector import” sentinel. Full `run_godot_tests.bat` passed all suites, including 0 content errors and eight campaign simulations. Known RID/ObjectDB shutdown diagnostics follow the editor-panel pass sentinel; batch reports success.
 - The visible Warning-row click is still not verified because the native Godot window could not be activated; the automated ItemList signal test passes.
+
+## Release-mode export preflight (2026-11-13)
+
+- Command: Godot 4.7.2 `--export-release "Android Debug APK" build/holo-perf-release.apk`.
+- Result: failed at Android code signing because the release keystore is not configured. `build/holo-perf-release.apk` was not created. No keystore was created or substituted; no release/Play artifact was produced.
+- Existing debug APK and unsigned CI AAB evidence remain valid for their stated test purposes only. Publisher signing/Play Console access is an external gate.
+- No Android target is currently connected to ADB; physical S25 Ultra gameplay/FPS and Android 10 checks remain unverified.
