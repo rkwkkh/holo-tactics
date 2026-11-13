@@ -245,6 +245,11 @@ The original four design documents now consistently reflect confirmed user rules
 - User will perform Galaxy S25 Ultra M1/combat and FPS checks directly, then send the logs. Physical acceptance remains pending until those logs arrive.
 - User has neither Play Console access nor a publisher upload keystore. Private-test setup remains pending on the user's external account and signing credentials; no account or key was created.
 
+## M5 visible editor verification unavailable (2026-11-13)
+
+- Retried the Windows Computer Use app discovery twice, reset and reinitialized its runtime, then retried once; each discovery failed because the native pipe was unavailable. No target window was exposed, so no clicks or edits occurred.
+- Automated headless editor checks still pass, but visible dock/Inspector interaction and Error-blocked/Warning-only save feedback remain unverified. Retry when the Windows UI bridge is available or have the project owner perform the documented GUI check.
+
 ## Play closed-test submission materials (2026-11-13)
 
 - Drafted Korean listing text and an owner-facing checklist in `PLAY_PRIVATE_TEST_PREPARATION.md`; icon/feature graphic and emulator screenshot draft files now exist in `store_assets/draft/`, but owner design approval, compliant final screenshots, developer/support/privacy details, tester roster, app-ID availability and signed release AAB remain missing or unverified.

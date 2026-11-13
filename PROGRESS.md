@@ -362,4 +362,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Generated draft app icon and feature graphic plus campaign/M1 screenshots under `store_assets/draft/`; image dimensions/encodings are checked. Re-captured the campaign-to-M1 flow at 1080×2160 (2:1) on API37 AVD, replacing the earlier over-limit 1080×2400 drafts. Physical-device capture and owner review remain open.
 - Revalidated production campaign→M1 navigation at the same 2:1 AVD size: deployed one swordsman, started wave 1, and saw an enemy render. Prior AVD black transitions are now treated as intermittent, not a confirmed game defect; S25 Ultra validation remains the acceptance gate.
 - Distinguished Closed testing from Internal testing; listing assets, privacy/contact details, package ID availability, signing, Console access and tester roster remain owner/Console tasks. No credentials or account actions were performed.
-- The document records the existing 192px SVG icon and unsigned CI AAB as insufficient store assets/upload material. This advances preparation only; it does not satisfy M6's actual closed-test distribution gate.
+- The existing 192px SVG icon and unsigned CI AAB remain insufficient as final store assets/upload material. This preparation does not satisfy M6's actual closed-test distribution gate.
+
+## Current continuation (2026-11-13)
+
+- Re-ran `run_godot_tests.bat` on Godot 4.7.2: core tests, content validation, all 8 seeded campaign-stage wins, editor-preview isolation, battle-result UI, and the 3 editor panels (stages/waves, 6 evolutions, 24 upgrades) passed. Content validation reported 0 errors. Editor-headless shutdown still emits RID/ObjectDB leak diagnostics after the success sentinel; the runner exits 0.
+- Attempted visible M5 Error/Warning interaction verification through Windows Computer Use. The native UI bridge failed to connect on the initial call and retry; no editor UI changes were made. Headless panel construction remains verified, while interactive dock/Inspector behavior is still open.
+- User confirmed Galaxy S25 Ultra combat/FPS will be tested directly and logs provided afterward. User has neither Play Console access nor a publisher upload key; no account, key, or Play submission was created. These M6 gates remain pending.

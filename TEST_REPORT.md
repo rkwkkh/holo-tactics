@@ -783,3 +783,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Reconnected the existing API37 x86_64 AVD and confirmed the installed `com.rhstudio.holotactics` process was foreground. Temporarily set Android display size to 1080×2160, entered M1 from campaign, placed one swordsman (resource 160→110), and started the wave; an enemy rendered and the app stayed foreground. Targeted Godot/AndroidRuntime error scan returned no matching script/fatal exception lines in the inspected log buffer.
 - Replaced draft screenshots with current app captures: campaign and M1 combat each 1080×2160 (2:1), converted to JPEG/24-bit RGB. These fit the current Play screenshot aspect limit. The old AVD size was restored with `wm size reset` (physical 1080×2400) after capture.
 - This improves emulator navigation/render evidence and produces compliant-ratio drafts; it does not establish physical-device behavior or FPS. User's S25 Ultra hands-on test remains pending.
+
+## Current regression run (2026-11-13)
+
+- Command: `run_godot_tests.bat`; Godot 4.7.2.stable.official.ed1daf0bf; exit code 0.
+- Passed: core tests, content validation (0 errors), seeded wins for all 8 campaign stages, editor preview isolation, battle result UI, and editor panel checks (stages/waves, 6 evolutions, 24 upgrades).
+- The editor-headless process printed RID/ObjectDB leak diagnostics while shutting down after its success output; the test runner completed successfully. This cleanup noise is recorded, not treated as a content/test failure.
+- Visible editor Error/Warning interaction was not retested: Windows Computer Use could not connect to its native pipe. Device FPS and combat flow remain pending the user's Galaxy S25 Ultra logs; Play Console and publisher signing key are unavailable per user.
