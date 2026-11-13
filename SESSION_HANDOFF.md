@@ -27,6 +27,6 @@ The user requested that the current work be completed and documented, then pause
 1. Check `git status`, `git log`, and the latest Actions run. If it is still `71ccf9a`, the two CI jobs above passed.
 2. Ask for/use the user's Galaxy S25 Ultra Android version, gameplay results, and `ANDROID_TESTING.md` profiler/logcat files. Verify regular combat and high-load FPS/P95, touch/safe-area, battle abandon/reward, and checkpoint flows from that evidence.
 3. Verify Android 10 compatibility on a physical device or a known-good Vulkan-capable API29 setup; the current API29 AVD black screen is inconclusive for physical hardware.
-4. Complete the visual EditorPlugin Error/Warning navigation check when Windows GUI access is available; headless assertions already pass.
+4. Finish remaining M5 visual checks: click the Warning row after selecting another record and verify it does not switch; interact with Inspector field controls. Error-row navigation and Warning rendering are now visually confirmed; Warning non-navigation remains headless-only.
 5. Resume Closed-test preparation only after owner access and publisher signing setup are available. Verify package ID availability, prepare a signed AAB and final approved listing/privacy/contact/tester materials, then upload with the authorized account. Never ask for secret key material in chat.
 6. Update `TEST_REPORT.md`, `ISSUES.md`, and `PROGRESS.md` with evidence; run relevant checks, commit and push. Do not claim M6/MVP complete until physical performance/compatibility and Closed-test gates are proven.

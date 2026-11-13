@@ -175,3 +175,8 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 4. Finish visible EditorPlugin Error/Warning focus-navigation checks when Windows editor UI access is available; headless assertions already pass.
 5. For Closed testing, wait for owner Play Console access and publisher signing setup. Then verify app ID availability, create signed AAB and final owner-approved listing/privacy/contact/tester materials, and upload only with authorized account access. Never request signing secrets in chat.
 6. Record evidence in `TEST_REPORT.md`, `ISSUES.md`, and `PROGRESS.md`; run relevant checks, commit/push, and wait for CI. Keep M6 incomplete until physical-device and Closed-test gates are proven.
+
+## M5 GUI acceptance update (2026-11-13)
+
+- Visible dock and all three content tabs are now inspected in Godot 4.7.2. Invalid save blocking and Error-row-to-JSON-field focus are visually verified; Warning-row rendering is also visible.
+- Remaining visual checks: Warning click leaves a different active record selected, and Inspector field editing/import. Existing headless panel/navigation tests pass. No catalog mutation occurred in GUI testing.

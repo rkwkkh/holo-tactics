@@ -387,3 +387,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Latest source change is the board refresh lookup optimization (`acbf984`). Local full Godot suite passed on 4.7.2; content validation had 0 errors. Matched API37 emulated-EGL A/B improved mean FPS 23.7→52.66, but this remains below the 60 FPS goal and is not device acceptance.
 - Current local debug APK: `build/holo-debug.apk`, SHA-256 `FFBFB6814DDF661DB214E72B560731E9CBE8D4D30AA2F1910600A3CFE9C5DDFA`; debug-signed, not a release artifact. See `SESSION_HANDOFF.md` for evidence, gates, and ordered resume actions.
 - Pending M6: S25 Ultra hands-on gameplay/FPS logs from the user; Android 10 physical-device compatibility; high-load/representative-device performance; remaining visual EditorPlugin Error/Warning interaction checks; publisher signing and Play Console access/setup for Closed testing. The latest API29 AVD install starts but renders black with Vulkan present error 5; do not generalize this emulator failure to physical devices.
+
+## M5 visible editor interaction follow-up (2026-11-13)
+
+- Opened the project in Godot 4.7.2 GUI and visibly inspected the content-editor dock, populated stage/wave JSON draft, and evolution/upgrade tabs.
+- In the stage panel, a temporary invalid draft was rejected by the save gate; clicking the displayed Error row selected the matching `"available_units"` key in the JSON editor. A second invalid draft displayed the 27-wave Warning row while save remained blocked.
+- The source catalog was not changed: draft edits remained in the editor, the GUI was closed, and `git status` plus diff checks showed the generated `project.godot` reformat was restored. `data/catalog.json` remained clean.
+- Visual Warning-row non-navigation after switching records and actual Inspector field editing remain to be checked. Their headless assertions and panel construction pass.

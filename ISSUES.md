@@ -266,3 +266,9 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Current stop point is documented in `SESSION_HANDOFF.md`. No known local source change is left uncommitted; latest code and API29 AVD findings are pushed in `71ccf9a`, with Actions run `43371542368` passing both jobs.
 - Resume blockers are external evidence/access: Galaxy S25 Ultra gameplay/FPS logs promised by the user, a physical Android 10 compatibility check, and owner Play Console plus publisher signing setup for Closed testing. These do not block independent documentation or other local M6 work after resume.
+
+## M5 visible editor follow-up (2026-11-13)
+
+- Windows Godot GUI is available again. The named content-editor dock and populated stage/wave, evolution, and upgrade tabs were visibly checked. Save blocking on an invalid draft and Error-row focus to the `available_units` JSON key were visually confirmed. A 27-wave Warning row was visibly rendered.
+- Remaining M5 GUI checks: click the Warning row after selecting another record to verify it does not navigate, and verify Inspector field editing. The warning non-navigation test currently has headless evidence only.
+- A temporary editor draft was not saved. Godot auto-reformatted `project.godot` during GUI startup; the exact generated changes were restored, including the Mobile renderer setting. Catalog and project files are clean.

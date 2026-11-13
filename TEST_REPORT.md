@@ -825,3 +825,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - At the user's request, recorded an explicit handoff in `SESSION_HANDOFF.md`; latest pushed code commit `acbf984`, latest evidence/docs commit `71ccf9a`, and latest Actions run `43371542368` (Godot + Android AAB) succeeded.
 - Full local `run_godot_tests.bat` had passed after the renderer optimization; content validation was 0 errors. The latest API29 emulator check is separately recorded above and is a black-screen Vulkan-present failure, not physical Android 10 evidence.
 - No new code was changed for the pause. No APK release or Play upload was created. Physical-device measurements and account-dependent Closed-test steps remain pending.
+
+## M5 visible content-editor validation check (2026-11-13)
+
+- Opened `main.tscn - Holo Tactics - Godot Engine` in Godot 4.7.2. The content-editor dock showed stage/wave, evolution, and upgrade tabs with the selected `stage.m1.frontier` JSON draft.
+- Entered a temporary minimal invalid stage record and pressed the panel's validation/save button. UI showed `Error · 저장 차단` and a populated error list; clicking its `available_units` Error row visibly selected the corresponding JSON key. The invalid draft was rejected, not persisted.
+- A second temporary draft referenced one valid wave 27 times. The panel showed a Warning row for 27 waves while Error rows still blocked saving. This verifies visible warning presentation, but warning-row non-navigation after another record is selected remains headless-only.
+- Closed the editor to discard its temporary in-memory drafts. `git status` showed Godot had auto-reformatted `project.godot`; restored that generated-only diff, preserving the configured Mobile renderer. Follow-up `git status` and `git diff` confirmed `project.godot` and `data/catalog.json` unchanged. No source code changed, so the passing full suite was not rerun.
