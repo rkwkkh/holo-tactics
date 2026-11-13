@@ -394,3 +394,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - In the stage panel, a temporary invalid draft was rejected by the save gate; clicking the displayed Error row selected the matching `"available_units"` key in the JSON editor. A second invalid draft displayed the 27-wave Warning row while save remained blocked.
 - The source catalog was not changed: draft edits remained in the editor, the GUI was closed, and `git status` plus diff checks showed the generated `project.godot` reformat was restored. `data/catalog.json` remained clean.
 - Visual Warning-row non-navigation after switching records and actual Inspector field editing remain to be checked. Their headless assertions and panel construction pass.
+
+## M5 validation signal test follow-up (2026-11-13)
+
+- `tests/editor_panels.gd` now emits the actual `ItemList.item_selected` signal for both row types. It verifies Error focus and verifies a Warning signal does not switch an already-selected different stage.
+- Full `run_godot_tests.bat` passed on Godot 4.7.2; content validation reported 0 errors. Existing editor-headless RID/ObjectDB cleanup diagnostics remain after success output.
+- Visual Warning click and Inspector field editing remain open; visible Error-row focus and Warning rendering were observed in the GUI.

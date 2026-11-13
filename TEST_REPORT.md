@@ -832,3 +832,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Entered a temporary minimal invalid stage record and pressed the panel's validation/save button. UI showed `Error · 저장 차단` and a populated error list; clicking its `available_units` Error row visibly selected the corresponding JSON key. The invalid draft was rejected, not persisted.
 - A second temporary draft referenced one valid wave 27 times. The panel showed a Warning row for 27 waves while Error rows still blocked saving. This verifies visible warning presentation, but warning-row non-navigation after another record is selected remains headless-only.
 - Closed the editor to discard its temporary in-memory drafts. `git status` showed Godot had auto-reformatted `project.godot`; restored that generated-only diff, preserving the configured Mobile renderer. Follow-up `git status` and `git diff` confirmed `project.godot` and `data/catalog.json` unchanged. No source code changed, so the passing full suite was not rerun.
+
+## Editor validation row signal regression (2026-11-13)
+
+- Updated `tests/editor_panels.gd` to exercise the connected `ItemList.item_selected` signal for Error and Warning rows. The Error signal focuses the referenced JSON key; after selecting a different stage, the Warning signal leaves that record active.
+- Full `run_godot_tests.bat` passed on Godot 4.7.2: core, content validation (0 errors), all 8 seeded campaign wins, editor preview isolation, result UI, and editor panel checks. Editor-headless shutdown still prints RID/ObjectDB cleanup diagnostics after its pass sentinel; runner exit code is 0.
+- The signal test does not replace visual Warning-click or Inspector interaction checks; those remain M5 GUI follow-ups.

@@ -272,3 +272,7 @@ The original four design documents now consistently reflect confirmed user rules
 - Windows Godot GUI is available again. The named content-editor dock and populated stage/wave, evolution, and upgrade tabs were visibly checked. Save blocking on an invalid draft and Error-row focus to the `available_units` JSON key were visually confirmed. A 27-wave Warning row was visibly rendered.
 - Remaining M5 GUI checks: click the Warning row after selecting another record to verify it does not navigate, and verify Inspector field editing. The warning non-navigation test currently has headless evidence only.
 - A temporary editor draft was not saved. Godot auto-reformatted `project.godot` during GUI startup; the exact generated changes were restored, including the Mobile renderer setting. Catalog and project files are clean.
+
+## M5 signal-level regression follow-up (2026-11-13)
+
+- Error and Warning `ItemList.item_selected` routing now passes headless regression, including Warning non-navigation while another stage is active. Full Godot suite passes. Remaining M5 GUI checks are visual Warning-row click and Inspector edit/import; visual Error focus and Warning rendering are already confirmed.
