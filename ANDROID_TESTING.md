@@ -16,6 +16,12 @@ The application ID is now set to `com.rhstudio.holotactics`. The debug APK insta
 
 ## Device smoke test
 
+### 시작 배치 파일
+
+- PC에서 게임 화면을 바로 열려면 프로젝트 폴더의 `run_godot_game.bat`을 실행한다. Godot GUI 실행 파일로 메인 씬을 게임 모드에서 연다.
+- Android 에뮬레이터에서 테스트하려면 `run_android_emulator_test.bat`을 실행한다. 기본 `MaDangStage6_API37` AVD(없으면 첫 번째 AVD)를 시작하고, `build/holo-debug.apk`를 설치한 뒤 게임을 실행한다. 첫 실행은 에뮬레이터 부팅 때문에 시간이 걸릴 수 있다.
+- APK가 없으면 Godot의 `Android Debug APK` preset으로 `build/holo-debug.apk`를 먼저 내보낸다. 두 배치 파일은 저장소 루트에서 더블클릭해 실행할 수 있다.
+
 On Windows, `run_android_emulator_test.bat` starts the configured `MaDangStage6_API37` AVD when available (otherwise the first configured AVD), waits for Android boot, then installs `build/holo-debug.apk` and launches the app. Export the `Android Debug APK` preset first if the ignored build artifact is absent.
 
 Use a physical Android 10+ device with USB debugging enabled. Record device model, Android version, display size, and Godot build with the result.
@@ -190,3 +196,8 @@ The user confirmed the refreshed APK downloaded, installed, and launched on Gala
 ## Android 10 emulator recheck (2026-11-13)
 
 - Latest debug APK installs and starts its process on the existing API29 `MaDang_API29` AVD, but a 20-second capture remains black and logcat repeats Vulkan queue present `error 5`. This is an emulator rendering failure only; physical Android 10 compatibility is still unverified. Production renderer settings were left unchanged.
+
+## Launcher verification (2026-11-13)
+
+- `run_godot_game.bat` launches the visible Windows game from the project folder using the installed Godot 4.7.2 GUI binary.
+- `run_android_emulator_test.bat` selected `MaDangStage6_API37`, installed the current debug APK, launched package `com.rhstudio.holotactics`, and left the emulator available. The captured screen showed the campaign menu. This verifies launcher/startup only; it is not a full gameplay or FPS acceptance run.

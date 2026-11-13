@@ -457,3 +457,8 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Godot printed the export-complete sentinel and wrote the APK, but its console process did not exit; it was interrupted after artifact verification. This is not a release build. No release keystore, Play upload, or device test was used.
 - Commit `14d43aa` is pushed; CI run [43385072374](https://github.com/rkwkkh/holo-tactics/actions/runs/43385072374) passed Godot validation and Android AAB export/structure checks.
 - User requested a pause after recording the current state. Resume with physical-device gameplay/FPS evidence and owner-side privacy/Play setup; M6 remains incomplete.
+
+## Manual test launchers (2026-11-13)
+
+- Added root-level `run_godot_game.bat` for opening the visible game on Windows. The existing `run_android_emulator_test.bat` starts the API37 AVD, installs the current debug APK, and launches the Android app.
+- Ran both launch paths: Godot's GUI game process remained active; the Android script installed and launched successfully, and an AVD screenshot showed the campaign menu. See `ANDROID_TESTING.md` and `TEST_REPORT.md`. No release APK was created.

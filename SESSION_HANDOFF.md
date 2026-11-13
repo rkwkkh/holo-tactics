@@ -62,3 +62,9 @@ Before the owner sets up Console, note the current target API 36 requirement (al
 - Export completion was printed and the APK written, but the Godot console process did not exit by itself; it was interrupted after the artifact checks. Treat the artifact checks as successful and the process exit code as interrupted.
 - The export/config + documentation update is committed and pushed as `14d43aa` (`Exclude store drafts from Android exports`); worktree was clean. GitHub Actions run [43385072374](https://github.com/rkwkkh/holo-tactics/actions/runs/43385072374) passed both Godot validation and Android AAB export/structure verification.
 - Still open: Galaxy S25 Ultra gameplay/FPS logs; physical Android 10; GUI Warning-row click; final owner-approved privacy policy/in-app link; release signing and Play Console access. M6/MVP remains incomplete. No release APK/AAB, GitHub Release, or Play upload was made.
+
+## Manual test launcher update (2026-11-13)
+
+- Use `run_godot_game.bat` to start the visible Windows game; it locates the Godot 4.7.2 GUI binary and opens the project main scene. `run_godot_tests.bat` is still the separate headless automated suite.
+- Use `run_android_emulator_test.bat` to start the preferred `MaDangStage6_API37` AVD, install the local debug APK, and launch the game. This path was run successfully; the AVD showed the campaign screen. Keep using `ANDROID_TESTING.md` for the user gameplay/FPS checklist.
+- Launchers are validated for startup only, not full gameplay or hardware acceptance. The Android shell invocation produced harmless stdin-redirection notices despite successful install/launch.

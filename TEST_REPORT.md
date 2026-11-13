@@ -895,3 +895,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Inspected the APK's `assets/assets.sparsepck` and Android asset listing: no `store_assets`, `tools/export_play_assets`, or `campaign-api37-draft` marker was found. This confirms those draft materials and generator are excluded from this debug APK.
 - Godot emitted the export-complete sentinel and updated the APK, but the console process remained alive and was interrupted; rely on the artifact, signature, and payload checks above, not the process exit code. No physical device, signed release AAB, or Play upload was tested.
 - Pushed commit `14d43aa`; GitHub Actions run [43385072374](https://github.com/rkwkkh/holo-tactics/actions/runs/43385072374) passed the Godot regression/content checks and Android debug AAB export/structure verification.
+
+## Manual launch scripts (2026-11-13)
+
+- `cmd /c run_godot_game.bat` launched the Godot 4.7.2 GUI game process from the project path, which remained running for manual visual testing.
+- `cmd /c run_android_emulator_test.bat` selected `MaDangStage6_API37`, booted it, installed `build/holo-debug.apk` successfully, and launched `com.rhstudio.holotactics`. ADB confirmed the app activity was resumed and the captured screen displayed the campaign menu.
+- The emulator script printed repeated “Input redirection is not supported” messages when run through this automated non-interactive shell; install and launch still succeeded. Double-click use in a regular Windows console was not separately checked.
+- This is a startup/menu smoke only. Full user playtest, physical-device performance, and Android 10 hardware remain unverified.
