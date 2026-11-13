@@ -750,3 +750,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Reconnected the existing API37 AVD, then `run_android_emulator_test.bat` installed and launched `com.rhstudio.holotactics`; package process and top-resumed activity were confirmed. The campaign screen was visible in a captured screenshot.
 - On this retest, tapping the M1 campaign button was followed by a black captured viewport while the Godot activity/process remained alive. Logcat showed no Godot script exception, but the AVD's `android.hardware` compositor process repeatedly aborted. Treat the M1 tap/render result as inconclusive on this AVD, not as a product pass or confirmed game defect. Earlier M1 battlefield/combat evidence remains in the preceding report entry; retest on a stable emulator and a physical device is still required.
 - This did not change code or export presets. Release signing variables are still unset, and no signed AAB or Play upload was produced.
+
+## API37 AVD renderer cross-check (2026-11-13)
+
+- A second existing Pixel 8 AVD using the installed Android 37.2 image reproduced the behavior. With `-gpu host`, the campaign screen rendered; tapping the visible M1 button yielded a black screenshot while `com.rhstudio.holotactics` stayed alive and top-resumed. With `-gpu swiftshader_indirect`, even the initial screen capture was black. Logcat again showed repeated `android.hardware` compositor SIGABRTs and no Godot script exception.
+- An `madang_api_36` AVD definition exists, but its configured Android 36 system image is absent from the SDK, so it cannot boot. No SDK image was downloaded. A temporary fresh AVD creation attempt was removed; no existing AVD data was wiped.
+- These emulator-only results leave M1 entry unresolved on this workstation; they do not override the previously recorded API37 combat run or the user's Galaxy S25 Ultra startup confirmation. Physical gameplay/FPS and a stable API29+ device remain acceptance checks.
