@@ -277,3 +277,14 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - 완료: 공성 시작 버튼을 `진격`으로 표시. 진격 시 적 웨이브 활성화와 전체 아군 자동 진격이 함께 시작됨. 별도 전체 이동 명령은 없음.
 - 자동 확인: 배치/이동/버튼 상태, 사용자 인터페이스 닫기·포기 확인창 및 승리/패배 테스트가 통과.
 - 사용자 확인 대기: 일시정지 메뉴에서 포기 후 실제 부분 보상 액수와 마을 복귀 흐름은 사용자의 게임 내 재확인 필요.
+
+## 2026-11-13 정책 문서 정합화
+
+- 사용자 결정으로 확정된 규칙이 기획 원문 일부에 오래된 OPEN/초안 표기로 남아 있어 네 기획 문서와 Issues 기록을 현재 정책에 맞춤: 단계별 유닛 해금, 핵심 생존 수성 지속, 개체당 1회 진화 고정, 전투/재정비 시설 수리, DoT/행동불가 규칙.
+- 테스트 보강: 시설 수리의 재정비 단계 경로도 비용 차감과 최대 HP 복원을 확인하도록 회귀 케이스 추가. 나머지 세 규칙은 기존 테스트에서 이미 검증.
+
+## Policy reconciliation and M5 verification attempt (2026-11-13)
+
+- Reconciled the four design documents to prior user decisions and corrected the obsolete “all five units immediately unlocked” summary. Current status is in `PLANNING_COVERAGE.md`.
+- Godot 4.7.2 full local test batch passed after adding preparation-phase facility repair regression; combat-phase repair remains covered.
+- M5 visual editor inspection attempted again, but Computer Use reported native pipe unavailable (OS error 2). Treat GUI usability as unverified.

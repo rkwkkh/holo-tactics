@@ -660,3 +660,21 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - API 37 x86_64 AVD에서 `run_android_emulator_test.bat` 실행: APK 설치 Success, `com.example.holotactics` 프로세스 실행, Godot 앱이 resumed foreground activity임을 확인.
 - `git diff --check` 통과. 실행 배치의 ADB 감지/부팅 상태 확인을 콘솔 파이프 없이 파일 기반으로 수정하여 Windows ADB의 입력 재지정 오류를 제거.
 - 이번 검증은 메뉴 실행과 자동화 테스트까지이며, 전투 포기 부분 보상은 사용자의 다음 수동 플레이 확인이 필요하다. API37 소프트웨어 렌더러 결과를 실기기 FPS 검증으로 간주하지 않는다.
+
+## 사용자 결정과 원문 정책 정합화 (2026-11-13)
+
+- PRODUCT_SPEC/REQUIREMENTS/DECISIONS/PLANNING_COVERAGE의 오래된 상충 문구를 사용자 승인 정책과 맞췄다. DEC-576~578의 “5종 즉시 해금”은 DEC-572~573/C2의 단계별 스토리 해금에 대체됨으로 표시했다.
+- 자동 회귀에 재정비 단계 시설 수리 케이스를 추가했다. 테스트 실행 결과는 아래 재검증 기록으로 남긴다.
+
+## Full policy regression (2026-11-13)
+
+- Re-ran `run_godot_tests.bat` on Godot 4.7.2 after the design-policy reconciliation: core logic, content validation (0 Errors), 8/8 seeded campaign wins, battle UI, and 3 editor panels/24 upgrades passed.
+- Added a specific preparation-phase facility-repair assertion alongside the existing combat-phase repair test. Both phases restore max HP and deduct the expected combat resource.
+- Headless editor panel run still exits with renderer/RID/ObjectDB cleanup warnings after its passing assertion marker; no test assertion or parse failure occurred.
+- M5 visible dock/Inspector verification was attempted through the Windows Computer Use helper; `sky.list_apps()` returned native pipe unavailable (Windows OS error 2), so no GUI interaction occurred.
+
+## Policy reconciliation and regression (2026-11-13)
+
+- Corrected outdated source-document conflicts for stage-gated units, core-survival defense, fixed one-time evolution, both-phase facility repair, and DoT/status overlap. DEC-576~578 now explicitly defer to DEC-572~573/C2. Planning coverage marks historical status rows clearly.
+- Added a direct test for preparation-phase facility repair. Godot 4.7.2 `run_godot_tests.bat` passed: core, content validator (0 Errors), seeded campaign (8/8), battle UI, editor-panel structure. Existing editor-headless engine cleanup diagnostics remain.
+- Attempted M5 visible GUI verification; `sky.list_apps()` returned native pipe unavailable (Windows error 2). No visual interaction was possible.

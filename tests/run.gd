@@ -953,6 +953,10 @@ func _initialize() -> void:
 	assert(facility_targeting.repair_facility(repair_target.id))
 	assert(repair_target.hp == facility_targeting.facility_definitions[repair_target.facility_id].hp and facility_targeting.combat_gold == repair_gold - 8)
 	assert(not facility_targeting.repair_facility(repair_target.id))
+	repair_target.hp -= 5.0
+	facility_targeting.phase = "preparation"
+	facility_targeting.combat_gold = 1
+	assert(facility_targeting.repair_facility(repair_target.id) and repair_target.hp == facility_targeting.facility_definitions[repair_target.facility_id].hp and facility_targeting.combat_gold == 0)
 	var facility_upgrade_test := BattleModel.new()
 	facility_upgrade_test.combat_gold = 500
 	assert(facility_upgrade_test.build_facility("facility.arrow_tower", Vector2i(1, 8)))

@@ -17,7 +17,7 @@
 - 보급형 Android 테스트 기기 모델이 미선정이다. 실제 성능 목표 인수 전에 기기가 필요하다.
 - 최신 APK 재확인: API37 AVD에서 캠페인 메뉴 렌더링, API29 AVD에서 Vulkan present error 5 재현. 이번 headless AVD 실행은 ADB 터치로 M1 진입을 재현하지 못했으며 실기기 검증도 아직 없다.
 - M5 EditorPlugin은 headless 구조 검증에 통과했으나 실제 Godot GUI에서 dock/Inspector 편집·미리보기 버튼을 조작하지 못했다. UI 연결이 복구되면 편집 저장/오류 이동/미리보기까지 수동 확인한다.
-- 시설 전투 강화 시점은 별도 정책 결정 대기. 시설 수리 시점(전투 중 허용)은 이미 확정되어 구현됐다.
+- 시설 수리·강화는 전투와 재정비 모두 허용으로 확정·구현됐다. 수리 및 강화 비용/효과 숫자는 조정 가능한 SEED다.
 
 ## 임시 초기값
 
@@ -171,3 +171,17 @@ Computer Use state query returned no apps; native pipe and browser host are unav
 해결: 유닛 문맥창 닫기 버튼 부재, 일시정지 화면의 전투 포기 접근성, 공성 자동 진격 조작 설명 부재, 전투 중 신규 아군 배치 제한. 기획과 요구사항에 확정 규칙을 반영했고 DEC-656/657로 기록했다. 자동 테스트 및 에뮬레이터 설치·실행 배치 검증은 통과.
 
 검증 대기: 사용자가 일시정지 메뉴에서 전투를 포기한 뒤 부분 보상 및 마을 복귀 결과를 실기기에서 확인해야 한다. 직접적인 전체 캠페인 UX, S25 성능, Android 10 실기기 검증 이슈는 기존 항목을 유지한다.
+
+## 기획 원문 정합성 재검토 (2026-11-13)
+
+- 발견한 잔여 상충: `PRODUCT_SPEC.md`와 `REQUIREMENTS.md` 일부가 기본 5종 즉시 해금, 수성 아군 전멸 패배 여부, 진화 재선택, 전투 중 시설 수리 규칙을 과거 초안/반대 문구로 유지하고 있었다.
+- 수정: 승인된 최신 결정을 네 기획 문서와 함께 대조해 상충 표기를 제거하고, 구버전 DEC-576~578을 DEC-572~573/C2에 대체됨으로 표시했다. 구현/회귀 테스트로 정책 일치를 확인한다.
+- 남은 인수 격차: Godot EditorPlugin 실제 GUI, 물리 Android 기기 성능/Android 10, Play용 앱 ID·서명·비공개 트랙 권한. 정책 문서 상충은 없음.
+
+## M5 GUI reattempt (2026-11-13)
+
+Computer Use was reinitialized and `sky.list_apps()` retried; the helper again reports native pipe unavailable (Windows error 2). No Godot window was returned, so visual dock/Inspector and preview-button validation remains blocked by workstation integration. Headless EditorPlugin tests remain green.
+
+## User policy document reconciliation (2026-11-13)
+
+The original four design documents now consistently reflect confirmed user rules: story-gated unit unlocks, defense continues while the core survives, one locked evolution choice per unit, combat/preparation repairs, and the selected DoT/incapacitation policy. The old “five units immediately unlocked” summary is explicitly marked superseded by DEC-572/573/C2. No gameplay rule required new user approval.
