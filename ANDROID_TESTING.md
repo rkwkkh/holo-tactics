@@ -16,6 +16,8 @@ The repository's application ID is a placeholder and must be replaced by the pub
 
 ## Device smoke test
 
+On Windows, `run_android_emulator_test.bat` starts the configured `MaDangStage6_API37` AVD when available (otherwise the first configured AVD), waits for Android boot, then installs `build/holo-debug.apk` and launches the app. Export the `Android Debug APK` preset first if the ignored build artifact is absent.
+
 Use a physical Android 10+ device with USB debugging enabled. Record device model, Android version, display size, and Godot build with the result.
 
 ```powershell

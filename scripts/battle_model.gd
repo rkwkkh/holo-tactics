@@ -168,7 +168,7 @@ func select_preview_wave(wave_id: String) -> bool:
 	return false
 
 func deploy(kind: String, cell: Vector2i) -> bool:
-	if not balance_seed.has(kind) or balance_seed[kind].team != "ally" or not stage.get("available_units", []).has(kind) or not _is_inside(cell) or cell.y < 6 or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied(cell):
+	if phase not in ["preparation", "combat"] or not balance_seed.has(kind) or balance_seed[kind].team != "ally" or not stage.get("available_units", []).has(kind) or not _is_inside(cell) or cell.y < 6 or cell == core_cell or blocked_cells.has(cell) or _wall_at(cell) >= 0 or _occupied(cell):
 		return false
 	var cost: int = balance_seed[kind].cost
 	if combat_gold < cost:
@@ -298,8 +298,12 @@ func _distance(a: Vector2i, b: Vector2i) -> int:
 
 func move_unit(unit_id: int, destination: Vector2i) -> bool:
 	var unit := _unit_by_id(unit_id)
-	if unit.is_empty() or _is_incapacitated(unit) or phase != "combat" or not _is_inside(destination) or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or _occupied(destination) or _find_path(unit, destination).is_empty():
+	if unit.is_empty() or _is_incapacitated(unit) or phase not in ["preparation", "combat"] or not _is_inside(destination) or destination == core_cell or blocked_cells.has(destination) or _wall_at(destination) >= 0 or _occupied(destination) or _find_path(unit, destination).is_empty():
 		return false
+	if phase == "preparation":
+		unit.cell = destination
+		unit.erase("destination")
+		return true
 	unit.destination = destination
 	unit.cooldown = maxf(unit.cooldown, 0.5)
 	return true
@@ -484,7 +488,7 @@ func tick(delta: float) -> void:
 				_strike_area(unit, unit_targets, unit_targets[target_index].cell, unit.splash_radius)
 			else:
 				_strike(unit, unit_targets[target_index])
-		elif stage.mode == "siege" and wave == waves.size() and unit.cooldown <= 0.0:
+		elif stage.mode == "siege" and unit.cooldown <= 0.0:
 			var distance := absi(unit.cell.x - core_cell.x) + absi(unit.cell.y - core_cell.y)
 			if distance <= unit.range:
 				core_hp = maxf(0.0, core_hp - unit.damage)

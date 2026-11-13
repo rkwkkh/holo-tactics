@@ -19,9 +19,21 @@ func _run() -> void:
 	assert(view.controls_scroll.get_v_scroll_bar().max_value > view.controls_scroll.get_v_scroll_bar().page)
 	assert(view.speed_button.disabled and view.timer.wait_time == 0.2)
 	var initial_phase: String = view.battle.phase
+	view.battle.stage.mode = "siege"
+	view._refresh()
+	assert(view.wave_button.text == "진격")
+	view.battle.stage.mode = "defense"
+	view._refresh()
 	var initial_gold: int = view.battle.combat_gold
 	view._toggle_pause()
 	assert(view.paused and view.timer.time_left == 0.0 and view.wave_button.disabled and view.back_button.disabled)
+	assert(view.pause_menu.visible and not view.pause_abandon_button.disabled)
+	var was_editor_preview: bool = view.editor_preview
+	view.editor_preview = false
+	view.pause_abandon_button.emit_signal("pressed")
+	assert((view.get_meta("abandon_dialog") as ConfirmationDialog).visible)
+	(view.get_meta("abandon_dialog") as ConfirmationDialog).hide()
+	view.editor_preview = was_editor_preview
 	view._start_wave()
 	view._on_tile_pressed(view.battle.core_cell)
 	assert(view.status.text.contains("핵심 · HP") and view.battle.phase == initial_phase and view.battle.combat_gold == initial_gold)
@@ -35,11 +47,13 @@ func _run() -> void:
 	assert(view.rest_timer.time_left > 0.0)
 	view._on_tile_pressed(Vector2i(0, 8))
 	view._on_tile_pressed(Vector2i(0, 8))
-	assert(view.context_panel.visible and view.context_info.text.begins_with("검사 · HP"))
+	assert(view.context_panel.visible and view.context_info.text.begins_with("검사 · HP") and view.context_close_button.visible)
 	assert(view.upgrade_controls.get_parent() == view.context_box)
 	var menu_rect := Rect2(view.context_panel.global_position, view.context_panel.get_combined_minimum_size())
 	assert(menu_rect.position.x >= 0.0 and menu_rect.position.y >= 0.0)
 	assert(menu_rect.end.x <= view.get_viewport_rect().size.x and menu_rect.end.y <= view.get_viewport_rect().size.y)
+	view._clear_selection()
+	assert(not view.context_panel.visible and view.selected_unit == -1)
 	assert(view.battle.build_facility("facility.arrow_tower", Vector2i(1, 8)))
 	view.battle.combat_gold += 100
 	view._on_tile_pressed(Vector2i(1, 8))
@@ -52,7 +66,15 @@ func _run() -> void:
 	assert(not view.facility_upgrade_button.disabled)
 	view._upgrade_selected_facility()
 	assert(view.battle.facilities[0].damage == tower_before + 8.0)
+	var deployed_before: int = view.battle.units.size()
+	var resource_before: int = view.battle.combat_gold
+	view._select_unit_kind("swordsman")
+	assert(not view.deploy_buttons[0].disabled and view.status.text.contains("배치"))
+	view._on_tile_pressed(Vector2i(3, 8))
+	assert(view.battle.units.size() == deployed_before + 1 and view.battle.combat_gold == resource_before - view.battle.balance_seed.swordsman.cost)
 	view.battle.phase = "preparation"
+	view._refresh()
+	assert(not view.deploy_buttons[0].disabled)
 	view._toggle_pause()
 	view._on_tile_pressed(Vector2i(0, 8))
 	assert(view.status.text.begins_with("검사 · HP"))

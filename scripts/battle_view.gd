@@ -35,6 +35,8 @@ var wave_button: Button
 var speed_button: Button
 var simulation_speed := 1
 var pause_button: Button
+var pause_menu: ColorRect
+var pause_abandon_button: Button
 var paused := false
 var pause_timer_remaining := 0.0
 var pause_rest_timer_remaining := 0.0
@@ -57,6 +59,7 @@ var evolution_controls_unit := -1
 var context_panel: PanelContainer
 var context_box: VBoxContainer
 var context_info: Label
+var context_close_button: Button
 var repair_button: Button
 var facility_upgrade_button: Button
 var controls_scroll: ScrollContainer
@@ -107,9 +110,17 @@ func _ready() -> void:
 	context_box = VBoxContainer.new()
 	context_panel.add_child(context_box)
 	add_child(context_panel)
+	var context_header := HBoxContainer.new()
+	context_box.add_child(context_header)
 	context_info = Label.new()
 	context_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	context_box.add_child(context_info)
+	context_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	context_header.add_child(context_info)
+	context_close_button = Button.new()
+	context_close_button.text = "닫기"
+	context_close_button.pressed.connect(_clear_selection)
+	context_close_button.add_to_group("battle_commands")
+	context_header.add_child(context_close_button)
 	repair_button = Button.new()
 	repair_button.text = "시설 수리"
 	repair_button.pressed.connect(_repair_selected_facility)
@@ -263,6 +274,43 @@ func _ready() -> void:
 	abandon_dialog.confirmed.connect(_abandon_battle)
 	add_child(abandon_dialog)
 	set_meta("abandon_dialog", abandon_dialog)
+	pause_menu = ColorRect.new()
+	pause_menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	pause_menu.color = Color(0.02, 0.035, 0.055, 0.92)
+	pause_menu.mouse_filter = Control.MOUSE_FILTER_STOP
+	pause_menu.z_index = 20
+	pause_menu.visible = false
+	var pause_center := CenterContainer.new()
+	pause_center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	pause_menu.add_child(pause_center)
+	var pause_panel := PanelContainer.new()
+	pause_panel.custom_minimum_size.x = 240
+	var pause_style := StyleBoxFlat.new()
+	pause_style.bg_color = Color("#111a22")
+	pause_style.border_color = Color("#caa65a")
+	pause_style.set_border_width_all(2)
+	pause_style.content_margin_left = 20
+	pause_style.content_margin_right = 20
+	pause_style.content_margin_top = 20
+	pause_style.content_margin_bottom = 20
+	pause_panel.add_theme_stylebox_override("panel", pause_style)
+	pause_center.add_child(pause_panel)
+	var pause_actions := VBoxContainer.new()
+	pause_actions.add_theme_constant_override("separation", 12)
+	pause_panel.add_child(pause_actions)
+	var pause_title := Label.new()
+	pause_title.text = "일시정지"
+	pause_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pause_actions.add_child(pause_title)
+	var resume_button := Button.new()
+	resume_button.text = "계속"
+	resume_button.pressed.connect(_toggle_pause)
+	pause_actions.add_child(resume_button)
+	pause_abandon_button = Button.new()
+	pause_abandon_button.text = "전투 포기"
+	pause_abandon_button.pressed.connect(_on_back_pressed)
+	pause_actions.add_child(pause_abandon_button)
+	add_child(pause_menu)
 	timer = Timer.new()
 	timer.wait_time = BATTLE_TICK_SECONDS
 	timer.timeout.connect(_tick)
@@ -355,9 +403,19 @@ func _on_tile_pressed(cell: Vector2i) -> void:
 	elif not selected_facility_id.is_empty():
 		if not battle.build_facility(selected_facility_id, cell):
 			status_override = "시설 위치 또는 전투 자원을 확인하세요"
-	elif battle.phase == "preparation" and not selected_kind.is_empty():
+	elif battle.phase in ["preparation", "combat"] and not selected_kind.is_empty():
 		if not battle.deploy(selected_kind, cell):
 			status_override = "배치 위치 또는 전투 자원을 확인하세요"
+	_refresh()
+
+func _clear_selection() -> void:
+	selected_kind = ""
+	selected_facility_id = ""
+	selected_facility_instance = -1
+	selected_obstacle_id = ""
+	selected_obstacle_instance = -1
+	selected_unit = -1
+	status_override = ""
 	_refresh()
 
 func _select_unit_kind(kind: String) -> void:
@@ -463,6 +521,9 @@ func _on_back_pressed() -> void:
 
 func _abandon_battle() -> void:
 	if battle.phase in ["preparation", "combat"]:
+		timer.stop()
+		rest_timer.stop()
+		paused = false
 		battle.phase = "finished"
 		battle.battle_result = "abandoned"
 		_process_result()
@@ -532,12 +593,13 @@ func _refresh() -> void:
 	_refresh_speed_control()
 	hud.text = "%s · 웨이브 %d / 핵심 HP %.0f / 전투 자원 %d" % [stage_title, battle.wave, battle.core_hp, battle.combat_gold]
 	_refresh_result_panel()
-	wave_button.text = "웨이브 시작 (%d)" % rest_seconds if rest_seconds > 0 else "웨이브 시작"
+	var start_label := "진격" if battle.stage.get("mode") == "siege" else "웨이브 시작"
+	wave_button.text = "%s (%d)" % [start_label, rest_seconds] if rest_seconds > 0 else start_label
 	wave_button.disabled = battle.phase != "preparation"
 	back_button.text = "테스트 종료" if editor_preview else "마을로 돌아가기" if battle.phase == "finished" else "전투 포기"
 	back_button.disabled = paused
 	for button in deploy_buttons:
-		button.disabled = battle.phase != "preparation"
+		button.disabled = battle.phase not in ["preparation", "combat"]
 	_refresh_upgrade_controls()
 	_refresh_skill_controls()
 	_refresh_evolution_controls()
@@ -547,7 +609,10 @@ func _refresh() -> void:
 		for command in get_tree().get_nodes_in_group("battle_commands"):
 			command.disabled = true
 	pause_button.text = "계속" if paused else "일시정지"
+	pause_button.visible = not paused and battle.phase != "finished"
 	pause_button.disabled = battle.phase == "finished"
+	pause_menu.visible = paused and battle.phase != "finished"
+	pause_abandon_button.text = "테스트 종료" if editor_preview else "전투 포기"
 	for y in BattleModel.ROWS:
 		for x in BattleModel.COLUMNS:
 			var cell := Vector2i(x, y)
@@ -587,7 +652,7 @@ func _refresh() -> void:
 			"safe_abort": status.text = "증원 출현 실패로 전투를 안전 종료했습니다. 마지막 체크포인트에서 다시 시작할 수 있습니다."
 			_: status.text = "전투에서 패배했습니다"
 	elif battle.phase == "combat":
-		status.text = "전투 중 · 선택 유닛을 누른 뒤 이동할 칸을 선택하세요"
+		status.text = "%s 배치 · 아군 구역을 선택하세요" % _unit_name(selected_kind) if not selected_kind.is_empty() else "진격 중 · 유닛을 선택한 뒤 이동할 칸을 선택하세요" if battle.stage.get("mode") == "siege" else "전투 중 · 유닛을 선택한 뒤 이동할 칸을 선택하세요"
 	else:
 		status.text = "배치 단계 · 검사/궁수를 선택한 뒤 아군 구역을 누르세요"
 

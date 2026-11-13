@@ -653,3 +653,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 
 - User reports that the refreshed `v0.1.0-preview.1` APK downloaded, installed, and launched successfully on Galaxy S25 Ultra. Recorded as user-confirmed install/startup, not an agent-observed test; OS version, game-flow results, and frame-rate data are unknown.
 - This closes the prior S25 installation blocker only. Full device gameplay checks, performance target measurement, Android 10 compatibility, editor GUI checks, permanent package identity, publisher-signed AAB, and Play private-test readiness remain open.
+
+## 전투 UX 및 공성 명령 후속 (2026-11-13)
+
+- Godot 4.7.2 Windows에서 `run_godot_tests.bat` 실행: core, 콘텐츠 검증(Errors 0), seeded 캠페인(8/8), 전투 결과/UI, 편집기 패널 검사를 모두 통과. 편집기 headless 종료 시 RID/ObjectDB 정리 경고 출력은 남음.
+- API 37 x86_64 AVD에서 `run_android_emulator_test.bat` 실행: APK 설치 Success, `com.example.holotactics` 프로세스 실행, Godot 앱이 resumed foreground activity임을 확인.
+- `git diff --check` 통과. 실행 배치의 ADB 감지/부팅 상태 확인을 콘솔 파이프 없이 파일 기반으로 수정하여 Windows ADB의 입력 재지정 오류를 제거.
+- 이번 검증은 메뉴 실행과 자동화 테스트까지이며, 전투 포기 부분 보상은 사용자의 다음 수동 플레이 확인이 필요하다. API37 소프트웨어 렌더러 결과를 실기기 FPS 검증으로 간주하지 않는다.

@@ -15,6 +15,8 @@ Portrait 2D strategy game built with Godot 4 and GDScript. Design source of trut
   ```
 
 - Open `project.godot` in the Godot editor to run the portrait project.
+- On Windows, double-click `run_godot_tests.bat` to run the headless core, content, campaign, battle-UI, and editor-panel checks.
+- After exporting the `Android Debug APK` preset to `build/holo-debug.apk`, double-click `run_android_emulator_test.bat` to boot the preferred API 37 AVD, install the APK, and launch the game.
 - The enabled **Holo Content Editor** dock has stage/wave, evolution, and combat-upgrade JSON panels. Stage/wave preview runs from saved catalog data in an isolated checkpoint and does not settle rewards.
 - Android device smoke, frame-rate measurement, and private-test readiness steps are in [ANDROID_TESTING.md](ANDROID_TESTING.md).
 - The main menu exposes the seeded 6-main/2-optional campaign. Village management includes the four growth buildings and a scrollable permanent-research screen. Base-stat amounts and evolution research prices are balance seeds. Combat evolution is implemented; each unit locks its first selected form. Battle controls expose only units and facilities available in the selected stage.

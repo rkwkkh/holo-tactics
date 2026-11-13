@@ -139,3 +139,10 @@ Error-blocking and Warning-only catalog save behavior, stable-ID protection, ato
 ## Acceptance update (2026-11-13)
 
 User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This resolves the device install/startup blocker, but does not verify gameplay flows, touch/safe-area behavior, or the 60/30 FPS targets. Remaining acceptance: hands-on device playthrough and profiler measurements; Android 10/API 29 compatibility on an appropriate device; visible Godot editor-panel/Inspector workflow; permanent application ID, publisher-signed AAB, and Play private-test readiness. See the user-confirmed evidence note in `TEST_REPORT.md`.
+
+## 2026-11-13 사용자 피드백 반영 작업
+
+- M1/M2 UX 보완: 유닛 창 닫기, pause 메뉴 전투 포기, 전투 중 유닛 신규 배치, 사용자 확정 공성 `진격`/자동 진격 및 개별 이동 의미 반영.
+- 의존 변경: `battle_model` 단계 허용/개별 이동·자동진격, `battle_view` 입력/상태 UI, model/UI 회귀 테스트, 제품·요구사항·결정 문서, 사용자용 Godot/Android 실행 배치.
+- 확인: Godot 통합 스크립트와 편집기 패널 자동화, Android 37 AVD 설치/foreground 실행. APK 릴리즈는 하지 않는다. 소스 커밋 및 원격 푸시만 수행.
+- 남은 사용자 QA: 확인 대화상자에서 포기 확정 후 실제 부분 보상 및 마을 복귀 여부 확인.

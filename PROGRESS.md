@@ -269,3 +269,11 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 
 - Galaxy S25 Ultra: user confirmed the refreshed APK installs and launches. Treat as a device startup smoke pass only. Full gameplay, touch/safe-area, save/reward, and regular/high-load performance checks are still needed on-device.
 - MVP acceptance is not down to gameplay testing alone: M5 editor GUI usability and M6 Android performance/Android 10 and publisher-signed Play package gates remain as listed in `ISSUES.md`.
+
+## 2026-11-13 사용자 관찰 이슈 수정
+
+- 완료: 유닛 정보창 닫기 동작 추가, 일시정지 메뉴에 확인형 전투 포기 추가.
+- 완료: 전투 중 해금 유닛 신규 배치 가능; 재정비 중 즉시 개별 재배치, 공성 전투 중 개별 목적지 보행 후 자동 진격 재개.
+- 완료: 공성 시작 버튼을 `진격`으로 표시. 진격 시 적 웨이브 활성화와 전체 아군 자동 진격이 함께 시작됨. 별도 전체 이동 명령은 없음.
+- 자동 확인: 배치/이동/버튼 상태, 사용자 인터페이스 닫기·포기 확인창 및 승리/패배 테스트가 통과.
+- 사용자 확인 대기: 일시정지 메뉴에서 포기 후 실제 부분 보상 액수와 마을 복귀 흐름은 사용자의 게임 내 재확인 필요.

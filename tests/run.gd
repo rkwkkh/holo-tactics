@@ -413,6 +413,40 @@ func _initialize() -> void:
 	for index in ally_kinds.size():
 		assert(roster_deploy_test.deploy(ally_kinds[index], Vector2i(index, 8)))
 	assert(roster_deploy_test.units.size() == 5 and roster_deploy_test.combat_gold == 660)
+	var combat_deploy_test := BattleModel.new()
+	combat_deploy_test.phase = "combat"
+	combat_deploy_test.combat_gold = 100
+	assert(combat_deploy_test.deploy("swordsman", Vector2i(1, 8)) and combat_deploy_test.combat_gold == 50)
+	combat_deploy_test.phase = "finished"
+	assert(not combat_deploy_test.deploy("swordsman", Vector2i(2, 8)) and combat_deploy_test.combat_gold == 50)
+	var siege_prep_move := BattleModel.new("stage.m2.siege")
+	assert(siege_prep_move.deploy("swordsman", Vector2i(1, 8)))
+	assert(siege_prep_move.move_unit(siege_prep_move.units[0].id, Vector2i(2, 8)))
+	assert(siege_prep_move.units[0].cell == Vector2i(2, 8) and not siege_prep_move.units[0].has("destination"))
+	var siege_advance_test := BattleModel.new("stage.m2.siege")
+	assert(siege_advance_test.deploy("swordsman", Vector2i(1, 8)) and siege_advance_test.deploy("archer", Vector2i(6, 8)))
+	siege_advance_test.wave = siege_advance_test.waves.size()
+	var siege_advance_store := CheckpointStore.new("user://siege_advance_test_%s.json" % Time.get_ticks_usec())
+	assert(siege_advance_test.start_wave(siege_advance_store))
+	siege_advance_test.enemies.clear()
+	siege_advance_test.enemy_facilities.clear()
+	siege_advance_test.pending_reinforcements.clear()
+	var before_advance_distances: Array[int] = []
+	for ally in siege_advance_test.units:
+		before_advance_distances.append(siege_advance_test._distance(ally.cell, siege_advance_test.core_cell))
+	siege_advance_test.tick(0.2)
+	for ally_index in siege_advance_test.units.size():
+		assert(siege_advance_test._distance(siege_advance_test.units[ally_index].cell, siege_advance_test.core_cell) < before_advance_distances[ally_index])
+	var moving_ally_id: int = siege_advance_test.units[0].id
+	var manual_destination: Vector2i = siege_advance_test.units[0].cell + (Vector2i.LEFT if siege_advance_test.units[0].cell.x > 0 else Vector2i.RIGHT)
+	assert(siege_advance_test.move_unit(moving_ally_id, manual_destination))
+	siege_advance_test.tick(0.2)
+	assert(siege_advance_test.units[0].cell == manual_destination)
+	var manual_move_cell: Vector2i = siege_advance_test.units[0].cell
+	siege_advance_test.tick(0.2)
+	siege_advance_test.tick(0.2)
+	assert(siege_advance_test._distance(siege_advance_test.units[0].cell, siege_advance_test.core_cell) < siege_advance_test._distance(manual_move_cell, siege_advance_test.core_cell))
+	siege_advance_store.clear_checkpoint()
 	assert(seeded_catalog.categories.upgrades.size() == 24)
 	assert(seeded_catalog.categories.upgrades.filter(func(upgrade): return upgrade.has("unit_kind")).size() == 20)
 	assert(seeded_catalog.categories.upgrades.filter(func(upgrade): return upgrade.has("facility_id")).size() == 4)

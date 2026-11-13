@@ -165,3 +165,9 @@ Computer Use state query returned no apps; native pipe and browser host are unav
 
 - Resolved: user downloaded the refreshed `v0.1.0-preview.1` APK and confirmed it installed and launched on Galaxy S25 Ultra. This is user-reported startup evidence; Android version and gameplay/performance measurements were not provided.
 - Still open: hands-on gameplay flows and UI/touch/safe-area checks, S25 frame-time measurement at regular/high load, Android 10/API 29 device compatibility, Godot editor GUI usability, and publisher package ID/signing/Play private-test readiness.
+
+## 사용자 플레이 피드백 반영 (2026-11-13)
+
+해결: 유닛 문맥창 닫기 버튼 부재, 일시정지 화면의 전투 포기 접근성, 공성 자동 진격 조작 설명 부재, 전투 중 신규 아군 배치 제한. 기획과 요구사항에 확정 규칙을 반영했고 DEC-656/657로 기록했다. 자동 테스트 및 에뮬레이터 설치·실행 배치 검증은 통과.
+
+검증 대기: 사용자가 일시정지 메뉴에서 전투를 포기한 뒤 부분 보상 및 마을 복귀 결과를 실기기에서 확인해야 한다. 직접적인 전체 캠페인 UX, S25 성능, Android 10 실기기 검증 이슈는 기존 항목을 유지한다.
