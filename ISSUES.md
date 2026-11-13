@@ -248,7 +248,7 @@ The original four design documents now consistently reflect confirmed user rules
 ## M5 visible editor verification unavailable (2026-11-13)
 
 - Retried the Windows Computer Use app discovery twice, reset and reinitialized its runtime, then retried once; each discovery failed because the native pipe was unavailable. No target window was exposed, so no clicks or edits occurred.
-- Automated headless editor checks still pass, but visible dock/Inspector interaction and Error-blocked/Warning-only save feedback remain unverified. Retry when the Windows UI bridge is available or have the project owner perform the documented GUI check.
+- Headless panel tests now also verify Error/Warning feedback rows, Error metadata and field navigation, and that a Warning row does not switch the selected record. Visible dock sizing, Inspector manipulation, and visual usability remain unverified; retry when the Windows UI bridge is available or have the project owner perform the documented GUI check.
 
 ## Play closed-test submission materials (2026-11-13)
 

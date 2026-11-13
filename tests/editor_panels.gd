@@ -17,10 +17,25 @@ func _initialize() -> void:
 		var panel: Dictionary = plugin.panels[key]
 		assert(panel.picker.item_count > 0 and panel.picker.selected == 0)
 		assert(panel.edit.text.begins_with("{"))
+	var catalog: Dictionary = plugin_script.read_catalog()
+	var stage_id: String = catalog.categories.stages[0].id
+	# Exercise the dock's validation feedback and item routing without mutating the source catalog.
+	var errors: Array[String] = ["%s.references: unresolved wave" % stage_id]
+	var warnings: Array[String] = ["campaign contains 27 waves"]
+	plugin._show_validation_errors("stages_waves", errors, catalog, warnings)
+	var error_list: ItemList = plugin.panels.stages_waves.errors
+	assert(error_list.item_count == 2)
+	assert(error_list.get_item_text(0).begins_with("Error · ") and error_list.get_item_metadata(0) == stage_id)
+	assert(error_list.get_item_text(1).begins_with("Warning · ") and error_list.get_item_metadata(1).is_empty())
+	plugin._open_error_record(0, "stages_waves")
+	assert(plugin.panels.stages_waves.edit.get_selected_text() == "\"references\"")
+	var selected_id: String = plugin.panels.stages_waves.active_id
+	plugin._open_error_record(1, "stages_waves")
+	assert(plugin.panels.stages_waves.active_id == selected_id)
 	var preview_controls: HBoxContainer = plugin.tabs.get_child(0).get_child(8)
 	assert(preview_controls.get_child(0).text == "스테이지 실행")
 	assert(preview_controls.get_child(1).text == "선택 웨이브 실행")
-	print("Editor content panels passed: stages/waves, 6 evolutions, 24 upgrades")
+	print("Editor content panels passed: stages/waves, 6 evolutions, 24 upgrades, validation Error/Warning navigation")
 	plugin.tabs.queue_free()
 	plugin.free()
 	await create_timer(2.0).timeout

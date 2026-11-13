@@ -367,6 +367,7 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 ## Current continuation (2026-11-13)
 
 - Re-ran `run_godot_tests.bat` on Godot 4.7.2: core tests, content validation, all 8 seeded campaign-stage wins, editor-preview isolation, battle-result UI, and the 3 editor panels (stages/waves, 6 evolutions, 24 upgrades) passed. Content validation reported 0 errors. Editor-headless shutdown still emits RID/ObjectDB leak diagnostics after the success sentinel; the runner exits 0.
-- Attempted visible M5 Error/Warning interaction verification through Windows Computer Use. The native UI bridge failed to connect on the initial call and retry; no editor UI changes were made. Headless panel construction remains verified, while interactive dock/Inspector behavior is still open.
+- Extended `tests/editor_panels.gd` to assert Error/Warning list presentation, Error-row metadata and field focus, and that Warning rows do not navigate. Direct editor-panel run and full regression batch pass; source catalog remains unchanged. Visible dock/Inspector usability remains open.
+- Attempted visible M5 verification through Windows Computer Use. The native UI bridge failed to connect on the initial call and retry; no editor UI changes were made.
 - User confirmed Galaxy S25 Ultra combat/FPS will be tested directly and logs provided afterward. User has neither Play Console access nor a publisher upload key; no account, key, or Play submission was created. These M6 gates remain pending.
 - Pushed documentation/import-metadata commit `cd6f356`; GitHub Actions run `43365467680` passed Godot validation and Android AAB export/structure verification. The uploaded artifact is unsigned and not Play-submittable.

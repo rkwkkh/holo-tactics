@@ -790,4 +790,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Passed: core tests, content validation (0 errors), seeded wins for all 8 campaign stages, editor preview isolation, battle result UI, and editor panel checks (stages/waves, 6 evolutions, 24 upgrades).
 - The editor-headless process printed RID/ObjectDB leak diagnostics while shutting down after its success output; the test runner completed successfully. This cleanup noise is recorded, not treated as a content/test failure.
 - Visible editor Error/Warning interaction was not retested: Windows Computer Use could not connect to its native pipe. Device FPS and combat flow remain pending the user's Galaxy S25 Ultra logs; Play Console and publisher signing key are unavailable per user.
+
+## Editor validation-feedback regression (2026-11-13)
+
+- Extended `tests/editor_panels.gd` with non-mutating checks for Error/Warning row text and metadata, clicking an Error row focuses the matching JSON field, and clicking a Warning row leaves the selected record unchanged.
+- Direct editor-panel run and the complete `run_godot_tests.bat` batch passed on Godot 4.7.2. Content validation remains at 0 errors. The editor-headless process still emits RID/ObjectDB cleanup diagnostics after its pass sentinel; runner exit code is 0.
+- This adds headless interaction coverage; it does not verify visible dock layout or hands-on Inspector usability.
 - GitHub Actions run [43365467680](https://github.com/rkwkkh/holo-tactics/actions/runs/43365467680) passed both jobs: Godot import/tests/content/scene checks and Android debug AAB export, structure verification, and artifact upload. The artifact is unsigned; no APK release or Play upload was created.
