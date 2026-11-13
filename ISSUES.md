@@ -307,3 +307,8 @@ The original four design documents now consistently reflect confirmed user rules
 - Local release-mode APK export was attempted and failed at code signing: Godot reported no release keystore. No APK artifact was produced. Existing debug export is unaffected.
 - Publisher-signed AAB/Closed testing remains dependent on owner-provided signing setup and Play Console access. No temporary/publisher key was created.
 - ADB currently has no connected target, leaving Galaxy S25 Ultra and physical Android 10 validation pending.
+
+## Play Console account condition (2026-11-13)
+
+- Official policy as of 2026-11-13 sets API 36 for new app/update submissions beginning 2026-08-31; current export preset already targets API 36.
+- If the owner's account is a personal account created after 2023-11-13, 12 testers must remain opted in for 14 consecutive days before applying for production access. This does not block starting Closed testing and does not extend this MVP into public release. Owner account type/date are unknown; verify in Console when access exists. Sources are linked in `PLAY_PRIVATE_TEST_PREPARATION.md`.

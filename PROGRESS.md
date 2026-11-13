@@ -437,3 +437,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Attempted `Godot 4.7.2 --export-release "Android Debug APK" build/holo-perf-release.apk` to check release-mode packaging. Export stopped at Android code signing because no release keystore is configured; no artifact was produced.
 - This does not affect the existing debug APK/AAB export path. A publisher-signed build and Play upload require the owner's release keystore and Play Console access; no substitute key was generated and no upload was attempted.
 - ADB reports no connected device in this session, so Galaxy S25 Ultra and physical Android 10 acceptance still require user-provided hardware/log evidence.
+
+## Play 정책 최신 확인 (2026-11-13)
+
+- Official Play guidance now requires Android 16/API 36 target for new app submissions and updates from 2026-08-31; the export preset is already target API 36 / min API 29.
+- A 12-tester/14-consecutive-day Closed test applies to personal developer accounts created after 2023-11-13 before they can apply for production access. It is not a prerequisite merely to begin the Closed test. Account type/date are owner-only facts and remain unverified. MVP scope ends at Closed testing; public/production release is outside scope.
+- Official sources and the conditional account check are linked in `PLAY_PRIVATE_TEST_PREPARATION.md`.

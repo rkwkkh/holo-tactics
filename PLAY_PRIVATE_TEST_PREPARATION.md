@@ -83,3 +83,9 @@ Windows에서 초안을 다시 생성할 때:
 - [Google Play Data safety 작성 안내](https://support.google.com/googleplay/android-developer/answer/10787469)
 
 Google Play 요건은 변경될 수 있으므로 Console 제출 시점의 안내를 다시 확인한다. 현재 공식 안내상 Closed testing은 앱 설정을 완료해야 하며, 스토어 등록 게시에는 아이콘·짧은 설명·기능 그래픽·스크린샷 자료가 요구된다. 내부 테스트 트랙의 면제 조건을 Closed testing에 적용하지 않는다.
+
+## 공식 Play 정책 재확인 (2026-11-13)
+
+- Google Play 신규 앱 및 앱 업데이트의 target API 최소 기준은 2026-08-31부터 Android 16/API 36이다. 프로젝트의 Android export preset은 target API 36, minimum API 29로 설정되어 있어 target 수치 기준은 맞는다. 이는 기기 호환성·정책 선언·AAB 서명 검증을 대신하지 않는다. [Android Developers: target API requirement](https://developer.android.com/google/play/requirements/target-sdk)
+- 2023-11-13 이후 생성된 개인 개발자 계정은 프로덕션 액세스를 신청하기 전, 최소 12명의 테스터가 Closed test에 연속 14일 opt-in해야 한다. 이것은 Closed test를 시작하는 전제 조건이 아니라 해당 계정의 프로덕션 액세스 조건이다. 이 MVP의 목표는 사용자가 정한 Closed test이며 프로덕션 공개는 범위 밖이다. 계정 유형/생성일은 소유자가 Console에서 확인해야 한다. [Play Console: new personal account testing requirements](https://support.google.com/googleplay/android-developer/answer/14151465)
+- Closed test 트랙을 생성하려면 앱 설정을 완료해야 하며, 내부 테스트의 예외를 혼용하지 않는다. [Play Console: testing tracks](https://support.google.com/googleplay/android-developer/answer/9845334)

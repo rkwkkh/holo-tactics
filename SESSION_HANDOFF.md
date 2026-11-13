@@ -44,3 +44,7 @@ The Warning-row visual click attempt failed because the native Godot window coul
 ## Current M6 gate check (2026-11-13)
 
 No Android device is attached to ADB. A local release-mode APK export preflight was attempted but could not sign without an owner release keystore; no artifact was produced. Keep the debug APK/AAB labeled test-only. Remaining final acceptance requires Galaxy S25 Ultra logs, physical Android 10 evidence, and owner Play Console/release signing access.
+
+## Play policy update (2026-11-13)
+
+Before the owner sets up Console, note the current target API 36 requirement (already configured) and the conditional 12 testers/14 consecutive days requirement for post-2023-11-13 personal accounts applying for production access. It is not a gate to begin the MVP Closed test. Verify account type and creation date with owner access; sources are in `PLAY_PRIVATE_TEST_PREPARATION.md`.
