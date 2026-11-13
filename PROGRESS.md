@@ -467,3 +467,7 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Full Godot source is tracked; `.godot/`, generated Android Gradle templates/cache, and `build/` binaries/logs remain ignored because they are machine-generated and reproducible. The Android template/export setup is documented in `README.md`.
 - A clean clone exposed that `run_godot_tests.bat` did not first create Godot's global script-class cache. Added a headless editor import step. The result UI test also attached preview metadata to the root Window instead of the SceneTree and inherited the workstation's saved campaign state; corrected it to use SceneTree metadata and deterministic in-memory progress.
 - Full local test batch passed after these fixes. Exact pushed-clone verification is the next check.
+## Pushed fresh-clone verification (2026-11-13)
+
+- Pushed source snapshot commit `64632e2` and cloned `origin/master` into a new temporary folder with no `.godot` cache. `run_godot_tests.bat` created the class cache/import state and then passed all suites, including 8/8 campaign simulations and 0 content errors.
+- GitHub Actions run [43398664085](https://github.com/rkwkkh/holo-tactics/actions/runs/43398664085) passed Godot validation and Android AAB export/structure verification. Worktree is clean and `master` matches `origin/master`.

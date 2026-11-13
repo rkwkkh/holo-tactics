@@ -73,3 +73,8 @@ Before the owner sets up Console, note the current target API 36 requirement (al
 - README now documents fresh checkout, Windows game/test launchers, Android SDK/JDK prerequisites, build template install/export, and the confirmed package ID.
 - `run_godot_tests.bat` now imports the project before tests so a new checkout registers global GDScript classes. `tests/results_view.gd` now uses SceneTree metadata and isolated in-memory completion state instead of relying on the local save.
 - The current checkout full suite passes after these changes. Before calling the source snapshot ready, rerun the same test batch in a newly cloned `master` checkout and verify CI. Do not add generated `.godot/`, `android/`, or `build/` artifacts.
+## Full source push verification (2026-11-13)
+
+- README now includes clean-checkout and Android setup, and the stale placeholder package ID text is corrected.
+- Commit `64632e2` includes the fresh-checkout test initialization and deterministic result-view test. A new clone of pushed `master` (without `.godot` cache) passed `run_godot_tests.bat` with exit code 0.
+- CI run [43398664085](https://github.com/rkwkkh/holo-tactics/actions/runs/43398664085) passed Godot validation and Android AAB export/structure checks. Android template/cache and local APK/AAB artifacts remain intentionally untracked and are regenerated from the committed presets.
