@@ -208,6 +208,7 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Local API37 AVD install/launch and M1 battlefield screenshot passed. Renderer is emulated (`ro.hardware.egl=emulation`); preparation sampled 33.9–34.8 FPS / P95 30.0–32.46 ms, while combat sampled 13.5–14.9 FPS / P95 72.47–93.16 ms. This is not representative hardware but indicates a serious performance risk; do not claim target acceptance until real-device profiling.
 - Remaining: representative Android 10+ low-tier and Galaxy S25 Ultra gameplay/FPS, high-load scenario measurement, Android 10 graphics compatibility on real hardware, and signed private-test artifact setup.
+- New current-APK repeat smoke (2026-11-13): after reconnecting the AVD, M1 wave 1 rendered and advanced (core HP 300→240); six intervals averaged 18.1–23.8 FPS / P95 54.40–99.63 ms on the emulated renderer. Treat as a below-target emulator risk signal only; physical acceptance remains open.
 
 ## Windows runner preview-test coverage (2026-11-13)
 

@@ -175,3 +175,9 @@ User selected facility upgrades during both preparation and combat. The latest A
 ## Latest physical-device note (2026-11-13)
 
 The user confirmed the refreshed APK downloaded, installed, and launched on Galaxy S25 Ultra. This supersedes prior notes that the device install result was unknown, but is not a gameplay or performance measurement. Run the numbered device smoke flows above and record Android version and frame-profiler results before treating M6 device acceptance as complete.
+
+## Latest current-APK API37 M1 smoke (2026-11-13)
+
+- Reconnected the existing API37 x86_64 phone AVD (1080×2400, density 420); the current debug APK opened the campaign, entered M1, placed one swordsman (resource 160→110), and began wave 1. Enemies rendered and core HP fell 300→240.
+- Six in-game sampler windows measured 18.1–23.8 average FPS, P95 54.40–99.63 ms, max 73.34–138.45 ms on `ro.hardware.egl=emulation`. These values are below the 60 FPS normal / 30 FPS high-load targets and are not physical-device evidence. Use S25 Ultra and representative lower-tier hardware logs for acceptance.
+- The ADB error scan returned no fatal exception, Godot script error, or Vulkan/renderer error in the inspected log buffer. This was only a short wave-1 smoke.

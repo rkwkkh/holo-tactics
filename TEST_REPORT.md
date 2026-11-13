@@ -797,4 +797,11 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Direct editor-panel run and the complete `run_godot_tests.bat` batch passed on Godot 4.7.2. Content validation remains at 0 errors. The editor-headless process still emits RID/ObjectDB cleanup diagnostics after its pass sentinel; runner exit code is 0.
 - This adds headless interaction coverage; it does not verify visible dock layout or hands-on Inspector usability.
 - GitHub Actions run [43366648146](https://github.com/rkwkkh/holo-tactics/actions/runs/43366648146) passed both Godot and Android AAB jobs, including the updated editor-panel assertions.
+
+## API37 current APK M1 combat smoke (2026-11-13)
+
+- Reconnected the existing x86_64 API37 phone AVD (1080×2400, density 420) and installed/launched `build/holo-debug.apk`, SHA-256 `70C4283381A65FF0E327EB188487A9BBACDA93C2F2F2BD230E07F89EDC3AB716`, package `com.rhstudio.holotactics`.
+- Campaign screen rendered; M1 opened; deploying one swordsman changed combat resources 160→110. Wave 1 started, enemy sprites rendered, and core HP decreased 300→240. Screenshot: ignored local artifact `build/avd-current-m1-combat.png`.
+- Six debug frame windows across about 50 seconds measured 18.1–23.8 average FPS, P95 54.40–99.63 ms, max 73.34–138.45 ms. AVD reports `ro.hardware.egl=emulation`; this is emulator-only and does not establish physical-device performance, but it is below both project targets and reinforces the need for Galaxy S25/lower-tier profiling.
+- Filtered logcat scan found no `FATAL EXCEPTION`, Godot `SCRIPT ERROR`, Vulkan error, or renderer condition error in the inspected buffer. This short smoke is not a full-stage victory test.
 - GitHub Actions run [43365467680](https://github.com/rkwkkh/holo-tactics/actions/runs/43365467680) passed both jobs: Godot import/tests/content/scene checks and Android debug AAB export, structure verification, and artifact upload. The artifact is unsigned; no APK release or Play upload was created.
