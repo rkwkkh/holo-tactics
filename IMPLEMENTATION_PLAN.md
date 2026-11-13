@@ -160,4 +160,8 @@ User confirmed the refreshed APK installs and launches on Galaxy S25 Ultra. This
 
 ## Android package ID decision (2026-11-13)
 
-- User confirmed `com.rhstudio.holotactics`; export presets and emulator launcher are updated. Rebuilt APK/AAB match the ID and API37 launch succeeded. The corrected remote AAB workflow, publisher signing, and Play Console availability remain open.
+- User confirmed `com.rhstudio.holotactics`; export presets and emulator launcher are updated. Rebuilt APK/AAB match the ID and API37 launch succeeded. Corrected GitHub AAB export passes; publisher signing and Play Console availability remain open.
+
+## GitHub Actions Android export retest (2026-11-13)
+
+- CI run `43351099459` for `b425bf8` passed the complete Godot validation job and Android debug AAB export/structure checks; the unsigned artifact uploaded successfully. This resolves the CI workflow stall. Play Console package availability and publisher-signed AAB/private-test setup remain open.

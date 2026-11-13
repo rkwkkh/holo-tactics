@@ -224,3 +224,8 @@ The original four design documents now consistently reflect confirmed user rules
 - User confirmed `com.rhstudio.holotactics`; APK/AAB presets, release-export preflight, emulator launcher, and current Android test instructions are updated. Play Console availability is not checked.
 - Existing installs use the earlier sample ID and will not update in place. Rebuilt APK/AAB under the confirmed ID and verified API37 install/launch; old sample-ID app was preserved.
 - Release signing environment values are not provided; the unsigned debug AAB is not uploadable to Play.
+
+## Android CI export stall — resolved (2026-11-13)
+
+- Root cause: the workflow ran `--install-android-build-template` without an export action, leaving all six recent Android jobs stuck while Godot tests passed.
+- Fix: combine template installation with debug AAB export and set a 20-minute timeout. CI run `43351099459` passed both jobs and uploaded the unsigned test artifact. No Play-ready signing or release was performed.

@@ -721,7 +721,7 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 
 - Remote history showed six consecutive push runs staying in `android-aab` at `Import project and install Gradle template`, while each Godot test job passed. Cancelled those stale in-progress runs.
 - Godot 4.7.2 help says `--install-android-build-template` is used together with an export action. Moved it onto the same `--export-debug "Android Play AAB"` command and added a 20-minute Android job timeout.
-- Ran the exact combined command locally; it created an 86,248,032-byte AAB with `BundleConfig.pb`, `base/manifest/AndroidManifest.xml`, and `base/dex/classes.dex`. SHA-256: `7A484105D3329C389D858111EC35BF8949E187C2AEE5C1796BCBE0921448F32D`. `jarsigner` reports unsigned. GitHub run after the workflow fix is pending.
+- Ran the exact combined command locally; it created an 86,248,032-byte AAB with `BundleConfig.pb`, `base/manifest/AndroidManifest.xml`, and `base/dex/classes.dex`. SHA-256: `7A484105D3329C389D858111EC35BF8949E187C2AEE5C1796BCBE0921448F32D`. `jarsigner` reports unsigned. The later corrected GitHub run passed; see the following CI report.
 
 ## Confirmed Android package ID (2026-11-13)
 
@@ -729,3 +729,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Rebuilt APK: 249,840,147 bytes, SHA-256 `70C4283381A65FF0E327EB188487A9BBACDA93C2F2F2BD230E07F89EDC3AB716`. `aapt dump badging` confirms package ID, min API 29, target API 36; `apksigner verify --verbose` confirms APK v2 signature.
 - Rebuilt test AAB: 86,248,046 bytes, SHA-256 `5A611E84AB2A00D087E05F10A327F78FEFC27E58EFD5855DDD2117552D43B154`. Required BundleConfig/manifest/dex entries exist; `jarsigner` reports unsigned. Gradle bundle metadata names the confirmed application ID.
 - Installed new APK on API37 x86_64 AVD successfully while preserving the old sample-ID package. The new activity is top-resumed, the campaign menu screenshot is visible, and the inspected log window has no fatal Android/Godot shader errors. An initial install attempt hit `device offline`; `adb reconnect offline` restored the AVD before successful install.
+
+## Corrected GitHub Actions Android build (2026-11-13)
+
+- Run `43351099459`, commit `b425bf8ef8d19e18821c4f0648df9b95569c318f`: conclusion `success`.
+- Godot job passed import, core tests, direct-wave preview isolation, editor panels, result UI, all 8 campaign stages, content validation, and scene smoke tests.
+- Android job passed SDK/template setup, project import, combined template-install/AAB export, ZIP structure checks (`BundleConfig.pb`, manifest, dex), and uploaded `holo-debug-aab-unsigned` (85,668,678 bytes, 7-day artifact retention).
+- The workflow only uploads an unsigned CI artifact. It did not publish a GitHub Release or upload to Play; publisher signing remains absent.
