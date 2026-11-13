@@ -296,3 +296,8 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Windows automation could not activate the Godot editor window during the repeated GUI attempt, so no visual Warning-row click was performed. The underlying click signal/navigation behavior still passes `tests/editor_panels.gd` headlessly. No source change is indicated by this attempt.
 - Restored the Godot-generated `project.godot` rewrite and confirmed the working tree returned clean. Full local `run_godot_tests.bat` passed afterward.
+
+## Inspector import regression test (2026-11-13)
+
+- Added headless coverage for dynamic `EditableCatalogRecord` editing and `_import_inspector`: draft value changes to 161, while disk catalog stays at 160. Standalone panel test and full Godot batch passed.
+- M5 visual Warning-row click remains inaccessible in the current GUI automation session; do not interpret the headless result as visual acceptance.

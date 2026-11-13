@@ -36,3 +36,7 @@ No release APK, GitHub Release, Play upload, or Closed test has been created. Af
 ## Latest local verification (2026-11-13)
 
 The Warning-row visual click attempt failed because the native Godot window could not be activated through Computer Use. The application was closed afterward; generated-only `project.godot` changes were restored and the worktree is clean. Full `run_godot_tests.bat` passed, including the Error/Warning signal regression and 0-error content validation. Resume with physical-device evidence and account-dependent Closed-test gates; M6 stays incomplete.
+
+## Latest test coverage update (2026-11-13)
+
+`tests/editor_panels.gd` now covers Inspector dynamic field edit/import plus catalog non-persistence. Both standalone panel run and full Godot batch passed on 4.7.2. GUI Warning-row click remains unverified; actual signal behavior is headless-tested. Device list currently has no connected Android target, so user-provided S25 Ultra logs remain pending.

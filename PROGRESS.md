@@ -425,3 +425,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Rechecked repository/CI before opening Godot; worktree clean at `0b864e8`, latest CI `43380120755` passed both jobs.
 - Godot 4.7.2 process opened the project, but the Windows computer-use bridge could not activate the editor window on repeated attempts. No warning-row click was made. Godot again rewrote `project.godot`; restored the generated-only diff, then stopped the editor process. Source/catalog/scene remained unchanged.
 - Re-ran `run_godot_tests.bat`: core, content validation (0 errors), 8 seeded stage sims, preview isolation, battle result UI and editor panel signal checks all passed. The editor-panel test reports success before known RID/ObjectDB shutdown leak diagnostics; script exit was successful.
+
+## Inspector import regression coverage (2026-11-13)
+
+- Extended `tests/editor_panels.gd` to exercise `EditableCatalogRecord` dynamic edit, the panel's Inspector import path, and the no-persistence boundary. The draft reflects temporary `start_resource=161`, while the on-disk catalog remains 160.
+- Standalone editor-panel test passed on Godot 4.7.2 and printed the Inspector-import pass sentinel. Full `run_godot_tests.bat` also passed. Existing editor shutdown RID/ObjectDB diagnostics occur after success; runner exits successfully.
+- Visual Warning-row click remains unverified because the Windows automation bridge could not activate the editor. Its signal route and no-navigation behavior are covered headlessly.

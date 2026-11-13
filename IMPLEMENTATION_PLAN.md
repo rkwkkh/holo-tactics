@@ -192,3 +192,7 @@ Re-tested API29 AVD with SwiftShader: Android boots and app starts, but screensh
 ## M5 Warning-row GUI check status (2026-11-13)
 
 The visual click was attempted after Inspector verification, but the Windows Computer Use bridge could not activate the Godot editor window. The warning non-navigation behavior remains covered by the actual-signal headless regression (`tests/editor_panels.gd`). Full local regression was rerun and passed; visual click remains unverified.
+
+## M5 Inspector import test update (2026-11-13)
+
+The automated editor-panel suite now tests dynamic Inspector resource mutation and importing the value into the JSON draft, while asserting that source catalog data was not persisted. Standalone panel and full Godot regression passed. The Warning-row visual click remains unverified due to native window activation failure.

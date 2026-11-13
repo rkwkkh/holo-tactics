@@ -865,3 +865,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Godot process opened the project, but Computer Use could not activate/capture the native window; therefore the requested visible Warning-row click was not completed. No interaction with the editor content occurred.
 - Godot auto-rewrote `project.godot` on launch. Restored the generated-only diff and stopped the editor process. Verified no project-source/catalog/scene modifications.
 - Re-ran `run_godot_tests.bat` on Godot 4.7.2: core tests, content validation (0 errors), 8 seeded campaign wins, editor preview isolation, battle result UI, and editor-panel checks passed. Editor-panel shutdown emitted known RID/ObjectDB leak diagnostics after its success sentinel; the batch runner reported all commands passed.
+
+## Inspector import regression test (2026-11-13)
+
+- Added to `tests/editor_panels.gd`: populate an `EditableCatalogRecord` from the selected stage draft, set `start_resource` to 161, route through `_import_inspector`, assert the JSON draft reflects 161, then assert source catalog still has 160.
+- Godot 4.7.2 standalone editor-panel command passed with the new “Inspector import” sentinel. Full `run_godot_tests.bat` passed all suites, including 0 content errors and eight campaign simulations. Known RID/ObjectDB shutdown diagnostics follow the editor-panel pass sentinel; batch reports success.
+- The visible Warning-row click is still not verified because the native Godot window could not be activated; the automated ItemList signal test passes.

@@ -19,6 +19,16 @@ func _initialize() -> void:
 		assert(panel.edit.text.begins_with("{"))
 	var catalog: Dictionary = plugin_script.read_catalog()
 	var stage_id: String = catalog.categories.stages[0].id
+	# Exercise the Inspector resource edit/import path without saving the source catalog.
+	var inspector_script: Script = load("res://addons/content_editor/editable_catalog_record.gd")
+	var inspector_record: Variant = inspector_script.new()
+	inspector_record.set_record(JSON.parse_string(plugin.panels.stages_waves.edit.text))
+	assert(inspector_record._set("start_resource", 161.0))
+	plugin.panels.stages_waves.inspector_record = inspector_record
+	plugin._import_inspector("stages_waves")
+	var imported_record: Variant = JSON.parse_string(plugin.panels.stages_waves.edit.text)
+	assert(float(imported_record.start_resource) == 161.0)
+	assert(float(plugin_script.read_catalog().categories.stages[0].start_resource) == 160.0)
 	# Exercise the dock's validation feedback and item routing without mutating the source catalog.
 	var errors: Array[String] = ["%s.references: unresolved wave" % stage_id]
 	var warnings: Array[String] = ["campaign contains 27 waves"]
@@ -38,7 +48,7 @@ func _initialize() -> void:
 	var preview_controls: HBoxContainer = plugin.tabs.get_child(0).get_child(8)
 	assert(preview_controls.get_child(0).text == "스테이지 실행")
 	assert(preview_controls.get_child(1).text == "선택 웨이브 실행")
-	print("Editor content panels passed: stages/waves, 6 evolutions, 24 upgrades, validation Error/Warning navigation")
+	print("Editor content panels passed: stages/waves, 6 evolutions, 24 upgrades, Inspector import, validation Error/Warning navigation")
 	plugin.tabs.queue_free()
 	plugin.free()
 	await create_timer(2.0).timeout
