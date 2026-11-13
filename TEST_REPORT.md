@@ -765,3 +765,9 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 
 - User will test M1/combat performance directly on Galaxy S25 Ultra and send the resulting logs; no device log has been received yet. `ANDROID_TESTING.md` now specifies how to capture `build/device-perf.txt` and `build/device-gfxinfo.txt`, plus model/Android version and flow results.
 - User reports neither Play Console access nor a publisher upload keystore is available. No account signup or signing key was initiated; private-test AAB upload remains externally gated.
+
+## Local regression recheck (2026-11-13)
+
+- Re-ran `run_godot_tests.bat` on Godot 4.7.2: core tests, content validation (0 errors), seeded simulation of all 8 campaign stages, editor preview isolation, battle result UI, and editor panels (stages/waves, 6 evolutions, 24 upgrades) passed.
+- The editor-headless check emitted RID/ObjectDB cleanup warnings after its success sentinel; the runner continued and reported `All Godot test commands passed`.
+- CI run `43359360273` for `ad8ac60` passed the Godot validation job and Android debug AAB export, structure verification, and artifact upload. The artifact is unsigned and retained for 7 days.
