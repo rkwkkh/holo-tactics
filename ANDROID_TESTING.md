@@ -244,3 +244,17 @@ The user confirmed the refreshed APK downloaded, installed, and launched on Gala
 - Re-exported the current project as `build/holo-continuation.apk`; SHA-256 is `C55E2E73AE38C043CCE052DEEE24E2931176812FC7E2648AD7C0B542911F54F7`. `aapt` confirms package `com.rhstudio.holotactics`, version `0.1.0`; `apksigner` verifies the debug APK v2 signature.
 - `adb install -r` on the Android 17/API37 AVD succeeded without clearing app data. The app process and resumed Godot activity were live 10 seconds after launch. The captured screen showed the campaign menu with M1–M6 and S1–S2 listed and permanent currency 433. Logcat showed Vulkan initialization and no fatal/script error in the captured interval. This was a startup/menu smoke, not a gameplay/FPS test.
 - Android 10 AVD renderer probe detail: current AVD EGL reports GLES maximum version 2. An isolated GLES3 Compatibility build therefore fails with `EGL_BAD_CONFIG: no ES 3 support`. Do not use this emulator result to infer physical Android 10 support; obtain physical Android 10 evidence if available.
+
+
+## API37 in-combat facility controls (2026-11-16 continuation)
+
+- Backed up the API37 app's campaign profile before interacting: 6 main clears, balance 433.
+- During M2 wave 1, built an arrow tower; UI showed combat resource 90→10 and the new tower on the grid.
+- During M4 wave 1, upgraded an arrow tower to level 2/3 while combat was active. Its HP was 90/120. Used in-combat Repair (cost 6); UI then showed 120/120 and Repair complete while still on wave 1.
+- Paused and abandoned after 2/4 settled waves; UI/save showed +12. Restored the original profile byte-for-byte and relaunched to confirm balance 433 and original campaign progression.
+
+![Arrow tower built during M2 wave 1](docs/evidence/api37-facility-built-combat.png)
+
+![Arrow tower upgraded during M4 wave 1](docs/evidence/api37-facility-upgrade-combat.png)
+
+![Arrow tower repaired during M4 wave 1](docs/evidence/api37-facility-repair-combat.png)

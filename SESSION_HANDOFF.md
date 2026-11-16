@@ -129,3 +129,11 @@ Before the owner sets up Console, note the current target API 36 requirement (al
 - Fresh Android debug APK export verified (SHA-256 `C55E2E73AE38C043CCE052DEEE24E2931176812FC7E2648AD7C0B542911F54F7`) and updated install/launch succeeded on API37 AVD. Campaign menu is visible with profile balance 433. This was not a gameplay/FPS run.
 - Isolated API29 GLES3 probe establishes that the AVD offers GLES2 only and cannot create an ES3 context (`EGL_BAD_CONFIG`). This does not validate physical Android 10. Production renderer was not changed.
 - Next: preserve current clean-profile/user-save state; request S25 gameplay/performance logs when the user is ready; get Android 10 hardware evidence if available; keep M6/Closed-test incomplete until owner-provided Play Console, signing, policy/contact details and test setup exist. No Play upload or release signing performed.
+
+
+## Latest continuation checkpoint (2026-11-16)
+
+- Verified on API37 AVD touch UI: new facility construction during M2 wave 1; arrow-tower upgrade to 2/3 and repair 90/120→120/120 during M4 wave 1. Visual captures are committed under `docs/evidence/`.
+- Pause→abandon after 2/4 waves settled +12. ADB `run-as` backup of the original app campaign progress was restored byte-for-byte; app relaunch confirmed balance 433 and original six-stage progression.
+- Current app is on the API37 campaign menu. No test profile changes remain. The earlier Godot and Android CI check is still green on commit `328defe`; this manual session only changed documentation/evidence and still needs its own commit/CI.
+- Continue M6: Galaxy S25 gameplay/FPS log and physical Android 10 evidence, plus owner Play Console/signing/privacy details. M5 Warning-row visual click also remains open; all automated panel assertions pass.

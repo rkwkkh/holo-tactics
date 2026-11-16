@@ -3,7 +3,7 @@
 ## API37 pause-abandon check (2026-11-16)
 
 - Resolved manual pause-abandon checks with 0 and 1 settled waves: M4 showed 0/4, +0 (balance 421), then 1/4, +6 (balance 427); each save event was unique and persisted once. Evidence: `TEST_REPORT.md`.
-- M4 preparation-phase arrow-tower upgrade was manually purchased (0/3→1/3, resource 180→155). In-combat upgrade and repair remain unverified; an underdefended run ended with core HP 0 before they could be tried.
+- M4 preparation-phase arrow-tower upgrade was manually purchased (0/3→1/3, resource 180→155). In-combat upgrade and repair were unverified at that check; see the 2026-11-16 continuation below for completed API37 touch verification.
 - Still open: manual facility repair and in-combat facility upgrade, M5 Warning-row GUI click, physical Android/FPS, and owner-controlled Closed-test readiness.
 
 ## OPEN_DECISION
@@ -368,3 +368,10 @@ The original four design documents now consistently reflect confirmed user rules
 - Confirmed `MaDang_API29` is Android 10/API29 but this emulator's EGL advertises `ANDROID_EMU_gles_max_version_2`. An isolated build using GL Compatibility (GLES3) crashes at context creation with `EGL_BAD_CONFIG: no ES 3 support`.
 - This explains why the AVD cannot validate a GLES3 fallback; it does not show that Android 10 physical devices fail. The production Mobile/Vulkan configuration remains unchanged pending physical-device evidence. The API29 AVD's black output under Vulkan remains an emulator-only result.
 - M6 external gates remain: physical-device gameplay/FPS (the user confirmed S25 install/start only), Android 10 hardware compatibility, and Play Closed-test owner prerequisites/signing/privacy materials.
+
+
+## In-combat facility manual checks resolved (2026-11-16 continuation)
+
+- Earlier issue entry noted manual facility repair and in-combat upgrade were unverified. API37 manual touch checks now confirm arrow-tower upgrade to 2/3 and repair to full HP during active waves; facility build during active M2 wave is also confirmed.
+- The AVD campaign profile was restored from an exact pre-test backup after the test. See `docs/evidence/` and `TEST_REPORT.md`.
+- Still open: physical Android gameplay/FPS and Android 10 hardware compatibility, M5 visual Warning-row click, and owner-controlled Closed-test/signing/privacy setup.

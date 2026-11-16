@@ -528,3 +528,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Re-exported and verified the debug APK (package `com.rhstudio.holotactics`, min API 29, target API 36, v2 signature); SHA-256 matches the recorded current build. Updated install and campaign-menu launch succeeded on API37 AVD, preserving profile state (balance 433). No FPS/gameplay test was taken this run.
 - API29 diagnostic shows the emulator backend exposes GLES 2 only; isolated GLES3 Compatibility probe failed context creation with `EGL_BAD_CONFIG`. This is an emulator limitation, not a physical Android 10 compatibility verdict. No production renderer change was made.
 - M0–M5 implementation and automated checks remain in place. M6 is still incomplete: S25 gameplay/FPS logs, physical Android 10 evidence, owner-approved privacy policy/contact data, publisher signing key, and Play Console access/test setup are outstanding. The owner had reported that Play Console and upload key were not available.
+
+
+## In-combat facility control validation (2026-11-16 continuation)
+
+- On Android 17/API37 AVD, confirmed facility construction during an active M2 wave, tower upgrade to level 2/3 during an active M4 wave, and tower repair from 90/120 to 120/120 during active combat.
+- Confirmed pause→abandon settlement at 2/4 waves (+12). Backed up the campaign profile before testing and restored it byte-for-byte; relaunch showed the original 433 currency and M1–M6 progress.
+- Captures are committed under `docs/evidence/`; details are in `ANDROID_TESTING.md` and `TEST_REPORT.md`. Physical-device performance and compatibility checks remain open.
