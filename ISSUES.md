@@ -2,9 +2,9 @@
 
 ## API37 pause-abandon check (2026-11-16)
 
-- Resolved the manual check for pause → abandon → confirm with no settled waves: M4 showed 0/4 and +0; saved balance remained 421, with one zero-reward event. Evidence: `TEST_REPORT.md`.
+- Resolved manual pause-abandon checks with 0 and 1 settled waves: M4 showed 0/4, +0 (balance 421), then 1/4, +6 (balance 427); each save event was unique and persisted once. Evidence: `TEST_REPORT.md`.
 - M4 preparation-phase arrow-tower upgrade was manually purchased (0/3→1/3, resource 180→155). In-combat upgrade and repair remain unverified; an underdefended run ended with core HP 0 before they could be tried.
-- Still open: abandonment after a settled wave, manual facility repair and combat upgrade, M5 Warning-row GUI click, physical Android/FPS, and owner-controlled Closed-test readiness.
+- Still open: manual facility repair and in-combat facility upgrade, M5 Warning-row GUI click, physical Android/FPS, and owner-controlled Closed-test readiness.
 
 ## OPEN_DECISION
 
