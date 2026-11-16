@@ -375,3 +375,10 @@ The original four design documents now consistently reflect confirmed user rules
 - Earlier issue entry noted manual facility repair and in-combat upgrade were unverified. API37 manual touch checks now confirm arrow-tower upgrade to 2/3 and repair to full HP during active waves; facility build during active M2 wave is also confirmed.
 - The AVD campaign profile was restored from an exact pre-test backup after the test. See `docs/evidence/` and `TEST_REPORT.md`.
 - Still open: physical Android gameplay/FPS and Android 10 hardware compatibility, M5 visual Warning-row click, and owner-controlled Closed-test/signing/privacy setup.
+
+
+## M6 API37 multi-unit frame diagnostic (2026-11-16 continuation)
+
+- M6 siege sample with four allies initially and a fifth after wave 1 produced two 10-second `[PERF]` windows at 60.0 FPS, p95/max 16.67ms. The emulator rendered through emulated EGL on host NVIDIA GTX 1660 SUPER and is 60-Hz capped.
+- This is diagnostic evidence that the debug sampler operates under a multi-unit run; it is not device acceptance or proof of a 30-FPS floor on representative phones. Physical S25 and lower-tier Android measurements remain open.
+- Test profile was restored exactly after +24 abandonment reward; no checkpoint remains.

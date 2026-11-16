@@ -258,3 +258,10 @@ The user confirmed the refreshed APK downloaded, installed, and launched on Gala
 ![Arrow tower upgraded during M4 wave 1](docs/evidence/api37-facility-upgrade-combat.png)
 
 ![Arrow tower repaired during M4 wave 1](docs/evidence/api37-facility-repair-combat.png)
+
+
+## M6 multi-unit performance diagnostic (2026-11-16 continuation)
+
+- On `MaDangStage6_API37` (Android 17/API37, emulated EGL, host NVIDIA GTX 1660 SUPER), deployed four units before M6 siege wave 1 and a fifth after wave 1 rewards. Two 10-second sampler windows each reported 600 frames, 60.0 average FPS, p95 16.67ms, max 16.67ms. No fatal/script/Vulkan errors appeared in the sampled log interval.
+- This reaches the 30-FPS numeric floor in this emulator scenario only. Host GPU and fixed 60-Hz presentation mean it cannot establish Galaxy S25 Ultra or general high-load Android performance.
+- The M6 run was abandoned after core HP reached zero. The original 433-currency profile was restored byte-for-byte; relaunch confirmed campaign state, and no battle checkpoint remained.

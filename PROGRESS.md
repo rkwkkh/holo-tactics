@@ -535,3 +535,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - On Android 17/API37 AVD, confirmed facility construction during an active M2 wave, tower upgrade to level 2/3 during an active M4 wave, and tower repair from 90/120 to 120/120 during active combat.
 - Confirmed pause→abandon settlement at 2/4 waves (+12). Backed up the campaign profile before testing and restored it byte-for-byte; relaunch showed the original 433 currency and M1–M6 progress.
 - Captures are committed under `docs/evidence/`; details are in `ANDROID_TESTING.md` and `TEST_REPORT.md`. Physical-device performance and compatibility checks remain open.
+
+
+## M6 multi-unit frame diagnostic (2026-11-16 continuation)
+
+- API37 host-accelerated AVD: M6 siege with four deployed units, then a fifth after wave 1; two 10-second windows each measured 60.0 FPS / 16.67ms p95 and max. No fatal/script/Vulkan errors in the sampled interval.
+- Diagnostic only: the AVD's emulated EGL and host GTX 1660 SUPER cannot establish physical-device performance or representative stress acceptance. Galaxy S25 Ultra gameplay/FPS logs remain outstanding.
+- Abandoned the run and restored the original campaign profile byte-for-byte (balance 433); confirmed menu launch and no remaining battle checkpoint.

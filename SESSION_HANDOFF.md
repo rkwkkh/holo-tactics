@@ -137,3 +137,10 @@ Before the owner sets up Console, note the current target API 36 requirement (al
 - Pause→abandon after 2/4 waves settled +12. ADB `run-as` backup of the original app campaign progress was restored byte-for-byte; app relaunch confirmed balance 433 and original six-stage progression.
 - Current app is on the API37 campaign menu. No test profile changes remain. The earlier Godot and Android CI check is still green on commit `328defe`; this manual session only changed documentation/evidence and still needs its own commit/CI.
 - Continue M6: Galaxy S25 gameplay/FPS log and physical Android 10 evidence, plus owner Play Console/signing/privacy details. M5 Warning-row visual click also remains open; all automated panel assertions pass.
+
+
+## Latest performance continuation (2026-11-16)
+
+- M6 API37 host-accelerated AVD run used four allied units and later added a fifth. Two 10-second sampler windows each measured 60.0 FPS, 16.67ms p95/max; no fatal/script/Vulkan lines in the captured interval. This is an AVD diagnostic only, not real-device or representative high-load acceptance.
+- Abandoned the run after core HP reached zero. Restored the API37 campaign save byte-for-byte and relaunched to the original campaign menu (433 currency, M1–M6 complete); verified no battle checkpoint remains.
+- See `TEST_REPORT.md` and `ANDROID_TESTING.md`. Remaining: physical S25 gameplay/FPS, physical Android 10, M5 Warning-row GUI click, owner Play Console/signing/privacy details and Closed-test setup.

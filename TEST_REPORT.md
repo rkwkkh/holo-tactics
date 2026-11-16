@@ -987,3 +987,11 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - During that same active wave, used Repair (cost 6): the panel changed from HP 90/120 to 120/120 and showed Repair complete. The context still said combat movement was disabled, and the top bar still showed wave 1. See committed visual captures in `docs/evidence/`.
 - Paused and abandoned afterward. The result settled 2/4 waves and +12 (balance 455), corroborating the existing partial-reward path. Restored the pre-test campaign progress file byte-for-byte (SHA-256 matched); force-stopped and relaunched the app, which showed the original balance 433 and all six campaign clears. No persistent test reward or unlock was left behind.
 - This verifies Android 17/API37 emulator touch/UI behavior for in-combat deployment, facility upgrade, repair, pause/abandon, and profile restore. It does not replace physical-device testing or FPS acceptance.
+
+
+## M6 multi-unit AVD performance sample and restore (2026-11-16 continuation)
+
+- Device: `MaDangStage6_API37`, Android API 37, `ro.hardware.egl=emulation`, `ro.kernel.qemu=1`, host NVIDIA GTX 1660 SUPER GFXStream. This is a host-accelerated emulator, not a phone.
+- M6 siege stress run began with four allied units (resource 260→10); after wave 1 rewards, deployed the fifth available unit before wave 2. Two consecutive 10-second debug sampler windows each logged `frames=600 avg_fps=60.0 p50_ms=16.67 p95_ms=16.67 max_ms=16.67`. Filtered interval contained no fatal exception, AndroidRuntime crash, script error or Vulkan error. A later wave reduced the core to zero; the run was abandoned and settled a +24 reward event.
+- The two samples meet the numeric 30-FPS high-load floor on this AVD, but they do not prove device performance: this backend is capped at the emulator's 60-Hz cadence and renders through the host GPU. Physical S25 Ultra FPS and a representative high-load hardware profile remain unverified.
+- Before the run, backed up the exact 947-byte `campaign_progress.json` (balance 433). After pause/abandon, force-stopped the app and restored it; remote and local SHA-256 matched (`7ee0f41b253f5785a5034b17f80c9fb9b53740e2dcbe62371a1f08e445a5d675`). Relaunch showed balance 433 and the original M1–M6 progression. The test checkpoint was cleared.
