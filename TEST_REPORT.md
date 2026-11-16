@@ -1,5 +1,11 @@
 # Test report
 
+## Fresh remote clone regression (2026-11-16)
+
+- Cloned current remote HEAD `0a11942` into a new temporary Windows directory with no `.godot` cache, then ran `run_godot_tests.bat` on Godot 4.7.2.
+- Import, core tests, content validation, seeded campaign simulation (8/8), editor preview isolation, battle-result UI, and editor-panel checks all passed; the batch printed `All Godot test commands passed`.
+- Godot emitted known RID/ObjectDB cleanup warnings after editor-panel checks; assertions and the batch pass sentinel succeeded. This verifies a clean Windows checkout, not Android hardware behavior.
+
 ## API37 pause-abandon result (2026-11-16)
 
 - In the existing M1–M6 profile (balance 421), entered M4 defense, deployed a swordsman, started the wave, then selected pause → `전투 포기` → confirm.

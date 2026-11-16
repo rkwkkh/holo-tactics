@@ -1,5 +1,10 @@
 # Session handoff (2026-11-16)
 
+## Latest clean-clone regression
+
+- Fresh remote clone of `0a11942` without `.godot` passed `run_godot_tests.bat` on Windows/Godot 4.7.2: core/content, 8/8 campaign, preview isolation, battle result UI, and editor panels. RID/ObjectDB cleanup warnings appeared after the editor-panel pass sentinel; the batch reported success. See `TEST_REPORT.md`.
+- Godot UI bridge recovery failed twice with `failed to activate captured window`; M5 Warning-row visual click remains headless-only.
+
 ## Latest continuation
 
 - Before this handoff update, `f61110f` was on `origin/master`; GitHub Actions run `43787360991` passed Godot tests and Android debug AAB export/structure verification.

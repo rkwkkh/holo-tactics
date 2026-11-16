@@ -1,5 +1,10 @@
 # Progress
 
+## Fresh remote clone verification (2026-11-16)
+
+- New temporary clone of remote HEAD `0a11942` (without `.godot`) imported and passed `run_godot_tests.bat`: core, content (0 errors), 8/8 seeded campaigns, preview isolation, battle result UI, and editor panel checks.
+- The editor-panel process printed RID/ObjectDB cleanup warnings after its pass sentinel; the overall batch reported all test commands passed. See `TEST_REPORT.md`.
+
 ## API37 전투 포기 정산 수동 확인 (2026-11-16)
 
 - M4 수성에서 유닛을 배치하고 첫 웨이브 진행 후 일시정지 → `전투 포기` → 확인을 실행했다. 결과는 0/4 완료, 영구 재화 +0, 보유 421을 표시했다.
