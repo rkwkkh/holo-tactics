@@ -4,8 +4,8 @@ Continue the active M0–M6 Godot Android MVP objective. The current project is 
 
 ## Current repository and validation
 
-- `master` HEAD was `10f05ac` (`Record API37 campaign gameplay smoke`), equal to `origin/master` at the start of this continuation. This continuation adds documentation-only emulator findings; refresh commit/push status after recording.
-- Latest GitHub Actions run [43782750032](https://github.com/rkwkkh/holo-tactics/actions/runs/43782750032) passed Godot validation and Android AAB export/structure verification for `10f05ac`.
+- `master` HEAD is `9b9ea4f` (`Record API37 M2 and M3 campaign validation`), pushed to `origin/master`; worktree is clean.
+- GitHub Actions run [43785020191](https://github.com/rkwkkh/holo-tactics/actions/runs/43785020191) passed Godot validation and Android AAB export/structure verification for `9b9ea4f`.
 - On 2026-11-16, local `run_godot_tests.bat` passed all suites on Godot 4.7.2: core, content validation, 8/8 campaign simulations, preview isolation, result UI, and editor panels. The panel test reported its pass sentinel; Godot emitted known RID/ObjectDB cleanup diagnostics afterward, but the batch exited 0.
 - API37 emulator continuation replayed M2 with an arrow tower/reinforcements and cleared 3/3 (+43), cleared M3 siege 3/3 (+47) after `진격` auto-advance, and confirmed M4 unlocked. The emulator progress JSON records M1/M2/M3 complete and permanent currency 250. See `TEST_REPORT.md` and `ANDROID_TESTING.md`.
 - Clean clone of source commit `64632e2` passed `run_godot_tests.bat` from a checkout without `.godot` cache. The batch performs an initial editor import; all suites passed, content errors 0, campaign simulations 8/8.
