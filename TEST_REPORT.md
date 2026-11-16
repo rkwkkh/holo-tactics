@@ -1004,3 +1004,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - The editor-panel process exited 0 after its pass sentinel but emitted the known headless RID/ObjectDB cleanup warnings. Android export was not repeated from this clone; fresh-machine Android SDK/template setup remains a separate prerequisite.
 
 - GitHub Actions run [43796686366](https://github.com/rkwkkh/holo-tactics/actions/runs/43796686366) for source commit `6353367` passed the Godot validation job and Android debug AAB export/structure verification.
+
+
+## API29 isolated Vulkan presentation probe (2026-11-16)
+
+- Exported a temporary clean-clone APK from source commit `280ad2c` with package ID `com.rhstudio.holotactics.vulkanprobe` (SHA-256 `BE9C4DC2B5B31FDB6BB306294E4D2039E1FDAEAE025A2371D37299E9E3F211C2`); APK v2 signature verification passed. The installed production package was not modified.
+- On the Android 10/API29 `MaDang_API29` AVD, the app activity resumed and Godot initialized Mobile/Vulkan with both `-gpu swiftshader` (Vulkan 1.2, SwiftShader) and `-gpu host` (Vulkan 1.3, NVIDIA GeForce GTX 1660 SUPER). Both runs produced a black full-screen capture and repeated `Couldn't present to Vulkan queue (VkResult error 5)` errors.
+- This confirms the API29 AVD cannot render this Vulkan app with the tested backends. It does not establish failure on Android 10 physical devices; physical Android 10 validation remains open.

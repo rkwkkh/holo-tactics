@@ -549,3 +549,9 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Current pushed source is `6353367`; a clean temporary clone imported in Godot 4.7.2 and passed core, content, campaign simulation, preview, results UI, and editor-panel checks.
 - GitHub Actions run [43796686366](https://github.com/rkwkkh/holo-tactics/actions/runs/43796686366) passed Godot validation and Android debug AAB export/structure checks.
 - M6 remains open for physical Android gameplay/FPS, Android 10 hardware evidence, final owner-provided privacy/contact policy, publisher signing, and Play Console closed-test setup.
+
+
+## API29 Vulkan emulator follow-up (2026-11-16)
+
+- Built an isolated probe APK from a clean clone of `280ad2c` with a separate package ID. On the Android 10/API29 AVD, both SwiftShader and host NVIDIA initialized Mobile/Vulkan but produced a black screen and Vulkan queue presentation errors (`VkResult error 5`).
+- This is emulator-only evidence. The installed production app/data were not modified; physical Android 10 hardware testing remains open. Diagnostic details are in `TEST_REPORT.md`, `ANDROID_TESTING.md`, and `ISSUES.md`.

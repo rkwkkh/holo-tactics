@@ -382,3 +382,9 @@ The original four design documents now consistently reflect confirmed user rules
 - M6 siege sample with four allies initially and a fifth after wave 1 produced two 10-second `[PERF]` windows at 60.0 FPS, p95/max 16.67ms. The emulator rendered through emulated EGL on host NVIDIA GTX 1660 SUPER and is 60-Hz capped.
 - This is diagnostic evidence that the debug sampler operates under a multi-unit run; it is not device acceptance or proof of a 30-FPS floor on representative phones. Physical S25 and lower-tier Android measurements remain open.
 - Test profile was restored exactly after +24 abandonment reward; no checkpoint remains.
+
+
+## Android 10 emulator Vulkan output follow-up (2026-11-16)
+
+- Reproduced the existing API29 AVD black-screen diagnostic using an isolated build from the current source. Both SwiftShader and host NVIDIA initialized Godot Mobile/Vulkan but repeatedly failed queue presentation with `VkResult error 5`.
+- Scope remains limited to `MaDang_API29`; production package/data were not changed. Do not change the production renderer based on this emulator result. Validate on physical Android 10 hardware before treating API29 support as accepted or failed.
