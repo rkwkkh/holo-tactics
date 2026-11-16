@@ -476,3 +476,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Rechecked repository at `1f8d128`; `master` matched `origin/master`. Latest CI [43399087873](https://github.com/rkwkkh/holo-tactics/actions/runs/43399087873) passed Godot and Android AAB jobs.
 - Retried the M5 Warning-row visual check. Godot opened with the content editor visible, but the Windows UI bridge mapped the observed click onto another app. No JSON/catalog/save action occurred. Godot auto-rewrote `project.godot`; restored the generated-only diff and verified the Mobile renderer setting.
 - ADB had no connected device. M6 remains open for user-provided S25 Ultra gameplay/FPS logs, physical Android 10, approved privacy-policy details, publisher signing and Play Console access.
+
+## Current source revalidation (2026-11-16)
+
+- Commit `291c5e6` is pushed to `origin/master`; worktree clean at start of this validation. Source/assets/tests/CI/launch scripts are tracked; generated `.godot`, Android templates and build outputs are ignored.
+- Local Godot 4.7.2 `run_godot_tests.bat` passed: core, content validation, 8/8 campaign simulations, preview isolation, results UI and editor panels. Panel assertions printed the pass sentinel; known RID/ObjectDB cleanup diagnostics followed, and the batch exited 0.
+- GitHub Actions run [43780690192](https://github.com/rkwkkh/holo-tactics/actions/runs/43780690192) passed both Godot and Android debug AAB export/structure verification.
+- M6 remains incomplete: Android SDK exists but ADB has no attached device; physical-device gameplay/FPS and Android 10 hardware evidence are still missing. API37 software-emulator performance is below 60 FPS and cannot substitute for device evidence. Closed-test setup remains owner-gated.

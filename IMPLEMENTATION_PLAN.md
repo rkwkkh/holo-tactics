@@ -213,6 +213,11 @@ The current debug APK manifest declares no permissions; the app source saves onl
 
 ## Current M5/M6 checkpoint (2026-11-16)
 
-- Current pushed source is `1f8d128`; clean-clone test and latest CI (`43399087873`) passed.
+- At this checkpoint, source commit `291c5e6` is pushed; full local tests and latest CI (`43780690192`) passed.
 - Reattempted the M5 Warning-row visual check; the UI bridge targeted `Memoit.exe`, so no click was made. Headless coverage remains the only evidence for this interaction.
 - Keep M6 open for physical-device/FPS evidence and owner-controlled Closed-test setup. See `SESSION_HANDOFF.md` for the current resume order.
+
+## M6 revalidation checkpoint (2026-11-16)
+
+- Current source commit `291c5e6` passed the full local Godot test batch and GitHub Actions run `43780690192` (Godot plus Android debug AAB export/structure).
+- No local Android target is attached. Keep physical FPS/API 29 and owner-controlled Closed-test tasks open; no release signing or Play upload occurred. See `SESSION_HANDOFF.md` and `ISSUES.md`.

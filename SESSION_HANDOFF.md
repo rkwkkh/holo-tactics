@@ -4,10 +4,11 @@ Continue the active M0–M6 Godot Android MVP objective. The current project is 
 
 ## Current repository and validation
 
-- `master` HEAD is `1f8d128` (`Record fresh clone verification`), equal to `origin/master`. Worktree was clean after restoring Godot's generated `project.godot` rewrite.
-- Latest GitHub Actions run [43399087873](https://github.com/rkwkkh/holo-tactics/actions/runs/43399087873) passed Godot validation and Android AAB export/structure verification.
+- `master` HEAD is `291c5e6` (`Record M5 and M6 continuation status`), equal to `origin/master`. Worktree was clean after the latest validation.
+- Latest GitHub Actions run [43780690192](https://github.com/rkwkkh/holo-tactics/actions/runs/43780690192) passed Godot validation and Android AAB export/structure verification.
+- On 2026-11-16, local `run_godot_tests.bat` passed all suites on Godot 4.7.2: core, content validation, 8/8 campaign simulations, preview isolation, result UI, and editor panels. The panel test reported its pass sentinel; Godot emitted known RID/ObjectDB cleanup diagnostics afterward, but the batch exited 0.
 - Clean clone of source commit `64632e2` passed `run_godot_tests.bat` from a checkout without `.godot` cache. The batch performs an initial editor import; all suites passed, content errors 0, campaign simulations 8/8.
-- No gameplay source changed in this continuation. ADB has no connected Android device. The latest local debug APK is test-only and ignored by Git.
+- No gameplay source changed in this continuation. Android SDK is installed, but ADB currently lists no connected device. The latest local debug APK is test-only and ignored by Git.
 
 ## Latest M5 check
 

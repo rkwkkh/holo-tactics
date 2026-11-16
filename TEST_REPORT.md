@@ -917,4 +917,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Godot 4.7.2 opened `main.tscn` with the Holo Content Editor dock and M1 stage draft visible.
 - The Windows UI bridge mapped an observed click onto `Memoit.exe`, not Godot. Per recovery guidance, stopped further input; no content click/edit/save occurred. Warning-row visual behavior remains unverified; headless Error/Warning signal tests pass.
 - Godot reordered `project.godot` and removed the committed mobile renderer line on startup. Since the worktree was clean before launch, restored only that generated rewrite and verified `renderer/rendering_method.mobile="mobile"` in HEAD. Catalog and scenes remained unchanged. No source tests rerun because no source change was retained.
-- Repository `1f8d128` is clean; CI [43399087873](https://github.com/rkwkkh/holo-tactics/actions/runs/43399087873) passed. This attempt is not visual editor acceptance.
+- Repository `291c5e6` is clean; CI [43780690192](https://github.com/rkwkkh/holo-tactics/actions/runs/43780690192) passed. This attempt is not visual editor acceptance.
+
+## Current source revalidation (2026-11-16)
+
+- On commit `291c5e6`, Godot 4.7.2 `run_godot_tests.bat` exited 0. Core, content validation, all 8 campaign simulations, preview isolation, battle results UI, and editor panels passed. Godot emitted RID/ObjectDB cleanup diagnostics after the editor-panel pass sentinel; these are recorded and did not fail the batch.
+- GitHub Actions [43780690192](https://github.com/rkwkkh/holo-tactics/actions/runs/43780690192) completed successfully: Godot validation plus Android debug AAB export and bundle structure checks passed.
+- These checks do not establish physical-device FPS, Android 10 hardware compatibility, or Closed-test readiness. ADB currently has no attached device; no signed release artifact or Play upload was made.

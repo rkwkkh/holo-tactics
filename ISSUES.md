@@ -325,4 +325,11 @@ The original four design documents now consistently reflect confirmed user rules
 - M5 Warning-row visual click remains open. Godot UI opened, but the Windows UI bridge targeted another app when asked to click; no content was changed. Headless navigation tests pass.
 - No Android device is connected to ADB. Galaxy S25 Ultra gameplay/FPS, physical Android 10 and representative-device performance remain pending.
 - Owner-side Closed-test dependencies remain: Play Console access, publisher signing key, final developer/contact identity, published privacy policy URL, in-app policy link/text and Data safety answers.
-- Current source tree is clean at `1f8d128` on `origin/master`; latest CI run `43399087873` passed both jobs. M6 is not complete.
+- At this checkpoint, source commit `291c5e6` is clean on `origin/master`; latest CI run `43780690192` passed both jobs. M6 is not complete.
+
+## Current external verification gates (2026-11-16)
+
+- Revalidated `291c5e6`: local Godot test batch passed and CI run `43780690192` passed Godot and Android debug AAB jobs.
+- Android SDK tools are present at `%LOCALAPPDATA%\Android\Sdk`, but ADB reports no attached device. Physical S25 Ultra gameplay/FPS and physical Android 10 checks remain pending; emulator FPS below target is not device acceptance.
+- Closed testing still requires owner-controlled Play Console access, publisher signing, approved developer/contact identity and published privacy-policy URL/content. No credentials or keys are available in the workspace.
+- M5's warning-row selection was exercised by automated signal tests, but the latest visual click was not completed because the UI bridge targeted another application. No catalog edit was made.
