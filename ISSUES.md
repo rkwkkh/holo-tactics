@@ -343,3 +343,10 @@ The original four design documents now consistently reflect confirmed user rules
 
 - A two-unit M2 defense run lost during wave 3 after 2/3 waves; the app showed the expected partial reward (+10) and stayed responsive. This was a deliberately minimal defense and should not be interpreted as a stage-balance bug.
 - The host-accelerated API37 AVD logged near-60-FPS windows, but it uses the workstation's NVIDIA GPU and is not device-performance evidence. Physical Android 10/S25 validation remains open.
+
+## Latest continuation findings (2026-11-16)
+
+- M2 was replayed with an arrow tower and reinforcements and cleared 3/3 (+43); M3 siege cleared 3/3 (+47), and M4 became unlocked. See `TEST_REPORT.md` for the manual sequence and evidence limits.
+- Pause menu displays `전투 포기`, but its confirm/settlement path remains unverified. Existing M2 defeat verified partial reward only.
+- `emulator-5554` is now connected (API37 AVD); earlier no-device notes are historical. It is not a physical device and does not close Android 10/FPS acceptance.
+- M5 visual click remains open: the current Windows UI helper failed to activate the Godot editor twice. No click or content edit was made.

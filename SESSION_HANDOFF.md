@@ -4,16 +4,17 @@ Continue the active M0–M6 Godot Android MVP objective. The current project is 
 
 ## Current repository and validation
 
-- `master` HEAD is `291c5e6` (`Record M5 and M6 continuation status`), equal to `origin/master`. Worktree was clean after the latest validation.
-- Latest GitHub Actions run [43780690192](https://github.com/rkwkkh/holo-tactics/actions/runs/43780690192) passed Godot validation and Android AAB export/structure verification.
+- `master` HEAD was `10f05ac` (`Record API37 campaign gameplay smoke`), equal to `origin/master` at the start of this continuation. This continuation adds documentation-only emulator findings; refresh commit/push status after recording.
+- Latest GitHub Actions run [43782750032](https://github.com/rkwkkh/holo-tactics/actions/runs/43782750032) passed Godot validation and Android AAB export/structure verification for `10f05ac`.
 - On 2026-11-16, local `run_godot_tests.bat` passed all suites on Godot 4.7.2: core, content validation, 8/8 campaign simulations, preview isolation, result UI, and editor panels. The panel test reported its pass sentinel; Godot emitted known RID/ObjectDB cleanup diagnostics afterward, but the batch exited 0.
-- Latest API37 emulator smoke on 2026-11-16 installed and launched the current debug APK, completed the restored M1 wave 2 (2/2 victory/reward), returned to campaign, then exercised M2 with two units. M2 reached wave 3 and ended in defeat after 2/3 waves with partial reward. Six host-accelerated AVD sampler windows measured 59.7–60.0 FPS; this is not physical-device or high-load acceptance.
+- API37 emulator continuation replayed M2 with an arrow tower/reinforcements and cleared 3/3 (+43), cleared M3 siege 3/3 (+47) after `진격` auto-advance, and confirmed M4 unlocked. The emulator progress JSON records M1/M2/M3 complete and permanent currency 250. See `TEST_REPORT.md` and `ANDROID_TESTING.md`.
 - Clean clone of source commit `64632e2` passed `run_godot_tests.bat` from a checkout without `.godot` cache. The batch performs an initial editor import; all suites passed, content errors 0, campaign simulations 8/8.
-- No gameplay source changed in this continuation. Android SDK is installed, but ADB currently lists no connected device. The latest local debug APK is test-only and ignored by Git.
+- No gameplay source changed in this continuation. API37 AVD is connected as `emulator-5554` and its M4 defense setup is open; no physical Android device is connected. The latest local debug APK is test-only and ignored by Git.
 
 ## Latest M5 check
 
 - Retried visual Warning-row selection on 2026-11-16. Godot editor and content dock opened, but refreshed UI coordinates were mapped onto `Memoit.exe` by the Windows UI bridge. No click, JSON edit, or save was performed; the Warning-row visual test remains unverified. Headless Error/Warning routing still passes.
+- A later Computer Use retry listed the Godot editor but failed twice to activate its window; no UI input was sent. The Warning-row visual test remains unverified.
 - Godot rewrote `project.godot` on open. Restored that generated-only rewrite and verified the committed `renderer/rendering_method.mobile="mobile"`; catalog and scenes are untouched.
 
 ## Remaining gates and resume actions
@@ -24,7 +25,7 @@ Continue the active M0–M6 Godot Android MVP objective. The current project is 
 4. Physical Android performance targets remain unverified; prior API37 AVD M1 measurements were below 60 FPS and do not establish device acceptance.
 5. Retry the M5 Warning-row visual click only when the UI bridge can reliably target the Godot window. No need to rerun the full suite unless source changes.
 
-No release AAB/APK, GitHub Release, Play upload, or Closed test has been created. Keep the M6/MVP goal active and incomplete.
+GitHub pre-release `v0.1.0-preview.1` exists with an older debug APK uploaded 2026-11-12 (SHA-256 `6823ca453156ed7ab8b157c2c4ae65fbe6c98c6c89e3c29f9bc132356a4a5cb2`). It was not updated in this continuation; local tested APK hash is `C55E2E73AE38C043CCE052DEEE24E2931176812FC7E2648AD7C0B542911F54F7`. No signed Play AAB, Play upload, or Closed test has been completed. Keep the M6/MVP goal active and incomplete.
 
 ---
 # Historical handoff notes through 2026-11-13
@@ -90,7 +91,7 @@ Before the owner sets up Console, note the current target API 36 requirement (al
 - Latest local regression: `run_godot_tests.bat` passed on Godot 4.7.2; content validation had 0 errors. `build/holo-debug.apk` was re-exported; `apksigner` verified its v2 debug signature, `aapt` confirmed package/min/target SDK metadata, and the APK sparse PCK was scanned for store-draft/tool markers (none found).
 - Export completion was printed and the APK written, but the Godot console process did not exit by itself; it was interrupted after the artifact checks. Treat the artifact checks as successful and the process exit code as interrupted.
 - The export/config + documentation update is committed and pushed as `14d43aa` (`Exclude store drafts from Android exports`); worktree was clean. GitHub Actions run [43385072374](https://github.com/rkwkkh/holo-tactics/actions/runs/43385072374) passed both Godot validation and Android AAB export/structure verification.
-- Still open: Galaxy S25 Ultra gameplay/FPS logs; physical Android 10; GUI Warning-row click; final owner-approved privacy policy/in-app link; release signing and Play Console access. M6/MVP remains incomplete. No release APK/AAB, GitHub Release, or Play upload was made.
+- Still open: Galaxy S25 Ultra gameplay/FPS logs; physical Android 10; GUI Warning-row click; final owner-approved privacy policy/in-app link; release signing and Play Console access. M6/MVP remains incomplete. A preview GitHub release exists; its APK is not the newer local debug APK. No signed Play AAB or Play upload was made.
 
 ## Manual test launcher update (2026-11-13)
 

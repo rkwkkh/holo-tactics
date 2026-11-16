@@ -1,9 +1,17 @@
 # Android test and private-test preparation
 
+## M2/M3 API37 후속 수동 테스트 (2026-11-16)
+
+- 기존 AVD 진행 데이터를 사용해 M2 재도전: 3/3 승리, 보상 +43, 잔액 203. 앞선 두 유닛 편성은 2/3 패배와 +10 부분 보상으로 종료됐다.
+- M3 공성에서 유닛 배치 후 `진격`으로 전투 시작 및 아군 자동 전진을 관찰하고, 3/3 승리(+47, 잔액 250)를 확인했다. 이후 M4가 캠페인에서 해금되어 M4 수성 준비 화면을 열었다.
+- 일시정지 창의 `전투 포기` 선택지는 표시됨을 확인했다. 포기 확인 버튼과 포기 보상 정산은 눌러 검증하지 못했다.
+- 현재 ADB 연결 대상: Android 17/API37 AVD `emulator-5554` (`sdk_gphone16k_x86_64`). Galaxy S25 Ultra나 Android 10 실기기 측정값이 아니다. 캡처는 로컬 `build/`에 있으며 Git에는 포함하지 않았다.
+
 ## Current artifact
 
-- Debug APK: `build/holo-debug.apk` (250,223,794 bytes; SHA-256 `FFBFB6814DDF661DB214E72B560731E9CBE8D4D30AA2F1910600A3CFE9C5DDFA`; debug-signed, API37 launch verified).
-- Test AAB: `build/ci-local-check.aab` (86,248,046 bytes; SHA-256 `5A611E84AB2A00D087E05F10A327F78FEFC27E58EFD5855DDD2117552D43B154`; required entries present, unsigned and not uploadable to Play).
+- Local debug APK: `build/holo-debug.apk` (249,841,067 bytes; SHA-256 `C55E2E73AE38C043CCE052DEEE24E2931176812FC7E2648AD7C0B542911F54F7`; exported 2026-11-13, debug-signed, API37 gameplay smoke verified).
+- Local test AAB: `build/ci-local-check.aab` (86,248,046 bytes; SHA-256 `5A611E84AB2A00D087E05F10A327F78FEFC27E58EFD5855DDD2117552D43B154`; exported 2026-11-13, required entries present, unsigned and not uploadable to Play).
+- GitHub pre-release `v0.1.0-preview.1` exists and contains a different APK (249,837,983 bytes; SHA-256 `6823ca453156ed7ab8b157c2c4ae65fbe6c98c6c89e3c29f9bc132356a4a5cb2`, uploaded 2026-11-12). This continuation did not replace that release asset; verify the APK against the local hash before distributing it as current.
 - Package ID: `com.rhstudio.holotactics` (user-confirmed; Play Console availability still needs checking).
 - Export preset: `Android Debug APK`; minimum API 29, target API 36. `Android Play AAB` uses Gradle with the same API levels.
 - The APK is debug-signed. It is for device smoke tests, not Google Play upload.

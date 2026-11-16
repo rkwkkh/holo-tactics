@@ -231,3 +231,9 @@ The current debug APK manifest declares no permissions; the app source saves onl
 
 - Manual Android AVD test entered M2 defense, placed two units, advanced through two waves, and observed wave-3 defeat with partial reward. Record as runtime path evidence only; seed balance remains unapproved and no full M2 completion is claimed.
 - AVD sampled 59.7–60 FPS at ordinary load on host NVIDIA graphics. Physical-device and high-load performance gates remain open.
+
+## API37 M2/M3 follow-up (2026-11-16)
+
+- M2 replay cleared all 3 waves after adding an arrow tower and reinforcing between waves; result +43. M3 siege `진격` started combat and whole-army advance; result +47. Campaign unlocked M4 and its defense setup opened. Evidence details are in `TEST_REPORT.md`.
+- Pause menu shows `전투 포기`; confirmation/settlement was not exercised. GUI editor visual interaction remains unverified because Windows automation could not activate the Godot window. No game source changed.
+- Active M6 blockers remain physical Android 10/S25 performance and owner-controlled Closed-test preparation.
