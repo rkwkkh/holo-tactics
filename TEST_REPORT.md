@@ -1002,3 +1002,5 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - Cloned origin/master into a new temporary directory with no .godot/, Android template, or build artifacts. Godot 4.7.2 imported the project successfully.
 - Core tests, content validation, all 8 seeded campaign simulations, editor preview isolation, battle result UI, and editor content-panel checks passed from the clone. This confirms the checked-in source and assets are sufficient for these desktop checks.
 - The editor-panel process exited 0 after its pass sentinel but emitted the known headless RID/ObjectDB cleanup warnings. Android export was not repeated from this clone; fresh-machine Android SDK/template setup remains a separate prerequisite.
+
+- GitHub Actions run [43796686366](https://github.com/rkwkkh/holo-tactics/actions/runs/43796686366) for source commit `6353367` passed the Godot validation job and Android debug AAB export/structure verification.

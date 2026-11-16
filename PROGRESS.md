@@ -542,3 +542,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - API37 host-accelerated AVD: M6 siege with four deployed units, then a fifth after wave 1; two 10-second windows each measured 60.0 FPS / 16.67ms p95 and max. No fatal/script/Vulkan errors in the sampled interval.
 - Diagnostic only: the AVD's emulated EGL and host GTX 1660 SUPER cannot establish physical-device performance or representative stress acceptance. Galaxy S25 Ultra gameplay/FPS logs remain outstanding.
 - Abandoned the run and restored the original campaign profile byte-for-byte (balance 433); confirmed menu launch and no remaining battle checkpoint.
+
+
+## Fresh clone and CI verification (2026-11-16)
+
+- Current pushed source is `6353367`; a clean temporary clone imported in Godot 4.7.2 and passed core, content, campaign simulation, preview, results UI, and editor-panel checks.
+- GitHub Actions run [43796686366](https://github.com/rkwkkh/holo-tactics/actions/runs/43796686366) passed Godot validation and Android debug AAB export/structure checks.
+- M6 remains open for physical Android gameplay/FPS, Android 10 hardware evidence, final owner-provided privacy/contact policy, publisher signing, and Play Console closed-test setup.
