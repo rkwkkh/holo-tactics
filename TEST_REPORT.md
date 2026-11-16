@@ -995,3 +995,10 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - M6 siege stress run began with four allied units (resource 260→10); after wave 1 rewards, deployed the fifth available unit before wave 2. Two consecutive 10-second debug sampler windows each logged `frames=600 avg_fps=60.0 p50_ms=16.67 p95_ms=16.67 max_ms=16.67`. Filtered interval contained no fatal exception, AndroidRuntime crash, script error or Vulkan error. A later wave reduced the core to zero; the run was abandoned and settled a +24 reward event.
 - The two samples meet the numeric 30-FPS high-load floor on this AVD, but they do not prove device performance: this backend is capped at the emulator's 60-Hz cadence and renders through the host GPU. Physical S25 Ultra FPS and a representative high-load hardware profile remain unverified.
 - Before the run, backed up the exact 947-byte `campaign_progress.json` (balance 433). After pause/abandon, force-stopped the app and restored it; remote and local SHA-256 matched (`7ee0f41b253f5785a5034b17f80c9fb9b53740e2dcbe62371a1f08e445a5d675`). Relaunch showed balance 433 and the original M1–M6 progression. The test checkpoint was cleared.
+
+
+## Fresh GitHub clone regression (2026-11-16)
+
+- Cloned origin/master into a new temporary directory with no .godot/, Android template, or build artifacts. Godot 4.7.2 imported the project successfully.
+- Core tests, content validation, all 8 seeded campaign simulations, editor preview isolation, battle result UI, and editor content-panel checks passed from the clone. This confirms the checked-in source and assets are sufficient for these desktop checks.
+- The editor-panel process exited 0 after its pass sentinel but emitted the known headless RID/ObjectDB cleanup warnings. Android export was not repeated from this clone; fresh-machine Android SDK/template setup remains a separate prerequisite.
