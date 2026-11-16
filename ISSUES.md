@@ -333,3 +333,13 @@ The original four design documents now consistently reflect confirmed user rules
 - Android SDK tools are present at `%LOCALAPPDATA%\Android\Sdk`, but ADB reports no attached device. Physical S25 Ultra gameplay/FPS and physical Android 10 checks remain pending; emulator FPS below target is not device acceptance.
 - Closed testing still requires owner-controlled Play Console access, publisher signing, approved developer/contact identity and published privacy-policy URL/content. No credentials or keys are available in the workspace.
 - M5's warning-row selection was exercised by automated signal tests, but the latest visual click was not completed because the UI bridge targeted another application. No catalog edit was made.
+
+## API37 emulator smoke note (2026-11-16)
+
+- Latest current-APK smoke succeeded on API37 AVD: resumed M1 checkpoint, completed its final wave, displayed victory/reward, returned to campaign, and opened M2 defense setup.
+- The run resumed existing emulator data, so it does not independently prove fresh-install progression or reward idempotency. No physical device was connected and the short battle yielded no usable FPS sample. M6 remains incomplete.
+
+## M2 API37 result (2026-11-16)
+
+- A two-unit M2 defense run lost during wave 3 after 2/3 waves; the app showed the expected partial reward (+10) and stayed responsive. This was a deliberately minimal defense and should not be interpreted as a stage-balance bug.
+- The host-accelerated API37 AVD logged near-60-FPS windows, but it uses the workstation's NVIDIA GPU and is not device-performance evidence. Physical Android 10/S25 validation remains open.

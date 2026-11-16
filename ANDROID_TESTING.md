@@ -201,3 +201,15 @@ The user confirmed the refreshed APK downloaded, installed, and launched on Gala
 
 - `run_godot_game.bat` launches the visible Windows game from the project folder using the installed Godot 4.7.2 GUI binary.
 - `run_android_emulator_test.bat` selected `MaDangStage6_API37`, installed the current debug APK, launched package `com.rhstudio.holotactics`, and left the emulator available. The captured screen showed the campaign menu. This verifies launcher/startup only; it is not a full gameplay or FPS acceptance run.
+## API37 campaign continuation smoke (2026-11-16)
+
+- Ran `run_android_emulator_test.bat` on `MaDangStage6_API37` (Android 17/API 37, `sdk_gphone16k_x86_64`, 1080×2400 at density 420). Install and app launch succeeded for package `com.rhstudio.holotactics`; launcher attached to existing M1 saved state rather than a clean profile.
+- In the restored M1 defense, tapped the wave-start control. The emulator rendered the M1 2/2 victory panel and +40 permanent reward (balance 140). Returned to village and campaign; M2 was shown unlocked and its defense setup opened (core HP 320, matching the M2 defense entry).
+- Current local APK SHA-256: `C55E2E73AE38C043CCE052DEEE24E2931176812FC7E2648AD7C0B542911F54F7`. Captures are under ignored `build/` (`campaign-api37-current.png`, `campaign-api37-combat.png`, `campaign-api37-village.png`, `campaign-api37-menu.png`, `siege-api37-setup.png`; note the latter filename is a setup capture, not a siege-mode test).
+- No `[PERF]`, fatal, AndroidRuntime or Vulkan error lines were found in the captured logcat interval. The battle ended before a reliable 10-second FPS window was recorded. This is API37 emulator smoke only; no full M2 play, clean-profile progression run, physical-device test or Android 10 hardware test was performed. The launcher emitted repeated input-redirection warnings from this non-interactive shell, but finished with exit 0 and successful install/launch.
+
+## M2 defense run and API37 frame sample (2026-11-16)
+
+- Re-entered unlocked `stage.m2.crossroads` and verified the M2 catalog setup on the screen (core HP 320). Placed one swordsman and one archer (resource 190→80) in the friendly area. The game advanced through waves 1 and 2, then core HP reached 0 during wave 3; result panel reported M2 defeat, 2/3 completed waves, and +10 permanent currency. The app remained responsive through result processing. This was a deliberate under-built test run, not a content-balance verdict.
+- During the same API37 AVD session, six debug sampler windows for `stage.m2.crossroads` reported 59.7–60.0 average FPS, p95 16.67ms, and one observed max of 48.15ms; the other window maxima were 16.67ms. The emulator reports `ro.hardware.egl=emulation`, `ro.kernel.qemu=1`, and host NVIDIA GeForce GTX 1660 SUPER/OpenGL ES 3.1. Treat these as host-accelerated emulator diagnostics, not physical-device or representative lower-tier acceptance. The workload was two allies and the seeded M2 waves; it was not a deliberate high-load profile.
+- API37 AVD remains on the M2 defeat/result state for manual inspection. No Android 10 hardware or Galaxy S25 Ultra test was possible.

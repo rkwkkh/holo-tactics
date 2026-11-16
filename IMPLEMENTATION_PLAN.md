@@ -221,3 +221,13 @@ The current debug APK manifest declares no permissions; the app source saves onl
 
 - Current source commit `291c5e6` passed the full local Godot test batch and GitHub Actions run `43780690192` (Godot plus Android debug AAB export/structure).
 - No local Android target is attached. Keep physical FPS/API 29 and owner-controlled Closed-test tasks open; no release signing or Play upload occurred. See `SESSION_HANDOFF.md` and `ISSUES.md`.
+
+## API37 application smoke (2026-11-16)
+
+- Current debug APK installed and launched via `run_android_emulator_test.bat` on `MaDangStage6_API37`. Resumed M1 checkpoint reached 2/2 victory and reward screen; village/campaign navigation and M2 unlocked-entry launch worked.
+- This only extends API37 UI/gameplay smoke. Do not use it as fresh-save, full-campaign, physical Android, Android 10, or FPS acceptance. See `ANDROID_TESTING.md`.
+
+## M2 API37 play smoke (2026-11-16)
+
+- Manual Android AVD test entered M2 defense, placed two units, advanced through two waves, and observed wave-3 defeat with partial reward. Record as runtime path evidence only; seed balance remains unapproved and no full M2 completion is claimed.
+- AVD sampled 59.7–60 FPS at ordinary load on host NVIDIA graphics. Physical-device and high-load performance gates remain open.

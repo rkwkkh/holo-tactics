@@ -483,3 +483,13 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 - Local Godot 4.7.2 `run_godot_tests.bat` passed: core, content validation, 8/8 campaign simulations, preview isolation, results UI and editor panels. Panel assertions printed the pass sentinel; known RID/ObjectDB cleanup diagnostics followed, and the batch exited 0.
 - GitHub Actions run [43780690192](https://github.com/rkwkkh/holo-tactics/actions/runs/43780690192) passed both Godot and Android debug AAB export/structure verification.
 - M6 remains incomplete: Android SDK exists but ADB has no attached device; physical-device gameplay/FPS and Android 10 hardware evidence are still missing. API37 software-emulator performance is below 60 FPS and cannot substitute for device evidence. Closed-test setup remains owner-gated.
+
+## API37 emulator continuation (2026-11-16)
+
+- Re-ran the checked-in Android launcher on `MaDangStage6_API37`; debug APK install/launch succeeded. The app resumed an existing M1 checkpoint, completed wave 2 and showed 2/2 victory/+40 reward, then returned through village/campaign. M2 appeared unlocked and entered its defense setup.
+- This adds visible campaign/result navigation evidence, but not a clean-profile unlock test, full M2 run, physical device/FPS or Android 10 validation. See `ANDROID_TESTING.md` and `TEST_REPORT.md`.
+
+## M2 API37 manual exercise (2026-11-16)
+
+- Opened unlocked M2 defense, deployed two basic units, and observed waves 1–2 complete. A two-unit setup without facilities lost core HP in wave 3; defeat showed 2/3 completed waves and +10 permanent currency. This confirms the partial-reward UI path in an emulator session, but is not a full M2-clear or balance acceptance.
+- Six host-accelerated API37 AVD sampler windows read 59.7–60.0 FPS (p95 16.67ms; one 48.15ms max). These do not satisfy physical-device or high-load performance verification. Details in `ANDROID_TESTING.md`/`TEST_REPORT.md`.

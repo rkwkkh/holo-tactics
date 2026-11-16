@@ -924,3 +924,16 @@ Tried the CI AAB export locally with `--quit-after 2`. Godot launched the Androi
 - On commit `291c5e6`, Godot 4.7.2 `run_godot_tests.bat` exited 0. Core, content validation, all 8 campaign simulations, preview isolation, battle results UI, and editor panels passed. Godot emitted RID/ObjectDB cleanup diagnostics after the editor-panel pass sentinel; these are recorded and did not fail the batch.
 - GitHub Actions [43780690192](https://github.com/rkwkkh/holo-tactics/actions/runs/43780690192) completed successfully: Godot validation plus Android debug AAB export and bundle structure checks passed.
 - These checks do not establish physical-device FPS, Android 10 hardware compatibility, or Closed-test readiness. ADB currently has no attached device; no signed release artifact or Play upload was made.
+
+## API37 campaign continuation smoke (2026-11-16)
+
+- `run_android_emulator_test.bat` selected `MaDangStage6_API37`, installed the debug APK (SHA-256 `C55E2E73AE38C043CCE052DEEE24E2931176812FC7E2648AD7C0B542911F54F7`) and launched `com.rhstudio.holotactics`. Device properties: Android 17/API37, `sdk_gphone16k_x86_64`, 1080×2400/density 420.
+- The app resumed an existing M1 checkpoint. Starting its second wave produced a visible M1 2/2 victory panel and +40 permanent reward. Returning to village/campaign showed M2 unlocked; selecting it opened a defense setup with core HP 320, consistent with the M2 catalog entry.
+- Captured logcat interval contained no `[PERF]`, fatal exception, AndroidRuntime or Vulkan matches. The battle ended before a valid 10-second FPS sample. This is not a clean-profile campaign test, full M2 test, physical-device result, Android 10 hardware test, or FPS acceptance.
+- The batch printed repeated input-redirection warnings under this non-interactive shell but completed with exit code 0 and successful install/launch. Screenshots remain in ignored `build/` and are not committed.
+
+## M2 API37 AVD battle result and frame sample (2026-11-16)
+
+- On the host-accelerated `MaDangStage6_API37` AVD, M2 defense setup opened after M1 had unlocked it. Deployed swordsman + archer (resource 190→80). Waves 1 and 2 completed; wave 3 reduced core HP to 0. Result showed defeat, 2/3 completed waves, and +10 permanent currency. The app remained responsive and the result screen rendered. This only records the tested two-unit/no-facility run and does not assess M2 balance.
+- Six `[PERF]` windows in this session measured 59.7–60.0 average FPS, p95 16.67ms, and one 48.15ms maximum frame; five windows had a 16.67ms maximum. AVD backend reports emulation via host NVIDIA GeForce GTX 1660 SUPER, not physical Android hardware. This is diagnostic normal/moderate load, not 60 FPS or high-load acceptance.
+- AVD screenshots are ignored under `build/`. No Galaxy S25 Ultra, Android 10 physical device, high-load performance profile or complete M2 victory was verified.
