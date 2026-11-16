@@ -521,3 +521,10 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 
 - Opened unlocked M2 defense, deployed two basic units, and observed waves 1–2 complete. A two-unit setup without facilities lost core HP in wave 3; defeat showed 2/3 completed waves and +10 permanent currency. This confirms the partial-reward UI path in an emulator session, but is not a full M2-clear or balance acceptance.
 - Six host-accelerated API37 AVD sampler windows read 59.7–60.0 FPS (p95 16.67ms; one 48.15ms max). These do not satisfy physical-device or high-load performance verification. Details in `ANDROID_TESTING.md`/`TEST_REPORT.md`.
+
+## Revalidation and Android export (2026-11-16 continuation)
+
+- Godot 4.7.2 `run_godot_tests.bat` passed core, content (0 errors), seeded 8-stage campaign simulation, preview isolation, battle-result UI, and editor-panel assertions (stages/waves, 6 evolutions, 24 upgrades, Inspector import, Error/Warning navigation). Known headless editor shutdown RID/ObjectDB diagnostics occurred after test success.
+- Re-exported and verified the debug APK (package `com.rhstudio.holotactics`, min API 29, target API 36, v2 signature); SHA-256 matches the recorded current build. Updated install and campaign-menu launch succeeded on API37 AVD, preserving profile state (balance 433). No FPS/gameplay test was taken this run.
+- API29 diagnostic shows the emulator backend exposes GLES 2 only; isolated GLES3 Compatibility probe failed context creation with `EGL_BAD_CONFIG`. This is an emulator limitation, not a physical Android 10 compatibility verdict. No production renderer change was made.
+- M0–M5 implementation and automated checks remain in place. M6 is still incomplete: S25 gameplay/FPS logs, physical Android 10 evidence, owner-approved privacy policy/contact data, publisher signing key, and Play Console access/test setup are outstanding. The owner had reported that Play Console and upload key were not available.

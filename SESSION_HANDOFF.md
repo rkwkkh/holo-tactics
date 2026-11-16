@@ -122,3 +122,10 @@ Before the owner sets up Console, note the current target API 36 requirement (al
 - README now includes clean-checkout and Android setup, and the stale placeholder package ID text is corrected.
 - Commit `64632e2` includes the fresh-checkout test initialization and deterministic result-view test. A new clone of pushed `master` (without `.godot` cache) passed `run_godot_tests.bat` with exit code 0.
 - CI run [43398664085](https://github.com/rkwkkh/holo-tactics/actions/runs/43398664085) passed Godot validation and Android AAB export/structure checks. Android template/cache and local APK/AAB artifacts remain intentionally untracked and are regenerated from the committed presets.
+
+## Continuation checkpoint (2026-11-16)
+
+- Current source revalidated on Godot 4.7.2: `run_godot_tests.bat` passed core, 0-error content validation, all 8 seeded campaign simulations, preview isolation, battle result UI, and editor panels (including Inspector import and Error/Warning signal behavior). The headless panel process prints known RID/ObjectDB shutdown diagnostics after its pass sentinel.
+- Fresh Android debug APK export verified (SHA-256 `C55E2E73AE38C043CCE052DEEE24E2931176812FC7E2648AD7C0B542911F54F7`) and updated install/launch succeeded on API37 AVD. Campaign menu is visible with profile balance 433. This was not a gameplay/FPS run.
+- Isolated API29 GLES3 probe establishes that the AVD offers GLES2 only and cannot create an ES3 context (`EGL_BAD_CONFIG`). This does not validate physical Android 10. Production renderer was not changed.
+- Next: preserve current clean-profile/user-save state; request S25 gameplay/performance logs when the user is ready; get Android 10 hardware evidence if available; keep M6/Closed-test incomplete until owner-provided Play Console, signing, policy/contact details and test setup exist. No Play upload or release signing performed.

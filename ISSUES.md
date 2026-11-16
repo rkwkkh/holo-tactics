@@ -362,3 +362,9 @@ The original four design documents now consistently reflect confirmed user rules
 - API37 emulator now records M1–M6 complete. M4/M5/M6 each displayed/settled 4/4 completion rewards; M6 +64 was corroborated by the persistent reward-event JSON although its result screenshot was missed.
 - Manual M4 facility upgrade/repair action and pause abandonment confirmation/settlement remain unverified. Do not mark these manual checks complete based only on menu visibility or automated model tests.
 - Still open: physical Android 10 and Galaxy S25 Ultra performance/function acceptance, M5 Warning-row GUI click, and owner-controlled Closed-test artifacts/details. This emulator pass does not close M6 release preparation.
+
+## API29 emulator capability diagnosis (2026-11-16 continuation)
+
+- Confirmed `MaDang_API29` is Android 10/API29 but this emulator's EGL advertises `ANDROID_EMU_gles_max_version_2`. An isolated build using GL Compatibility (GLES3) crashes at context creation with `EGL_BAD_CONFIG: no ES 3 support`.
+- This explains why the AVD cannot validate a GLES3 fallback; it does not show that Android 10 physical devices fail. The production Mobile/Vulkan configuration remains unchanged pending physical-device evidence. The API29 AVD's black output under Vulkan remains an emulator-only result.
+- M6 external gates remain: physical-device gameplay/FPS (the user confirmed S25 install/start only), Android 10 hardware compatibility, and Play Closed-test owner prerequisites/signing/privacy materials.
