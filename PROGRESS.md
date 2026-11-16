@@ -555,3 +555,8 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 
 - Built an isolated probe APK from a clean clone of `280ad2c` with a separate package ID. On the Android 10/API29 AVD, both SwiftShader and host NVIDIA initialized Mobile/Vulkan but produced a black screen and Vulkan queue presentation errors (`VkResult error 5`).
 - This is emulator-only evidence. The installed production app/data were not modified; physical Android 10 hardware testing remains open. Diagnostic details are in `TEST_REPORT.md`, `ANDROID_TESTING.md`, and `ISSUES.md`.
+
+
+## M5 visual interaction retry (2026-11-16)
+
+- Retried the Warning-row check through the Windows UI helper. Godot window activation failed twice, so no input or content edit was made. Headless editor-panel tests remain passing; visual click behavior stays open.

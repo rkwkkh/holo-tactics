@@ -388,3 +388,9 @@ The original four design documents now consistently reflect confirmed user rules
 
 - Reproduced the existing API29 AVD black-screen diagnostic using an isolated build from the current source. Both SwiftShader and host NVIDIA initialized Godot Mobile/Vulkan but repeatedly failed queue presentation with `VkResult error 5`.
 - Scope remains limited to `MaDang_API29`; production package/data were not changed. Do not change the production renderer based on this emulator result. Validate on physical Android 10 hardware before treating API29 support as accepted or failed.
+
+
+## M5 Warning-row visual retry (2026-11-16)
+
+- Windows UI automation enumerated the Godot editor window but failed to activate the captured window twice (`failed to activate captured window`). Per recovery guidance, stopped without clicking or editing catalog data.
+- Automated editor-panel coverage still passes and verifies Error-row field navigation plus Warning-row selection behavior. Visual click behavior remains unverified.
