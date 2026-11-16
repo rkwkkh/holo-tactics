@@ -320,3 +320,9 @@ The original four design documents now consistently reflect confirmed user rules
 - Current debug APK manifest declares no permissions; inspected source shows local `user://` progress/checkpoint storage and no project analytics/ad/network SDK integration. Recheck the final signed AAB and third-party SDK data handling before making Console declarations.
 
 - Android 패키지의 스토어 초안 에셋 포함 위험은 2026-11-13 export preset에서 `store_assets/**`, `tools/**`를 제외하고 디버그 APK 내부를 확인해 해결했다. 릴리즈/AAB 재검증은 실제 서명 키 설정 후 수행한다.
+## M5/M6 status recheck (2026-11-16)
+
+- M5 Warning-row visual click remains open. Godot UI opened, but the Windows UI bridge targeted another app when asked to click; no content was changed. Headless navigation tests pass.
+- No Android device is connected to ADB. Galaxy S25 Ultra gameplay/FPS, physical Android 10 and representative-device performance remain pending.
+- Owner-side Closed-test dependencies remain: Play Console access, publisher signing key, final developer/contact identity, published privacy policy URL, in-app policy link/text and Data safety answers.
+- Current source tree is clean at `1f8d128` on `origin/master`; latest CI run `43399087873` passed both jobs. M6 is not complete.

@@ -471,3 +471,8 @@ API37 emulator repeat-play smoke completed the two-wave M1 defense. The result p
 
 - Pushed source snapshot commit `64632e2` and cloned `origin/master` into a new temporary folder with no `.godot` cache. `run_godot_tests.bat` created the class cache/import state and then passed all suites, including 8/8 campaign simulations and 0 content errors.
 - GitHub Actions run [43398664085](https://github.com/rkwkkh/holo-tactics/actions/runs/43398664085) passed Godot validation and Android AAB export/structure verification. Worktree is clean and `master` matches `origin/master`.
+## M5/M6 continuation check (2026-11-16)
+
+- Rechecked repository at `1f8d128`; `master` matched `origin/master`. Latest CI [43399087873](https://github.com/rkwkkh/holo-tactics/actions/runs/43399087873) passed Godot and Android AAB jobs.
+- Retried the M5 Warning-row visual check. Godot opened with the content editor visible, but the Windows UI bridge mapped the observed click onto another app. No JSON/catalog/save action occurred. Godot auto-rewrote `project.godot`; restored the generated-only diff and verified the Mobile renderer setting.
+- ADB had no connected device. M6 remains open for user-provided S25 Ultra gameplay/FPS logs, physical Android 10, approved privacy-policy details, publisher signing and Play Console access.

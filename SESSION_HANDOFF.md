@@ -1,4 +1,31 @@
-﻿# Session handoff (2026-11-13)
+# Session handoff (2026-11-16)
+
+Continue the active M0–M6 Godot Android MVP objective. The current project is not complete: real-device/FPS and Closed-test owner gates remain.
+
+## Current repository and validation
+
+- `master` HEAD is `1f8d128` (`Record fresh clone verification`), equal to `origin/master`. Worktree was clean after restoring Godot's generated `project.godot` rewrite.
+- Latest GitHub Actions run [43399087873](https://github.com/rkwkkh/holo-tactics/actions/runs/43399087873) passed Godot validation and Android AAB export/structure verification.
+- Clean clone of source commit `64632e2` passed `run_godot_tests.bat` from a checkout without `.godot` cache. The batch performs an initial editor import; all suites passed, content errors 0, campaign simulations 8/8.
+- No gameplay source changed in this continuation. ADB has no connected Android device. The latest local debug APK is test-only and ignored by Git.
+
+## Latest M5 check
+
+- Retried visual Warning-row selection on 2026-11-16. Godot editor and content dock opened, but refreshed UI coordinates were mapped onto `Memoit.exe` by the Windows UI bridge. No click, JSON edit, or save was performed; the Warning-row visual test remains unverified. Headless Error/Warning routing still passes.
+- Godot rewrote `project.godot` on open. Restored that generated-only rewrite and verified the committed `renderer/rendering_method.mobile="mobile"`; catalog and scenes are untouched.
+
+## Remaining gates and resume actions
+
+1. Wait for the user's Galaxy S25 Ultra gameplay/FPS logs and inspect `ANDROID_TESTING.md` results.
+2. Verify Android 10 on physical hardware; API29 AVD black Vulkan output is not hardware evidence.
+3. Closed testing still needs owner Play Console access, a publisher upload key, app-ID availability, approved developer/contact details, public privacy-policy URL, in-app policy link, final Data safety answers, listing content, and testers.
+4. Physical Android performance targets remain unverified; prior API37 AVD M1 measurements were below 60 FPS and do not establish device acceptance.
+5. Retry the M5 Warning-row visual click only when the UI bridge can reliably target the Godot window. No need to rerun the full suite unless source changes.
+
+No release AAB/APK, GitHub Release, Play upload, or Closed test has been created. Keep the M6/MVP goal active and incomplete.
+
+---
+# Historical handoff notes through 2026-11-13
 
 Continue the active Godot MVP objective; this is not an MVP completion record.
 
