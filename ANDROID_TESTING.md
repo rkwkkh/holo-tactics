@@ -1,5 +1,12 @@
 # Android test and private-test preparation
 
+## API37 pause-abandon manual check (2026-11-16)
+
+- Existing profile: M4 defense → deploy swordsman → start wave → pause → abandon → confirm.
+- Result showed 0/4 settled waves, +0 reward, balance 421. The saved JSON retained progress/balance and recorded one zero-value reward event. Local screenshot is ignored at `build/current-screen.png`.
+- Abandonment after one or more settled waves and physical-device checks remain separate cases.
+- A separate M4 setup built an arrow tower and purchased its level-1 upgrade (resource 180→155, next upgrade cost 40). This verifies setup-phase upgrade only; combat-phase upgrade and repair were not confirmed.
+
 ## M4–M6 API37 누적 캠페인 실행 (2026-11-16)
 
 - 기존 AVD 프로필에서 M4 수성 4/4 (+51), M5 공성 4/4 (+56), M6 공성 4/4 (+64)를 완료했다. 각 결과 뒤 캠페인 저장에 반영됐고, M4→M5 및 M5→M6 해금을 화면에서 확인했다.

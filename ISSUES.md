@@ -1,5 +1,11 @@
 # Issues and open decisions
 
+## API37 pause-abandon check (2026-11-16)
+
+- Resolved the manual check for pause → abandon → confirm with no settled waves: M4 showed 0/4 and +0; saved balance remained 421, with one zero-reward event. Evidence: `TEST_REPORT.md`.
+- M4 preparation-phase arrow-tower upgrade was manually purchased (0/3→1/3, resource 180→155). In-combat upgrade and repair remain unverified; an underdefended run ended with core HP 0 before they could be tried.
+- Still open: abandonment after a settled wave, manual facility repair and combat upgrade, M5 Warning-row GUI click, physical Android/FPS, and owner-controlled Closed-test readiness.
+
 ## OPEN_DECISION
 
 - **GAP-P0-01 — 해결:** 2026-11-12 사용자 결정: 수성은 아군 유닛이 모두 전멸해도 핵심이 생존하면 계속 진행한다. 자동 패배시키지 않으며 core HP가 0이 되면 패배한다.

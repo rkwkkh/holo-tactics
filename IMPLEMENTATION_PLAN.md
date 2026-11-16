@@ -1,5 +1,11 @@
 # Implementation plan
 
+## API37 pause-abandon runtime check (2026-11-16)
+
+- Confirmed M4 pause → abandon → confirm on the AVD. With 0/4 waves settled, the result showed +0 and preserved balance 421; the persistent save recorded one zero-value settlement event and retained M1–M6 progress. See `TEST_REPORT.md`.
+- Manual no-completed-wave abandonment is confirmed. Facility upgrade/repair clicks and physical-device checks remain open.
+- Also purchased an arrow-tower upgrade during M4 setup (0/3→1/3, resource 180→155). This does not confirm an in-combat upgrade or repair. Physical-device checks remain open.
+
 기준 문서: `docs/PRODUCT_SPEC.md`, `docs/PLANNING_COVERAGE.md`, `docs/DECISIONS.md`, `docs/REQUIREMENTS.md` (기획 v12.8, 2026-11-11).
 
 ## 정책 상태

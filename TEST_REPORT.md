@@ -1,5 +1,12 @@
 # Test report
 
+## API37 pause-abandon result (2026-11-16)
+
+- In the existing M1–M6 profile (balance 421), entered M4 defense, deployed a swordsman, started the wave, then selected pause → `전투 포기` → confirm.
+- Result showed M4, 0/4 settled waves, +0 reward, balance 421. The saved campaign JSON retained progress and balance and recorded exactly one new zero-value settlement event.
+- This confirms the no-completed-wave abandonment path. Abandoning after a settled wave remains a separate case.
+- In a retry, built an arrow tower during M4 setup and bought its first upgrade: the panel changed from level 0/3 (cost 25) to level 1/3 (next cost 40), and battle resource changed 180→155. This confirms setup-phase purchasing only. A later underdefended run reached core HP 0 before a combat-phase upgrade could be tested.
+
 ## API37 M4–M6 메인 캠페인 수동 실행 (2026-11-16)
 
 - M4 `숲의 방어선`: 수성 4/4 승리, 영구 재화 +51 (잔액 301). 검사/궁수/지원병과 화살탑을 배치했고, 재정비 단계에 궁수를 추가했다. 화살탑이 손상되어 사라진 뒤 새 화살탑을 재건했다.
