@@ -350,3 +350,9 @@ The original four design documents now consistently reflect confirmed user rules
 - Pause menu displays `전투 포기`, but its confirm/settlement path remains unverified. Existing M2 defeat verified partial reward only.
 - `emulator-5554` is now connected (API37 AVD); earlier no-device notes are historical. It is not a physical device and does not close Android 10/FPS acceptance.
 - M5 visual click remains open: the current Windows UI helper failed to activate the Godot editor twice. No click or content edit was made.
+
+## M4–M6 emulator pass (2026-11-16)
+
+- API37 emulator now records M1–M6 complete. M4/M5/M6 each displayed/settled 4/4 completion rewards; M6 +64 was corroborated by the persistent reward-event JSON although its result screenshot was missed.
+- Manual M4 facility upgrade/repair action and pause abandonment confirmation/settlement remain unverified. Do not mark these manual checks complete based only on menu visibility or automated model tests.
+- Still open: physical Android 10 and Galaxy S25 Ultra performance/function acceptance, M5 Warning-row GUI click, and owner-controlled Closed-test artifacts/details. This emulator pass does not close M6 release preparation.

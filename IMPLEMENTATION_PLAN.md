@@ -237,3 +237,9 @@ The current debug APK manifest declares no permissions; the app source saves onl
 - M2 replay cleared all 3 waves after adding an arrow tower and reinforcing between waves; result +43. M3 siege `진격` started combat and whole-army advance; result +47. Campaign unlocked M4 and its defense setup opened. Evidence details are in `TEST_REPORT.md`.
 - Pause menu shows `전투 포기`; confirmation/settlement was not exercised. GUI editor visual interaction remains unverified because Windows automation could not activate the Godot window. No game source changed.
 - Active M6 blockers remain physical Android 10/S25 performance and owner-controlled Closed-test preparation.
+
+## M4–M6 API37 manual campaign completion (2026-11-16)
+
+- M4/M5/M6 all cleared 4/4 waves on the Android 17/API37 AVD, with rewards +51/+56/+64. The persisted campaign save now contains all six main stage IDs and balance 421. Manual M4–M6 and unlock evidence is recorded in `TEST_REPORT.md`.
+- M6 is gameplay-validated on this emulator, not accepted on physical hardware. Facility upgrade/repair click behavior and pause-abandon settlement remain unverified manually; automated logic coverage remains separate evidence.
+- No gameplay source changed. Continue M6 external acceptance gates: Android 10/representative phone FPS, owner signing and Closed-test readiness.
