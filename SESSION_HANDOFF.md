@@ -6,6 +6,7 @@
 - Verified API37 M4 pause → abandon → confirm: 0/4 settled waves, +0 reward, balance 421 preserved, one zero-value settlement event in the saved JSON. See `TEST_REPORT.md`.
 - Purchased an arrow-tower upgrade in M4 setup (0/3→1/3, resource 180→155). The follow-up underdefended battle ended before an in-combat upgrade could be tested. Repair remains untested.
 - Replayed M4 with four defenders, deployed a bowman during combat (87→27 resource), cleared wave 1, then abandoned in wave 2. Result/save confirmed 1/4 and a single +6 event (balance 427). Pause-abandon is now manually verified both before and after one settled wave.
+- Latest AVD state is the M4 result overlay after an underdefended wave-2 core defeat; save JSON confirms all M1–M6 completed and balance 433 after another unique +6 event. M5 GUI warning-row check was retried but Godot window activation failed twice (`failed to activate captured window`); no editor click was made.
 - Remaining manual checks: abandonment after two or more settled waves, combat facility upgrade, and repair. External gates: physical-device/API29 performance and owner-controlled Closed-test setup.
 
 Continue the active M0–M6 Godot Android MVP objective. The current project is not complete: real-device/FPS and Closed-test owner gates remain.

@@ -6,6 +6,7 @@
 - Result showed M4, 0/4 settled waves, +0 reward, balance 421. The saved campaign JSON retained progress and balance and recorded exactly one new zero-value settlement event.
 - A second M4 run cleared wave 1, entered wave 2, then abandoned. The result showed 1/4 waves, +6, balance 427; persistent save added one unique +6 reward event. Both zero-wave and one-wave abandonment cases are now manually confirmed.
 - During that second run, a bowman was deployed while wave 1 was active; resource changed 87→27 and the unit appeared on the board. This confirms combat-phase unit deployment on API37 AVD.
+- A further underdefended M4 replay failed at core HP 0 during wave 2 after 1/4 waves were settled. The result again paid +6, and the saved balance is now 433 with a new unique +6 event. This is runtime evidence for partial settlement, not a stage-balance diagnosis; no facility upgrade was attempted during this run.
 - In a retry, built an arrow tower during M4 setup and bought its first upgrade: the panel changed from level 0/3 (cost 25) to level 1/3 (next cost 40), and battle resource changed 180→155. This confirms setup-phase purchasing only. A later underdefended run reached core HP 0 before a combat-phase upgrade could be tested.
 
 ## API37 M4–M6 메인 캠페인 수동 실행 (2026-11-16)

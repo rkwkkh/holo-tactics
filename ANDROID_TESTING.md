@@ -6,6 +6,7 @@
 - Result showed 0/4 settled waves, +0 reward, balance 421. The saved JSON retained progress/balance and recorded one zero-value reward event. Local screenshot is ignored at `build/current-screen.png`.
 - Abandonment with zero and one settled wave has been checked. Cases with two or more settled waves and physical-device checks remain untested.
 - Follow-up: cleared M4 wave 1, entered wave 2, then abandoned. The result showed 1/4, +6 (balance 427) and the save contained one unique +6 event. Also deployed a bowman during combat; resource changed 87→27 and the unit appeared on the board. This is API37 AVD evidence only.
+- A subsequent underdefended M4 attempt reached core HP 0 during wave 2; it settled +6 for 1/4 and the persisted profile balance became 433. No facility upgrade was attempted during that run.
 - A separate M4 setup built an arrow tower and purchased its level-1 upgrade (resource 180→155, next upgrade cost 40). This verifies setup-phase upgrade only; combat-phase upgrade and repair were not confirmed.
 
 ## M4–M6 API37 누적 캠페인 실행 (2026-11-16)
